@@ -1045,10 +1045,12 @@ def do_summary( directory , **options ) :
         for name in names :
             gmn_filename = '%s/%s' % ( dirname , name )
             if os.path.isdir( gmn_filename ) :
-                os.path.walk( gmn_filename , process_files , None )
                 continue
-            else :
+            if '.pkl' in gmn_filename :
+                continue
+            if not any( [ a in gmn_filename.lower() for a in [ '.gmn' , '.tcx' , '.fit' , '.txt' ] ] ) :
                 print gmn_filename
+                continue
             reduced_gmn_filename = gmn_filename.split('/')[-1]
             gmn_md5sum = compute_file_md5sum( gmn_filename )
             
@@ -1074,8 +1076,6 @@ def do_summary( directory , **options ) :
         cPickle.dump( filename_md5_dict , pkl_file , cPickle.HIGHEST_PROTOCOL )
         pkl_file.close()
         run_command( 'mv %s/run/garmin.pkl.tmp %s/run/garmin.pkl' % ( script_path , script_path ) )
-    else :
-        print os.path.exists( '%s/garmin.pkl' % script_path )
 
     if 'build' in options and options['build'] :
         return
@@ -1328,29 +1328,30 @@ def do_summary( directory , **options ) :
         total_summary.print_total_summary( 'total' , len(day_set) , total_days )
         print ''
 
-    occur_map = {}
-    for i in range(0,len(day_set)+1) :
-        occur_map[i] = 0
+    if 'occur' in options :
+        occur_map = {}
+        for i in range(0,len(day_set)+1) :
+            occur_map[i] = 0
 
-    if len(day_set) > 1 :
-        last_date = day_set[0]
-        for i in range(1,len(day_set)) :
-            if (day_set[i]-day_set[i-1]).days > 1 :
-                occur_map[(day_set[i-1] - last_date).days + 1] += 1
-                if ( (day_set[i-1] - last_date).days + 1 ) > 5 :
-                    print day_set[i-1]
-                last_date = day_set[i]
-        try :
-            occur_map[(day_set[-1]-last_date).days + 1] += 1
-        except KeyError :
-            print day_set[-1] , last_date
-            print (day_set[-1]-last_date).days + 1
-            print occur_map
-            print day_set
-            print 'key error'
-            exit(1)
+        if len(day_set) > 1 :
+            last_date = day_set[0]
+            for i in range(1,len(day_set)) :
+                if (day_set[i]-day_set[i-1]).days > 1 :
+                    occur_map[(day_set[i-1] - last_date).days + 1] += 1
+                    if ( (day_set[i-1] - last_date).days + 1 ) > 5 :
+                        print day_set[i-1]
+                    last_date = day_set[i]
+            try :
+                occur_map[(day_set[-1]-last_date).days + 1] += 1
+            except KeyError :
+                print day_set[-1] , last_date
+                print (day_set[-1]-last_date).days + 1
+                print occur_map
+                print day_set
+                print 'key error'
+                exit(1)
 
-        if not do_sport :
-            for i in range(0,len(day_set)+1) :
-                if occur_map[i] > 0 :
-                    print i , occur_map[i]
+            if not do_sport :
+                for i in range(0,len(day_set)+1) :
+                    if occur_map[i] > 0 :
+                        print i , occur_map[i]
