@@ -1044,6 +1044,11 @@ def do_summary( directory , **options ) :
     def process_files( arg , dirname , names ) :
         for name in names :
             gmn_filename = '%s/%s' % ( dirname , name )
+            if os.path.isdir( gmn_filename ) :
+                os.path.walk( gmn_filename , process_files , None )
+                continue
+            else :
+                print gmn_filename
             reduced_gmn_filename = gmn_filename.split('/')[-1]
             gmn_md5sum = compute_file_md5sum( gmn_filename )
             
