@@ -66,20 +66,23 @@ if __name__ == '__main__' :
     for arg in os.sys.argv[1:] :
         if arg == 'build' :
             options['build'] = True
-        if os.path.isfile( arg ) :
+        elif arg == 'occur' :
+            options['occur'] = True
+        elif os.path.isfile( arg ) :
             read_garmin_file( arg )
             exit(0)
-        if arg != 'run' and os.path.isdir( arg ) :
+        elif arg != 'run' and os.path.isdir( arg ) :
             sdir.append( arg )
-        if arg != 'run' and os.path.isdir( '%s/run/%s' % ( script_path , arg ) ) :
+        elif arg != 'run' and os.path.isdir( '%s/run/%s' % ( script_path , arg ) ) :
             sdir.append( '%s/run/%s' % ( script_path , arg ) )
-        if arg in options :
+        elif arg in options :
             options[arg] = True
-        if 'do_%s' % arg in options :
+        elif 'do_%s' % arg in options :
             options['do_%s' % arg] = True
-        spts = filter( lambda x : arg in x , sport_types )
-        if len(spts) > 0 :
-            options['do_sport'] = spts[0]
+        else :
+            spts = filter( lambda x : arg in x , sport_types )
+            if len(spts) > 0 :
+                options['do_sport'] = spts[0]
     if not sdir :
         sdir.append( '%s/run' % script_path )
     do_summary( sdir , **options )
