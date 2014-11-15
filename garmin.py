@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from garmin_base import garmin_file , do_summary , meters_per_mile , sport_types
+from garmin_base import garmin_file , do_summary , meters_per_mile , sport_types , convert_gmn_to_gpx
 from util import run_command
 
 def read_garmin_file( fname ) :
@@ -49,6 +49,11 @@ def read_garmin_file( fname ) :
 if __name__ == '__main__' :
     #print os.sys.argv
     script_path = '/'.join( os.path.abspath( os.sys.argv[0] ).split('/')[:-1] )
+    
+    if '%s/bin' % script_path not in os.getenv( 'PATH' ) :
+        os.putenv( 'PATH' , '%s:%s/bin' % ( os.getenv( 'PATH' ) , script_path ) )
+
+    
     if not os.path.exists( '%s/run' % script_path ) :
         run_command( 'mkdir -p %s/run/' % script_path )
         os.chdir( '%s/run' % script_path )
