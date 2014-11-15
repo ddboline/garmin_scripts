@@ -59,6 +59,8 @@ if __name__ == '__main__' :
 
     sdir = []
     for arg in os.sys.argv[1:] :
+        if arg == 'build' :
+            options['build'] = True
         if os.path.isfile( arg ) :
             read_garmin_file( arg )
             exit(0)

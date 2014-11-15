@@ -1072,6 +1072,9 @@ def do_summary( directory , **options ) :
     else :
         print os.path.exists( '%s/garmin.pkl' % script_path )
 
+    if 'build' in options and options['build'] :
+        return
+
     file_vector = sorted( file_vector , cmp = lambda x,y: cmp( x.begin_time , y.begin_time ) )
 
     year_set = set()
