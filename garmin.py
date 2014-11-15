@@ -82,5 +82,4 @@ if __name__ == '__main__' :
             options['do_sport'] = spts[0]
     if not sdir :
         sdir.append( '%s/run' % script_path )
-    print sdir , options
     do_summary( sdir , **options )
