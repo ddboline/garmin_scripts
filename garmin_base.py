@@ -1035,7 +1035,7 @@ def do_summary( directory , **options ) :
     script_path = '/'.join( os.path.abspath( os.sys.argv[0] ).split('/')[:-1] )
     
     try :
-        pkl_file = open( '%s/garmin.pkl' % script_path , 'rb' )
+        pkl_file = open( '%s/run/garmin.pkl' % script_path , 'rb' )
         filename_md5_dict = cPickle.load( pkl_file )
         pkl_file.close()
     except IOError :
@@ -1065,10 +1065,10 @@ def do_summary( directory , **options ) :
             os.path.walk( d , process_files , None )
     
     if pickle_file_is_modified[0] :
-        pkl_file = open( '%s/garmin.pkl.tmp' % script_path , 'wb' )
+        pkl_file = open( '%s/run/garmin.pkl.tmp' % script_path , 'wb' )
         cPickle.dump( filename_md5_dict , pkl_file , cPickle.HIGHEST_PROTOCOL )
         pkl_file.close()
-        run_command( 'mv %s/garmin.pkl.tmp %s/garmin.pkl' % ( script_path , script_path ) )
+        run_command( 'mv %s/run/garmin.pkl.tmp %s/run/garmin.pkl' % ( script_path , script_path ) )
     else :
         print os.path.exists( '%s/garmin.pkl' % script_path )
 
