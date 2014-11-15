@@ -473,8 +473,8 @@ class garmin_file :
                 for node3 in node2.getElementsByTagName( 'Lap' ) :
                     cur_lap = garmin_lap()
                     cur_lap.read_lap_tcx( node3 )
-                    if len(self.laps) == 0 and cur_lap.lap_start in list_of_corrected_laps :
-                        corrected_laps = list_of_corrected_laps[cur_lap.lap_start]
+                    if len(self.laps) == 0 and print_date_string( cur_lap.lap_start ) in list_of_corrected_laps :
+                        corrected_laps = list_of_corrected_laps[print_date_string( cur_lap.lap_start )]
                     for node4 in node3.getElementsByTagName( 'Track' ) : ### every time you stop then start watch a new track is created...
                         is_beginning_of_track = True
                         for node5 in node4.getElementsByTagName( 'Trackpoint' ) :
@@ -536,8 +536,8 @@ class garmin_file :
             cur_lap = garmin_lap()
             cur_lap.read_lap_xml( node )
             cur_lap.lap_number = lap_number
-            if len(self.laps) ==  0 and cur_lap.lap_start in list_of_corrected_laps :
-                corrected_laps = list_of_corrected_laps[cur_lap.lap_start]
+            if len(self.laps) ==  0 and print_date_string( cur_lap.lap_start ) in list_of_corrected_laps :
+                corrected_laps = list_of_corrected_laps[print_date_string( cur_lap.lap_start )]
             if lap_number in corrected_laps :
                 if type(corrected_laps[lap_number]) == float or len(corrected_laps[lap_number]) == 1 :
                     cur_lap.lap_distance = corrected_laps[lap_number] * meters_per_mile
@@ -1049,12 +1049,11 @@ def do_summary( directory , **options ) :
             if '.pkl' in gmn_filename :
                 continue
             if not any( [ a in gmn_filename.lower() for a in [ '.gmn' , '.tcx' , '.fit' , '.txt' ] ] ) :
-                print gmn_filename
                 continue
             reduced_gmn_filename = gmn_filename.split('/')[-1]
             gmn_md5sum = compute_file_md5sum( gmn_filename )
-            
-            if ( reduced_gmn_filename not in filename_md5_dict ) or filename_md5_dict[reduced_gmn_filename].md5sum != gmn_md5sum or ( do_update and filename_md5_dict[reduced_gmn_filename].begin_time in list_of_corrected_laps ) :
+
+            if ( reduced_gmn_filename not in filename_md5_dict ) or filename_md5_dict[reduced_gmn_filename].md5sum != gmn_md5sum or ( do_update and print_date_string( filename_md5_dict[reduced_gmn_filename].begin_time ) in list_of_corrected_laps ) :
                 pickle_file_is_modified[0] = True
                 gfile = garmin_summary( gmn_filename , md5sum = gmn_md5sum )
                 if gfile.read_file() :
