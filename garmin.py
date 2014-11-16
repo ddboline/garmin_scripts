@@ -9,6 +9,8 @@ def read_garmin_file( fname ) :
     gfile = garmin_file( fname )
     gfile.print_file_string()
     gfile.calculate_speed()
+    if gfile.is_txt :
+        return
     print ''
     gfile.print_splits( meters_per_mile )
     print ''
@@ -52,7 +54,6 @@ if __name__ == '__main__' :
     
     if '%s/bin' % script_path not in os.getenv( 'PATH' ) :
         os.putenv( 'PATH' , '%s:%s/bin' % ( os.getenv( 'PATH' ) , script_path ) )
-
     
     if not os.path.exists( '%s/run' % script_path ) :
         run_command( 'mkdir -p %s/run/' % script_path )
