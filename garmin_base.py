@@ -172,7 +172,7 @@ class garmin_point :
             functions:
                 read_point_xml( node ) , read_point_tcx( node )
     '''
-    def __init__( self , time = '' , latitude = 0 , longitude = 0 , altitude = 0 , distance = 0 , heart_rate = 0 ) :
+    def __init__( self , time = None , latitude = 0 , longitude = 0 , altitude = 0 , distance = 0 , heart_rate = 0 ) :
         self.time = time
         self.latitude = latitude
         self.longitude = longitude
@@ -242,7 +242,7 @@ class garmin_lap :
             functions:
                 read_lap_xml( node ) , read_lap_tcx( node ) , print_lap_string( node )
     '''
-    def __init__( self , lap_type = None , lap_index = 0 , lap_start = None , lap_duration = 0.0 , lap_distance = 0.0 , lap_trigger = None , lap_max_speed = None , lap_calories = 0 , lap_avg_hr = None , lap_max_hr = None , lap_intensity = None , lap_number = 0 ) :
+    def __init__( self , lap_type = None , lap_index = 0 , lap_start = None , lap_duration = 0.0 , lap_distance = 0.0 , lap_trigger = None , lap_max_speed = None , lap_calories = 0 , lap_avg_hr = -1 , lap_max_hr = -1 , lap_intensity = None , lap_number = 0 ) :
         self.lap_type = lap_type
         self.lap_index = lap_index
         self.lap_start = lap_start
@@ -335,14 +335,15 @@ class garmin_file :
         self.is_txt = is_txt
         self.graphs = []
         
-        self.determine_file_type()
-        self.filename = convert_gmn_to_xml( self.filename )
-        self.read_file()
-        self.calculate_speed()
+        if self.filename :
+            self.determine_file_type()
+            self.filename = convert_gmn_to_xml( self.filename )
+            self.read_file()
+            self.calculate_speed()
 
     def __del__( self ) :
         if self.filename and not self.is_tcx and not self.is_txt :
-            #run_command( 'rm %s' % self.filename )
+            run_command( 'rm %s' % self.filename )
             pass
 
     def determine_file_type( self ) :
