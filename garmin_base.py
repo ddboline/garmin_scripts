@@ -166,7 +166,7 @@ def convert_gmn_to_xml( gmn_filename ) :
     os.system( 'cp %s /tmp/temp.xml' % xml_file.name )
     return xml_filename
 
-class garmin_point :
+class garmin_point(object) :
     '''
         point representing each gps point
             functions:
@@ -236,7 +236,7 @@ class garmin_point :
             self.heart_rate = int( hr )
         return None
 
-class garmin_lap :
+class garmin_lap(object) :
     '''
         class representing each lap in xml file
             functions:
@@ -312,7 +312,7 @@ class garmin_lap :
 
         return None
 
-class garmin_file :
+class garmin_file(object) :
     '''
         class representing a full xml file
             functions:
@@ -780,7 +780,7 @@ def compute_file_md5sum( filename ) :
         gmn_md5sum = line.split()[0]
         return gmn_md5sum
 
-class garmin_summary :
+class garmin_summary(object) :
     ''' summary class for a file '''
     def __init__( self , filename = '' , is_tcx = False , is_txt = False , md5sum = None ) :
         self.filename = filename
