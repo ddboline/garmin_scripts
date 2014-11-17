@@ -320,7 +320,6 @@ class garmin_file :
     '''
     def __init__( self , filename = '' , is_tcx = False , is_txt = False ) :
         self.filename = filename
-        self.doc = None
         self.track_points = []
         self.begin_time = None
         self.begin_date = None
@@ -458,8 +457,8 @@ class garmin_file :
         ''' read tcx file '''
         is_bad_run = False
         is_bad_bike = False
-        self.doc = xml.dom.minidom.parse(self.filename)
-        for node in self.doc.getElementsByTagName('Activities') :
+        doc = xml.dom.minidom.parse(self.filename)
+        for node in doc.getElementsByTagName('Activities') :
             for node2 in node.getElementsByTagName( 'Activity' ) :
                 self.sport = node2.getAttribute( 'Sport' ).lower()
                 if is_biking_file( self.filename ) :
@@ -518,9 +517,9 @@ class garmin_file :
 
     def read_file_xml( self ) :
         ''' read xml file '''
-        self.doc = xml.dom.minidom.parse(self.filename)
+        doc = xml.dom.minidom.parse(self.filename)
 
-        for node in self.doc.getElementsByTagName('run'):
+        for node in doc.getElementsByTagName('run'):
             run_type = node.getAttribute('type')
             track = node.getAttribute('track')
             self.sport = node.getAttribute('sport')
@@ -533,7 +532,7 @@ class garmin_file :
 
         lap_number = 0
         corrected_laps = {}
-        for node in self.doc.getElementsByTagName('lap') :
+        for node in doc.getElementsByTagName('lap') :
             cur_lap = garmin_lap()
             cur_lap.read_lap_xml( node )
             cur_lap.lap_number = lap_number
@@ -555,7 +554,7 @@ class garmin_file :
 
         time_from_begin = 0
 
-        for node in self.doc.getElementsByTagName('point'):
+        for node in doc.getElementsByTagName('point'):
             cur_point = garmin_point()
             cur_point.read_point_xml( node )
 
