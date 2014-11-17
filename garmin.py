@@ -7,8 +7,8 @@ from util import run_command
 
 def read_garmin_file( fname ) :
     gfile = garmin_file( fname )
+        
     gfile.print_file_string()
-    gfile.calculate_speed()
     if gfile.is_txt :
         return
     print ''
