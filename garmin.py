@@ -41,9 +41,9 @@ def read_garmin_file( fname ) :
         print 'vertical climb : %.2f m' % vertical_climb
     print ''
 
+    gpx_filename = convert_gmn_to_gpx( os.sys.argv[1] )
     if len(os.sys.argv)>2 and os.sys.argv[2] == 'plot' :
         gfile.do_plots()
-        gpx_filename = convert_gmn_to_gpx( os.sys.argv[1] )
         gfile.do_map( gpx_filename )
         #os.system( 'rm %s' % gpx_filename )
 
