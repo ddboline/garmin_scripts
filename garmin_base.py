@@ -339,7 +339,6 @@ class garmin_file :
             self.determine_file_type()
             self.filename = convert_gmn_to_xml( self.filename )
             self.read_file()
-            self.calculate_speed()
 
     def __del__( self ) :
         if self.filename and not self.is_tcx and not self.is_txt :
@@ -382,6 +381,7 @@ class garmin_file :
             self.sport = 'walking'
         if print_date_string( self.begin_time ) in list_of_biking_files_by_time :
             self.sport = 'biking'
+        self.calculate_speed()
 
     def read_file_txt( self ) :
         ''' read txt file, these just contain summary information '''
