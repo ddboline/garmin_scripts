@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os
+import datetime
 from garmin_base import garmin_file , do_summary , meters_per_mile , sport_types , convert_gmn_to_gpx
 from util import run_command
 
 def read_garmin_file( fname ) :
     gfile = garmin_file( fname )
-        
+
     gfile.print_file_string()
     if gfile.is_txt :
         return
@@ -72,6 +73,8 @@ if __name__ == '__main__' :
     for arg in os.sys.argv[1:] :
         if arg == 'build' :
             options['build'] = True
+        elif arg == 'backup' :
+            run_command( 'cd %s/run/ ; tar zcvf %s/garmin_data_%s.tar.gz 2* garmin.pkl' % ( script_path , script_path , datetime.date.today().strftime( '%Y%m%d' ) ) )
         elif arg == 'occur' :
             options['occur'] = True
         elif os.path.isfile( arg ) :
