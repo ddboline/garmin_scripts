@@ -47,6 +47,11 @@ def read_garmin_file( fname ) :
         gfile.do_map( gpx_filename )
         #os.system( 'rm %s' % gpx_filename )
 
+def compare_with_remote() :
+    from urllib2 import urlopen
+    for line in urlopen( "https://ddbolineathome.mooo.com/~ddboline/garmin/files/garmin.list" ) :
+        print line.strip()
+    return
 
 if __name__ == '__main__' :
     #print os.sys.argv
