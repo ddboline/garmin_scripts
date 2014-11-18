@@ -1024,7 +1024,7 @@ class garmin_summary(object) :
         return True
 
 def do_summary( directory , **options ) :
-    ''' get summary of files in directory '''    
+    ''' get summary of files in directory '''
     opts = [ 'do_plot' , 'do_year' , 'do_month' , 'do_week' , 'do_day' , 'do_file' , 'do_sport' , 'do_update' ]
     do_plot , do_year , do_month , do_week , do_day , do_file , do_sport , do_update = [ options[o] for o in opts ]
     
@@ -1041,6 +1041,23 @@ def do_summary( directory , **options ) :
     except IOError :
         pass
     
+    def add_file( gmn_filename ) :
+        if not any( [ a in gmn_filename.lower() for a in [ '.gmn' , '.tcx' , '.fit' , '.txt' ] ] ) :
+            return
+        reduced_gmn_filename = gmn_filename.split('/')[-1]
+        gmn_md5sum = compute_file_md5sum( gmn_filename )
+
+        if ( reduced_gmn_filename not in filename_md5_dict ) or filename_md5_dict[reduced_gmn_filename].md5sum != gmn_md5sum or ( do_update and print_date_string( filename_md5_dict[reduced_gmn_filename].begin_time ) in list_of_corrected_laps ) :
+            pickle_file_is_modified[0] = True
+            gfile = garmin_summary( gmn_filename , md5sum = gmn_md5sum )
+            if gfile.read_file() :
+                filename_md5_dict[reduced_gmn_filename] = gfile
+            else :
+                print 'file %s not loaded for some reason' % reduced_gmn_filename
+        else :
+            gfile = filename_md5_dict[reduced_gmn_filename]
+        file_vector.append( gfile )
+
     def process_files( arg , dirname , names ) :
         for name in names :
             gmn_filename = '%s/%s' % ( dirname , name )
@@ -1048,28 +1065,20 @@ def do_summary( directory , **options ) :
                 continue
             if '.pkl' in gmn_filename :
                 continue
-            if not any( [ a in gmn_filename.lower() for a in [ '.gmn' , '.tcx' , '.fit' , '.txt' ] ] ) :
-                continue
-            reduced_gmn_filename = gmn_filename.split('/')[-1]
-            gmn_md5sum = compute_file_md5sum( gmn_filename )
+            add_file( gmn_filename )
 
-            if ( reduced_gmn_filename not in filename_md5_dict ) or filename_md5_dict[reduced_gmn_filename].md5sum != gmn_md5sum or ( do_update and print_date_string( filename_md5_dict[reduced_gmn_filename].begin_time ) in list_of_corrected_laps ) :
-                pickle_file_is_modified[0] = True
-                gfile = garmin_summary( gmn_filename , md5sum = gmn_md5sum )
-                if gfile.read_file() :
-                    filename_md5_dict[reduced_gmn_filename] = gfile
-                else :
-                    print 'file %s not loaded for some reason' % reduced_gmn_filename
-            else :
-                gfile = filename_md5_dict[reduced_gmn_filename]
-            file_vector.append( gfile )
-    
     if type(directory) == str :
-        os.path.walk( directory , process_files , None )
+        if os.path.isdir( directory ) :
+            os.path.walk( directory , process_files , None )
+        elif os.path.isfile( directory ) :
+            add_file( directory )
     if type(directory) == list :
         for d in directory :
-            os.path.walk( d , process_files , None )
-    
+            if os.path.isdir( d ) :
+                os.path.walk( d , process_files , None )
+            elif os.path.isfile( d ) :
+                add_file( d )
+            
     if pickle_file_is_modified[0] :
         pkl_file = open( '%s/run/garmin.pkl.tmp' % script_path , 'wb' )
         cPickle.dump( filename_md5_dict , pkl_file , cPickle.HIGHEST_PROTOCOL )
