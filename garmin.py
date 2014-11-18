@@ -42,7 +42,7 @@ def read_garmin_file( fname ) :
         print 'vertical climb : %.2f m' % vertical_climb
     print ''
 
-    gpx_filename = convert_gmn_to_gpx( os.sys.argv[1] )
+    gpx_filename = convert_gmn_to_gpx( fname )
     if len(os.sys.argv)>2 and os.sys.argv[2] == 'plot' :
         gfile.do_plots()
         gfile.do_map( gpx_filename )
@@ -127,10 +127,13 @@ if __name__ == '__main__' :
         elif 'do_%s' % arg in options :
             options['do_%s' % arg] = True
         else :
-            spts = filter( lambda x : arg in x , list(sport_types)+['bike'] )
+            spts = filter( lambda x : arg in x , list(sport_types) )
             if len(spts) > 0 :
                 options['do_sport'] = spts[0]
+            elif arg == 'bike' :
+                options['do_sport'] = 'biking'
             elif '-' in arg :
+                print arg
                 ent = arg.split('-')
                 year = ent[0]
                 if len(ent)>1 :
@@ -138,9 +141,10 @@ if __name__ == '__main__' :
                     month = ent[1]
                 else :
                     month = '*'
-                files = glob.glob( '%s/run/%s/%s/%s*' % ( script_path , year , month , arg ) )
+                files = glob.glob( '%s/run/%s/%s/%s*' % ( script_path , year , month , arg ) ) + glob.glob( '%s/run/%s/%s/%s*' % ( script_path , year , month , ''.join( ent ) ) )
                 if len(files) == 1 :
                     read_garmin_file( files[0] )
+                    exit(0)
                 else :
                     sdir += files
     if not sdir :
