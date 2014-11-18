@@ -127,9 +127,22 @@ if __name__ == '__main__' :
         elif 'do_%s' % arg in options :
             options['do_%s' % arg] = True
         else :
-            spts = filter( lambda x : arg in x , sport_types )
+            spts = filter( lambda x : arg in x , list(sport_types)+['bike'] )
             if len(spts) > 0 :
                 options['do_sport'] = spts[0]
+            elif '-' in arg :
+                ent = arg.split('-')
+                year = ent[0]
+                if len(ent)>1 :
+                    import glob
+                    month = ent[1]
+                else :
+                    month = '*'
+                files = glob.glob( '%s/run/%s/%s/%s*' % ( script_path , year , month , arg ) )
+                if len(files) == 1 :
+                    read_garmin_file( files[0] )
+                else :
+                    sdir += files
     if not sdir :
         sdir.append( '%s/run' % script_path )
     do_summary( sdir , **options )
