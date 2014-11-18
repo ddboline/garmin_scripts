@@ -48,10 +48,39 @@ def read_garmin_file( fname ) :
         gfile.do_map( gpx_filename )
         #os.system( 'rm %s' % gpx_filename )
 
-def compare_with_remote() :
+def compare_with_remote( script_path ) :
     from urllib2 import urlopen
-    for line in urlopen( "https://ddbolineathome.mooo.com/~ddboline/garmin/files/garmin.list" ) :
-        print line.strip()
+    remote_file_chksum = {}
+    remote_file_path = {}
+    for line in urlopen( 'https://ddbolineathome.mooo.com/~ddboline/garmin/files/garmin.list' ) :
+        md5sum , fname = line.split()[0:2]
+        fn = fname.split('/')[-1]
+        if fn not in remote_file_chksum :
+            remote_file_chksum[fn] = md5sum
+            remote_file_path[fn] = '/'.join(fname.split('/')[:-1])
+        else :
+            print fname , md5sum , remote_file_chksum[fn]
+
+    local_file_chksum = {}
+    
+    def process_files( arg , dirname , names ) :
+        for fn in names :
+            fname = '%s/%s' % ( dirname , fn )
+            if os.path.isdir( fname ) or fn == 'garmin.pkl' or fn == 'garmin.list' :
+                continue
+            cmd = 'md5sum %s' % fname
+            md5sum = run_command( cmd , do_popen = True ).read().split()[0]
+            if fn not in local_file_chksum :
+                local_file_chksum[fn] = md5sum
+    
+    os.path.walk( '%s/run' % script_path , process_files , None )
+    
+    for fn in remote_file_chksum.keys() :
+        if fn not in local_file_chksum.keys() :
+            print fn , remote_file_chksum[fn] , remote_file_path[fn]
+            run_command( 'wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/garmin/files/%s/%s' % ( remote_file_path[fn] , fn ) )
+            if os.path.exists( fn ) :
+                run_command( 'mv %s %s/run/%s/%s' % ( fn , script_path , remote_file_path[fn] , fn ) )
     return
 
 if __name__ == '__main__' :
@@ -60,13 +89,22 @@ if __name__ == '__main__' :
     
     if '%s/bin' % script_path not in os.getenv( 'PATH' ) :
         os.putenv( 'PATH' , '%s:%s/bin' % ( os.getenv( 'PATH' ) , script_path ) )
-    
-    if not os.path.exists( '%s/run' % script_path ) :
+
+    if os.sys.argv[1] == 'get' and not os.path.exists( '%s/run' % script_path ) :
         run_command( 'mkdir -p %s/run/' % script_path )
         os.chdir( '%s/run' % script_path )
         run_command( 'wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/backup/garmin_data.tar.gz' )
         run_command( 'tar zxvf garmin_data.tar.gz ; rm garmin_data.tar.gz' )
-    
+        exit(0)
+
+    if os.sys.argv[1] == 'sync' :
+        compare_with_remote( script_path )
+        exit(0)
+
+    if not os.path.exists( '%s/run' % script_path ) :
+        print 'need to download files first'
+        exit(0)
+
     options = { 'do_plot' : False , 'do_year' : False , 'do_month' : False , 'do_week' : False , 'do_day' : False , 'do_file' : False , 'do_sport' : None , 'do_update' : False }
 
     sdir = []
