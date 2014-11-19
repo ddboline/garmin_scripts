@@ -45,7 +45,7 @@ def read_garmin_file( fname ) :
     gpx_filename = convert_gmn_to_gpx( fname )
     if len(os.sys.argv)>2 and os.sys.argv[2] == 'plot' :
         gfile.do_plots()
-        gfile.do_map( gpx_filename )
+        #gfile.do_map( gpx_filename )
         #os.system( 'rm %s' % gpx_filename )
 
 def compare_with_remote( script_path ) :
@@ -90,16 +90,17 @@ if __name__ == '__main__' :
     if '%s/bin' % script_path not in os.getenv( 'PATH' ) :
         os.putenv( 'PATH' , '%s:%s/bin' % ( os.getenv( 'PATH' ) , script_path ) )
 
-    if os.sys.argv[1] == 'get' and not os.path.exists( '%s/run' % script_path ) :
-        run_command( 'mkdir -p %s/run/' % script_path )
-        os.chdir( '%s/run' % script_path )
-        run_command( 'wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/backup/garmin_data.tar.gz' )
-        run_command( 'tar zxvf garmin_data.tar.gz ; rm garmin_data.tar.gz' )
-        exit(0)
+    if len(os.sys.argv)>1 :
+        if os.sys.argv[1] == 'get' and not os.path.exists( '%s/run' % script_path ) :
+            run_command( 'mkdir -p %s/run/' % script_path )
+            os.chdir( '%s/run' % script_path )
+            run_command( 'wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/backup/garmin_data.tar.gz' )
+            run_command( 'tar zxvf garmin_data.tar.gz ; rm garmin_data.tar.gz' )
+            exit(0)
 
-    if os.sys.argv[1] == 'sync' :
-        compare_with_remote( script_path )
-        exit(0)
+        if os.sys.argv[1] == 'sync' :
+            compare_with_remote( script_path )
+            exit(0)
 
     if not os.path.exists( '%s/run' % script_path ) :
         print 'need to download files first'
