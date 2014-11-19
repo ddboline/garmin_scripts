@@ -172,7 +172,7 @@ class garmin_point(object) :
             functions:
                 read_point_xml( node ) , read_point_tcx( node )
     '''
-    def __init__( self , time = None , latitude = 0 , longitude = 0 , altitude = 0 , distance = 0 , heart_rate = 0 ) :
+    def __init__( self , time = None , latitude = None , longitude = None , altitude = 0 , distance = 0 , heart_rate = 0 ) :
         self.time = time
         self.latitude = latitude
         self.longitude = longitude
@@ -692,6 +692,8 @@ class garmin_file(object) :
         mph_speed_values = []
         avg_speed_values = []
         avg_mph_speed_values = []
+        lat_vals = []
+        lon_vals = []
         for point in self.points :
             if use_time :
                 xval = point.duration_from_begin
@@ -715,6 +717,9 @@ class garmin_file(object) :
                 avg_speed_values.append( [ xval , point.avg_speed_value_permi ] )
             if point.avg_speed_value_mph > 0 :
                 avg_mph_speed_values.append( [ xval , point.avg_speed_value_mph ] )
+            if point.latitude and point.longitude :
+                lat_vals.append( point.latitude )
+                lon_vals.append( point.longitude )
         if sum_time > 0 :
             avg_hr /= sum_time
             max_hr = max(hr_vals)
@@ -726,7 +731,7 @@ class garmin_file(object) :
             print 'max altitude diff : %.2f m' % (max(alt_vals) - min(alt_vals) )
             print 'vertical climb : %.2f m' % vertical_climb
 
-        def plot_graph_root( title = None , data = None ) :
+        def plot_graph_root( name = None , title = None , data = None , **opts ) :
             ''' convenience function '''
             import numpy as np
             from ROOT import TCanvas , TGraph
@@ -742,37 +747,83 @@ class garmin_file(object) :
             canv.Update()
             return [ canv , graph ]
 
-        def plot_graph_pyplot( title = None , data = None ) :
+        def plot_graph_pyplot( name = None , title = None , data = None , **opts ) :
             import numpy as np
             import matplotlib
             matplotlib.use( 'Agg' )
             import matplotlib.pyplot as plt
+            plt.clf()
             x , y = zip( *data )
             xa = np.array( x )
             ya = np.array( y )
-            plt.scatter( xa , ya )
-            plt.savefig('%s.png' % title)
-            return '%s.png' % title
+            plt.plot( xa , ya )
+            plt.title( title )
+            plt.savefig('%s.png' % name)
+            return '%s.png' % name
 
-        def plot_graph( title = None , data = None ) :
-            return plot_graph_root( title , data )
+        def plot_graph( name = None , title = None , data = None , **opts ) :
+            #return plot_graph_root( name , title , data )
+            return plot_graph_pyplot( name , title , data )
+        
+        def make_mercator_map( name = None , title = None , lats = None , lons = None , **opts ) :
+            import matplotlib
+            matplotlib.use( 'Agg' )
+            from mpl_toolkits.basemap import Basemap
+            import numpy as np
+            import matplotlib.pyplot as plt
+            plt.clf()
+            x = np.array( lons )
+            y = np.array( lats )
 
+            latcent = ( y.max() + y.min() ) / 2.
+            loncent = ( x.max() + x.min() ) / 2.
+            latwidth = abs(y.max() - y.min())
+            lonwidth = abs(x.max() - x.min())
+            width = max( latwidth , lonwidth )
+            latmin = latcent - 0.6 * width
+            latmax = latcent + 0.6 * width
+            lonmin = loncent - 0.6 * width
+            lonmax = loncent + 0.6 * width
+            
+            m = Basemap(projection='merc' , llcrnrlat=latmin , urcrnrlat=latmax , llcrnrlon=lonmin , urcrnrlon=lonmax , resolution='h' )
+            m.drawcoastlines()
+            m.fillcontinents(color='coral',lake_color='aqua')
+            m.drawstates()
+            m.drawcounties()
+            
+            m.plot( x , y , latlon = True )
+            
+            plt.title( title )
+            plt.xlabel( 'longitude deg' )
+            plt.ylabel( 'latitude deg' )
+            plt.savefig( '%s.png' % name )
+        
+        curpath = os.path.realpath( os.path.curdir )
+        print curpath
+        if not os.path.exists( '%s/html' % curpath ) :
+            os.makedirs( '%s/html' % curpath )
+        os.chdir( '%s/html' % curpath )
+        
         if len(hr_values) > 0 :
-            self.graphs.append( plot_graph( title = 'Heart Rate %2.2f avg %2.2f max' % ( avg_hr , max_hr ) , data = hr_values ) )
+            self.graphs.append( plot_graph( name = 'heart_rate' , title = 'Heart Rate %2.2f avg %2.2f max' % ( avg_hr , max_hr ) , data = hr_values ) )
         if len(alt_values) > 0 :
-            self.graphs.append( plot_graph( title = 'Altitude' , data = alt_values ) )
+            self.graphs.append( plot_graph( name = 'altitude' , title = 'Altitude' , data = alt_values ) )
         if len(speed_values) > 0 :
-            self.graphs.append( plot_graph( title = 'Speed min/mi' , data = speed_values ) )
-            self.graphs.append( plot_graph( title = 'Speed mph' , data = mph_speed_values ) )
+            self.graphs.append( plot_graph( name = 'speed_minpermi' , title = 'Speed min/mi' , data = speed_values ) )
+            self.graphs.append( plot_graph( name = 'speed_mph' , title = 'Speed mph' , data = mph_speed_values ) )
 
         if len(avg_speed_values) > 0 :
             avg_speed_value_min = int(avg_speed_values[-1][1])
             avg_speed_value_sec = int( ( avg_speed_values[-1][1] - avg_speed_value_min ) * 60. )
-            self.graphs.append( plot_graph( title = 'Avg Speed %i:%02i min/mi' % ( avg_speed_value_min , avg_speed_value_sec ) , data = avg_speed_values ) )
+            self.graphs.append( plot_graph( name = 'avg_speed_minpermi' , title = 'Avg Speed %i:%02i min/mi' % ( avg_speed_value_min , avg_speed_value_sec ) , data = avg_speed_values ) )
 
         if len(avg_mph_speed_values) > 0 :
             avg_mph_speed_value = avg_mph_speed_values[-1][1]
-            self.graphs.append( plot_graph( title = 'Avg Speed %.2f mph' % avg_mph_speed_value , data = avg_mph_speed_values ) )
+            self.graphs.append( plot_graph( name = ' avg_speed_mph' , title = 'Avg Speed %.2f mph' % avg_mph_speed_value , data = avg_mph_speed_values ) )
+        
+        make_mercator_map( name = 'route_map' , title = 'Route Map' , lats = lat_vals , lons = lon_vals )
+        
+        os.chdir( curpath )
 
 def compute_file_md5sum( filename ) :
     ''' wrapper around md5sum '''
