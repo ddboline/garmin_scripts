@@ -728,11 +728,11 @@ class garmin_file(object) :
 
         def plot_graph_root( title = None , data = None ) :
             ''' convenience function '''
-            import array
+            import numpy as np
             from ROOT import TCanvas , TGraph
             x , y = zip( *data )
-            xa = array.array( 'f' , x )
-            ya = array.array( 'f' , y )
+            xa = np.array( x )
+            ya = np.array( y )
             canv = TCanvas(title,title)
             graph = TGraph(len(x),xa,ya)
             if title :
@@ -743,15 +743,16 @@ class garmin_file(object) :
             return [ canv , graph ]
 
         def plot_graph_pyplot( title = None , data = None ) :
-            import array
+            import numpy as np
+            import matplotlib
+            matplotlib.use( 'Agg' )
             import matplotlib.pyplot as plt
             x , y = zip( *data )
-            xa = array.array( 'f' , x )
-            ya = array.array( 'f' , y )
-            plt.figure()
-            plt.plot( xa , ya )
-            plt.show()
-            return 0
+            xa = np.array( x )
+            ya = np.array( y )
+            plt.scatter( xa , ya )
+            plt.savefig('%s.png' % title)
+            return '%s.png' % title
 
         def plot_graph( title = None , data = None ) :
             return plot_graph_root( title , data )
