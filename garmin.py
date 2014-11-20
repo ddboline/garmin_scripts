@@ -45,8 +45,6 @@ def read_garmin_file( fname ) :
     gpx_filename = convert_gmn_to_gpx( fname )
     if len(os.sys.argv)>2 and os.sys.argv[2] == 'plot' :
         gfile.do_plots()
-        #gfile.do_map( gpx_filename )
-        #os.system( 'rm %s' % gpx_filename )
 
 def compare_with_remote( script_path ) :
     from urllib2 import urlopen
