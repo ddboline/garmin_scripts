@@ -182,10 +182,11 @@ class garmin_point(object) :
         ### These are set by garmin_file class, left here as placeholders
         self.duration_from_last = 0 ### here last will mean last track point, resets at every new track
         self.duration_from_begin = 0 ### here we add up durations, ignoring time between tracks
-        self.speed_permi = 0
-        self.speed_mph = 0
-        self.avg_speed_value_permi = 0
-        self.avg_speed_value_mph = 0
+        self.speed_mps = None
+        self.speed_permi = None
+        self.speed_mph = None
+        self.avg_speed_value_permi = None
+        self.avg_speed_value_mph = None
 
     def read_point_xml( self , node ) :
         ''' read point from xml file (generated from binary gmn file '''
@@ -232,6 +233,10 @@ class garmin_point(object) :
         hr = ''
         for L in node.getElementsByTagName( 'HeartRateBpm' ) :
             hr = getText(L.getElementsByTagName('Value')[0])
+        for L in node.getElementsByTagName( 'Speed' ) :
+            self.speed_mps = float( getText( L ) )
+            self.speed_mph = self.speed_mps * 3600. / meters_per_mile
+            self.speed_permi = meters_per_mile / self.speed_mps / 60.
         if hr != '' :
             self.heart_rate = int( hr )
         return None
@@ -570,11 +575,19 @@ class garmin_file(object) :
 
         return None
 
-    def print_file_string( self ):
+    def print_file_string( self , do_html = False ):
         ''' nice output string for a file '''
-        print 'Start time' , print_date_string( self.begin_time )
+        retval = []
+        if do_html :
+            retval.append( '<table>Start time %s' % print_date_string( self.begin_time ) )
+        else : 
+            print 'Start time' , print_date_string( self.begin_time )
+
         for lap in self.laps :
-            lap.print_lap_string( self.sport )
+            if do_html :
+                pass
+            else :
+                lap.print_lap_string( self.sport )
 
         min_mile = 0
         mi_per_hr = 0
@@ -596,24 +609,25 @@ class garmin_file(object) :
 
     def calculate_speed( self ) :
         ''' calculate instantaneous speed (could maybe be a bit more elaborate?) '''
-        N = 5
-        if len(self.points) < N : return None
         for idx in range( 1 , len(self.points) ) :
-            jdx = idx - N
-            if jdx < 0 : jdx = idx - 1
-            totdur = ( self.points[idx].time - self.points[jdx].time ).total_seconds() # seconds
-            totdis = self.points[idx].distance - self.points[jdx].distance # meters
-            if totdis > 0 :
+            jdx = idx - 1
+            t1 = self.points[idx].time
+            t0 = self.points[jdx].time
+            d1 = self.points[idx].distance
+            d0 = self.points[jdx].distance
+            totdur = ( t1 - t0 ).total_seconds() # seconds
+            totdis = d1 - d0 # meters
+            if totdis > 0 and not self.points[idx].speed_permi :
                 self.points[idx].speed_permi = (totdur/60.) / (totdis/meters_per_mile)
-            if totdur > 0 :
+            if totdur > 0 and not self.points[idx].speed_mph :
                 self.points[idx].speed_mph = (totdis/meters_per_mile) / (totdur/60./60.)
-            if self.points[idx].distance > 0 :
-                self.points[idx].avg_speed_value_permi = ( ( self.points[idx].time - self.points[0].time ).total_seconds()/60. ) / ( self.points[idx].distance/meters_per_mile )
-            if ( self.points[idx].time - self.points[0].time ).total_seconds() > 0 :
-                self.points[idx].avg_speed_value_mph = ( self.points[idx].distance/meters_per_mile ) / ( ( self.points[idx].time - self.points[0].time ).total_seconds()/60./60. )
+            if d1 > 0 :
+                self.points[idx].avg_speed_value_permi = ( ( t1 - self.points[0].time ).total_seconds()/60. ) / ( d1/meters_per_mile )
+            if ( t1 - self.points[0].time ).total_seconds() > 0 :
+                self.points[idx].avg_speed_value_mph = ( self.points[idx].distance/meters_per_mile ) / ( ( t1 - self.points[0].time ).total_seconds()/60./60. )
         return None
 
-    def print_splits( self , split_distance_in_meters , label = 'mi' ) :
+    def print_splits( self , split_distance_in_meters = meters_per_mile , label = 'mi' ) :
         ''' print split time for given split distance '''
         if len(self.points) == 0 : return None
         last_point_me = 0
@@ -757,6 +771,10 @@ class garmin_file(object) :
             xa = np.array( x )
             ya = np.array( y )
             plt.plot( xa , ya )
+            xmin , xmax , ymin , ymax = plt.axis()
+            xmin , ymin = map( lambda z : z - 0.1 * abs( z ) , [ xmin , ymin ] )
+            xmax , ymax = map( lambda z : z + 0.1 * abs( z ) , [ xmax , ymax ] )
+            plt.axis( [ xmin , xmax , ymin , ymax ] )
             plt.title( title )
             plt.savefig('%s.png' % name)
             return '%s.png' % name
@@ -797,12 +815,20 @@ class garmin_file(object) :
             plt.xlabel( 'longitude deg' )
             plt.ylabel( 'latitude deg' )
             plt.savefig( '%s.png' % name )
+            return '%s.png' % name
         
         curpath = os.path.realpath( os.path.curdir )
         print curpath
         if not os.path.exists( '%s/html' % curpath ) :
             os.makedirs( '%s/html' % curpath )
         os.chdir( '%s/html' % curpath )
+        htmlfile = open( 'index.html' , 'w' )
+        htmlfile.write( '<!DOCTYPE HTML>\n<html>\n<body>\n' )
+    
+        
+    
+        if len(lat_vals)>0 and len(lon_vals)>0 :
+            self.graphs.append( make_mercator_map( name = 'route_map' , title = 'Route Map' , lats = lat_vals , lons = lon_vals ) )
         
         if len(hr_values) > 0 :
             self.graphs.append( plot_graph( name = 'heart_rate' , title = 'Heart Rate %2.2f avg %2.2f max' % ( avg_hr , max_hr ) , data = hr_values ) )
@@ -820,10 +846,17 @@ class garmin_file(object) :
         if len(avg_mph_speed_values) > 0 :
             avg_mph_speed_value = avg_mph_speed_values[-1][1]
             self.graphs.append( plot_graph( name = ' avg_speed_mph' , title = 'Avg Speed %.2f mph' % avg_mph_speed_value , data = avg_mph_speed_values ) )
-        
-        make_mercator_map( name = 'route_map' , title = 'Route Map' , lats = lat_vals , lons = lon_vals )
-        
+    
+        for f in self.graphs :
+            htmlfile.write( '<p>\n<img src="%s">\n</p>' % f )
+
+        htmlfile.write( '</body>\n</html>\n' )
+        htmlfile.close()
         os.chdir( curpath )
+        if os.path.exists( '%s/html' % curpath ) and os.path.exists( '%s/public_html/garmin' % os.getenv( 'HOME' ) ) :
+            if os.path.exists( '%s/public_html/garmin/html' % os.getenv( 'HOME' ) ) :
+                run_command( 'rm -rf %s/public_html/garmin/html' % os.getenv( 'HOME' ) )
+            run_command( 'mv %s/html %s/public_html/garmin' % ( curpath , os.getenv( 'HOME' ) ) )
 
 def compute_file_md5sum( filename ) :
     ''' wrapper around md5sum '''
