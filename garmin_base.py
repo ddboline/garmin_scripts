@@ -236,7 +236,8 @@ class garmin_point(object) :
         for L in node.getElementsByTagName( 'Speed' ) :
             self.speed_mps = float( getText( L ) )
             self.speed_mph = self.speed_mps * 3600. / meters_per_mile
-            self.speed_permi = meters_per_mile / self.speed_mps / 60.
+            if self.speed_mps > 0. :
+                self.speed_permi = meters_per_mile / self.speed_mps / 60.
         if hr != '' :
             self.heart_rate = int( hr )
         return None
