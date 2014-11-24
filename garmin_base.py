@@ -679,15 +679,15 @@ class garmin_file(object) :
                                 print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
                             else :
                                 print ''
-                        split_vector.append( [ split_dist , time_val / ( split_distance_in_meters / meters_per_mile ) / 60. ] )
+                        split_vector.append( [ cur_point_me/meters_per_mile , time_val / ( split_distance_in_meters / meters_per_mile ) / 60. ] )
                     else :
                         if print_out :
-                            print '%i %s \t' % ( split_dist , label ) , print_h_m_s( time_val ) , '\t' , '%.2f mph' % ( 1. / ( time_val / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ) ,
+                            print '%i %s \t' % ( cur_point_me/meters_per_mile , label ) , print_h_m_s( time_val ) , '\t' , '%.2f mph' % ( 1. / ( time_val / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ) ,
                             if avg_hrt_rate > 0 :
                                 print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
                             else :
                                 print ''
-                        split_vector.append( [ split_dist , 1. / ( time_val / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ] )
+                        split_vector.append( [ cur_point_me/meters_per_mile , 1. / ( time_val / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ] )
 
                 prev_split_me = cur_split_me
                 prev_split_time = cur_split_time
@@ -712,7 +712,7 @@ class garmin_file(object) :
         alt_vals = []
         alt_values = []
         vertical_climb = 0
-        speed_values = self.print_splits( 100. , print_out = False )
+        speed_values = filter( lambda x : x[1] < 20 , self.print_splits( 400. , print_out = False ) )
         mph_speed_values = []
         avg_speed_values = []
         avg_mph_speed_values = []
@@ -819,7 +819,7 @@ class garmin_file(object) :
             
             m = Basemap(projection='merc' , llcrnrlat=latmin , urcrnrlat=latmax , llcrnrlon=lonmin , urcrnrlon=lonmax , resolution='h' )
             m.drawcoastlines()
-            m.fillcontinents(color='coral',lake_color='aqua')
+            m.fillcontinents(color='white',lake_color='aqua')
             m.drawstates()
             m.drawcounties()
             
@@ -844,14 +844,14 @@ class garmin_file(object) :
         
         if len(mile_split_vals)>0 :
             options = { 'plotopt' : { 'marker' : 'o' } }
-            self.graphs.append( plot_graph( name = 'mile_splits' , title = 'Pace' , data = mile_split_vals , **options ) )
+            self.graphs.append( plot_graph( name = 'mile_splits' , title = 'Pace per Mile every mi' , data = mile_split_vals , **options ) )
         
         if len(hr_values) > 0 :
             self.graphs.append( plot_graph( name = 'heart_rate' , title = 'Heart Rate %2.2f avg %2.2f max' % ( avg_hr , max_hr ) , data = hr_values ) )
         if len(alt_values) > 0 :
             self.graphs.append( plot_graph( name = 'altitude' , title = 'Altitude' , data = alt_values ) )
         if len(speed_values) > 0 :
-            self.graphs.append( plot_graph( name = 'speed_minpermi' , title = 'Speed min/mi' , data = speed_values ) )
+            self.graphs.append( plot_graph( name = 'speed_minpermi' , title = 'Speed min/mi every 1/4 mi' , data = speed_values ) )
             self.graphs.append( plot_graph( name = 'speed_mph' , title = 'Speed mph' , data = mph_speed_values ) )
 
         if len(avg_speed_values) > 0 :
