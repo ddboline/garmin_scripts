@@ -82,7 +82,7 @@ def compare_with_remote( script_path ) :
     return
 
 if __name__ == '__main__' :
-    options = [ 'build' , 'sync' , 'backup' , 'run' ]
+    options = [ 'build' , 'sync' , 'backup' ]
     
     #print os.sys.argv
     script_path = '/'.join( os.path.abspath( os.sys.argv[0] ).split('/')[:-1] )
