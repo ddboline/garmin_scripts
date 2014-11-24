@@ -628,7 +628,7 @@ class garmin_file(object) :
                 self.points[idx].avg_speed_value_mph = ( self.points[idx].distance/meters_per_mile ) / ( ( t1 - self.points[0].time ).total_seconds()/60./60. )
         return None
 
-    def print_splits( self , split_distance_in_meters = meters_per_mile , label = 'mi' ) :
+    def print_splits( self , split_distance_in_meters = meters_per_mile , label = 'mi' , print_out = True ) :
         ''' print split time for given split distance '''
         if len(self.points) == 0 : return None
         last_point_me = 0
@@ -636,6 +636,7 @@ class garmin_file(object) :
         prev_split_me = 0
         prev_split_time = 0
         avg_hrt_rate = 0
+        split_vector = []
 
         for point in self.points :
             cur_point_me = point.distance
@@ -655,30 +656,38 @@ class garmin_file(object) :
                 if nmiles > 1 :
                     for nmi in range( 0 , nmiles ) :
                         if self.is_running() :
-                            print '%i %s \t' % ( split_dist / nmiles + nmi , label ) , print_h_m_s( time_val  / nmiles ) , '\t' , print_h_m_s( time_val / nmiles / ( split_distance_in_meters / meters_per_mile ) , False ) , '/ mi\t' , print_h_m_s( time_val / nmiles / ( split_distance_in_meters / 1000. ) , False ) , '/ km\t' , print_h_m_s( time_val / nmiles / ( split_distance_in_meters / meters_per_mile ) * marathon_distance_mi ) ,
-                            if avg_hrt_rate > 0 :
-                                print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
-                            else :
-                                print ''
+                            if print_out :
+                                print '%i %s \t' % ( split_dist / nmiles + nmi , label ) , print_h_m_s( time_val  / nmiles ) , '\t' , print_h_m_s( time_val / nmiles / ( split_distance_in_meters / meters_per_mile ) , False ) , '/ mi\t' , print_h_m_s( time_val / nmiles / ( split_distance_in_meters / 1000. ) , False ) , '/ km\t' , print_h_m_s( time_val / nmiles / ( split_distance_in_meters / meters_per_mile ) * marathon_distance_mi ) ,
+                                if avg_hrt_rate > 0 :
+                                    print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
+                                else :
+                                    print ''
+                            split_vector.append( [ split_dist/nmiles + nmi , time_val / nmiles / ( split_distance_in_meters / meters_per_mile ) / 60. ] )
                         else :
-                            print '%i %s \t' % ( split_dist / nmiles + nmi , label ) , print_h_m_s( time_val / nmiles ) , '\t' , '%.2f mph' % ( 1. / ( time_val / nmiles / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ) ,
-                            if avg_hrt_rate > 0 :
-                                print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
-                            else :
-                                print ''
+                            if print_out :
+                                print '%i %s \t' % ( split_dist / nmiles + nmi , label ) , print_h_m_s( time_val / nmiles ) , '\t' , '%.2f mph' % ( 1. / ( time_val / nmiles / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ) ,
+                                if avg_hrt_rate > 0 :
+                                    print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
+                                else :
+                                    print ''
+                            split_vector.append( [ split_dist/nmiles + nmi , 1. / ( time_val / nmiles / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ] )
                 else :
                     if self.is_running() :
-                        print '%i %s \t' % ( split_dist , label ) , print_h_m_s( time_val ) , '\t' , print_h_m_s( time_val / ( split_distance_in_meters / meters_per_mile ) , False ) , '/ mi\t' , print_h_m_s( time_val / ( split_distance_in_meters / 1000. ) , False ) , '/ km\t' , print_h_m_s( time_val / ( split_distance_in_meters / meters_per_mile ) * marathon_distance_mi ) ,
-                        if avg_hrt_rate > 0 :
-                            print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
-                        else :
-                            print ''
+                        if print_out :
+                            print '%i %s \t' % ( split_dist , label ) , print_h_m_s( time_val ) , '\t' , print_h_m_s( time_val / ( split_distance_in_meters / meters_per_mile ) , False ) , '/ mi\t' , print_h_m_s( time_val / ( split_distance_in_meters / 1000. ) , False ) , '/ km\t' , print_h_m_s( time_val / ( split_distance_in_meters / meters_per_mile ) * marathon_distance_mi ) ,
+                            if avg_hrt_rate > 0 :
+                                print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
+                            else :
+                                print ''
+                        split_vector.append( [ split_dist , time_val / ( split_distance_in_meters / meters_per_mile ) / 60. ] )
                     else :
-                        print '%i %s \t' % ( split_dist , label ) , print_h_m_s( time_val ) , '\t' , '%.2f mph' % ( 1. / ( time_val / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ) ,
-                        if avg_hrt_rate > 0 :
-                            print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
-                        else :
-                            print ''
+                        if print_out :
+                            print '%i %s \t' % ( split_dist , label ) , print_h_m_s( time_val ) , '\t' , '%.2f mph' % ( 1. / ( time_val / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ) ,
+                            if avg_hrt_rate > 0 :
+                                print '\t %i bpm avg' % ( avg_hrt_rate / ( cur_split_time - prev_split_time ) )
+                            else :
+                                print ''
+                        split_vector.append( [ split_dist , 1. / ( time_val / ( split_distance_in_meters / meters_per_mile ) / 60. / 60. ) ] )
 
                 prev_split_me = cur_split_me
                 prev_split_time = cur_split_time
@@ -686,7 +695,7 @@ class garmin_file(object) :
             last_point_me = cur_point_me
             last_point_time = cur_point_time
 
-        return None
+        return split_vector
 
     def do_map( self , gpx_filename ) :
         ''' wrapper around gpxviewer '''
@@ -703,18 +712,19 @@ class garmin_file(object) :
         alt_vals = []
         alt_values = []
         vertical_climb = 0
-        speed_values = []
+        speed_values = self.print_splits( 100. , print_out = False )
         mph_speed_values = []
         avg_speed_values = []
         avg_mph_speed_values = []
         lat_vals = []
         lon_vals = []
+        mile_split_vals = self.print_splits( meters_per_mile , print_out = False )
         for point in self.points :
             if use_time :
                 xval = point.duration_from_begin
             else :
                 xval = point.distance / meters_per_mile
-            if point.heart_rate > 0 :
+            if xval > 0 and point.heart_rate > 0 :
                 avg_hr += point.heart_rate * point.duration_from_last
                 sum_time += point.duration_from_last
                 hr_vals.append( point.heart_rate )
@@ -724,8 +734,8 @@ class garmin_file(object) :
                 if len(alt_vals) > 1 and alt_vals[-1] > alt_vals[-2] :
                     vertical_climb += alt_vals[-1] - alt_vals[-2]
                 alt_values.append( [ xval , point.altitude ] )
-            if point.speed_permi > 0 and point.speed_permi < 20 :
-                speed_values.append( [ xval , point.speed_permi ] )
+            # if point.speed_permi > 0 and point.speed_permi < 20 :
+                # speed_values.append( [ xval , point.speed_permi ] )
             if point.speed_mph > 0 and point.speed_mph < 20 :
                 mph_speed_values.append( [ xval , point.speed_mph ] )
             if point.avg_speed_value_permi > 0 and point.avg_speed_value_permi < 20 :
@@ -767,11 +777,14 @@ class garmin_file(object) :
             import matplotlib
             matplotlib.use( 'Agg' )
             import matplotlib.pyplot as plt
+            popts = {}
+            if 'plotopt' in opts :
+                popts = opts['plotopt']
             plt.clf()
             x , y = zip( *data )
             xa = np.array( x )
             ya = np.array( y )
-            plt.plot( xa , ya )
+            plt.plot( xa , ya , **popts )
             xmin , xmax , ymin , ymax = plt.axis()
             xmin , ymin = map( lambda z : z - 0.1 * abs( z ) , [ xmin , ymin ] )
             xmax , ymax = map( lambda z : z + 0.1 * abs( z ) , [ xmax , ymax ] )
@@ -782,7 +795,7 @@ class garmin_file(object) :
 
         def plot_graph( name = None , title = None , data = None , **opts ) :
             #return plot_graph_root( name , title , data )
-            return plot_graph_pyplot( name , title , data )
+            return plot_graph_pyplot( name , title , data , **opts )
         
         def make_mercator_map( name = None , title = None , lats = None , lons = None , **opts ) :
             import matplotlib
@@ -825,11 +838,13 @@ class garmin_file(object) :
         os.chdir( '%s/html' % curpath )
         htmlfile = open( 'index.html' , 'w' )
         htmlfile.write( '<!DOCTYPE HTML>\n<html>\n<body>\n' )
-    
-        
-    
+
         if len(lat_vals)>0 and len(lon_vals)>0 :
             self.graphs.append( make_mercator_map( name = 'route_map' , title = 'Route Map' , lats = lat_vals , lons = lon_vals ) )
+        
+        if len(mile_split_vals)>0 :
+            options = { 'plotopt' : { 'marker' : 'o' } }
+            self.graphs.append( plot_graph( name = 'mile_splits' , title = 'Pace' , data = mile_split_vals , **options ) )
         
         if len(hr_values) > 0 :
             self.graphs.append( plot_graph( name = 'heart_rate' , title = 'Heart Rate %2.2f avg %2.2f max' % ( avg_hr , max_hr ) , data = hr_values ) )
