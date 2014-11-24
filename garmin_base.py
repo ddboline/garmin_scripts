@@ -581,7 +581,7 @@ class garmin_file(object) :
         retval = []
         if do_html :
             retval.append( '<table>Start time %s' % print_date_string( self.begin_time ) )
-        else : 
+        else :
             print 'Start time' , print_date_string( self.begin_time )
 
         for lap in self.laps :
