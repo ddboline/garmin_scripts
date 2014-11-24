@@ -82,6 +82,8 @@ def compare_with_remote( script_path ) :
     return
 
 if __name__ == '__main__' :
+    options = [ 'build' , 'sync' , 'backup' , 'run' ]
+    
     #print os.sys.argv
     script_path = '/'.join( os.path.abspath( os.sys.argv[0] ).split('/')[:-1] )
     
@@ -112,6 +114,7 @@ if __name__ == '__main__' :
             options['build'] = True
         elif arg == 'backup' :
             run_command( 'cd %s/run/ ; tar zcvf %s/garmin_data_%s.tar.gz 2* garmin.pkl' % ( script_path , script_path , datetime.date.today().strftime( '%Y%m%d' ) ) )
+            exit(0)
         elif arg == 'occur' :
             options['occur'] = True
         elif os.path.isfile( arg ) :
