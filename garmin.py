@@ -6,7 +6,7 @@ import datetime
 from garmin_base import garmin_file , do_summary , meters_per_mile , sport_types , convert_gmn_to_gpx
 from util import run_command
 
-def read_garmin_file( fname ) :
+def read_garmin_file( fname , **options ) :
     gfile = garmin_file( fname )
 
     gfile.print_file_string()
@@ -43,7 +43,7 @@ def read_garmin_file( fname ) :
     print ''
 
     gpx_filename = convert_gmn_to_gpx( fname )
-    if len(os.sys.argv)>2 and os.sys.argv[2] == 'plot' :
+    if 'do_plot' in options and options['do_plot'] :
         gfile.do_plots()
 
 def compare_with_remote( script_path ) :
@@ -108,7 +108,8 @@ if __name__ == '__main__' :
 
     options = { 'do_plot' : False , 'do_year' : False , 'do_month' : False , 'do_week' : False , 'do_day' : False , 'do_file' : False , 'do_sport' : None , 'do_update' : False }
 
-    sdir = []
+    gdir = []
+    gfil = None
     for arg in os.sys.argv[1:] :
         if arg == 'build' :
             options['build'] = True
@@ -118,12 +119,13 @@ if __name__ == '__main__' :
         elif arg == 'occur' :
             options['occur'] = True
         elif os.path.isfile( arg ) :
-            read_garmin_file( arg )
-            exit(0)
+            gfil = arg
+            # read_garmin_file( arg )
+            # exit(0)
         elif arg != 'run' and os.path.isdir( arg ) :
-            sdir.append( arg )
+            gdir.append( arg )
         elif arg != 'run' and os.path.isdir( '%s/run/%s' % ( script_path , arg ) ) :
-            sdir.append( '%s/run/%s' % ( script_path , arg ) )
+            gdir.append( '%s/run/%s' % ( script_path , arg ) )
         elif arg in options :
             options[arg] = True
         elif 'do_%s' % arg in options :
@@ -145,10 +147,12 @@ if __name__ == '__main__' :
                     month = '*'
                 files = glob.glob( '%s/run/%s/%s/%s*' % ( script_path , year , month , arg ) ) + glob.glob( '%s/run/%s/%s/%s*' % ( script_path , year , month , ''.join( ent ) ) )
                 if len(files) == 1 :
-                    read_garmin_file( files[0] )
-                    exit(0)
+                    gfil = files[0]
                 else :
-                    sdir += files
-    if not sdir :
-        sdir.append( '%s/run' % script_path )
-    do_summary( sdir , **options )
+                    gdir += files
+    if not gdir :
+        gdir.append( '%s/run' % script_path )
+    if gfil :
+        read_garmin_file( gfil , **options )
+    else :
+        do_summary( gdir , **options )
