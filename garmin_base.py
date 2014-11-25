@@ -819,6 +819,7 @@ class garmin_file(object) :
             
             m = Basemap(projection='merc' , llcrnrlat=latmin , urcrnrlat=latmax , llcrnrlon=lonmin , urcrnrlon=lonmax , resolution='h' )
             m.drawcoastlines()
+            m.drawlsmask( ocean_color='aqua' )
             m.fillcontinents(color='white',lake_color='aqua')
             m.drawstates()
             m.drawcounties()
