@@ -703,7 +703,7 @@ class garmin_file(object) :
             run_command( 'gpxviewer %s' % gpx_filename )
 
     def do_plots( self , use_time = False ) :
-        ''' create pretty plots using ROOT '''
+        ''' create pretty plots '''
         avg_hr = 0
         sum_time = 0
         max_hr = 0
@@ -756,23 +756,7 @@ class garmin_file(object) :
             print 'max altitude diff : %.2f m' % (max(alt_vals) - min(alt_vals) )
             print 'vertical climb : %.2f m' % vertical_climb
 
-        def plot_graph_root( name = None , title = None , data = None , **opts ) :
-            ''' convenience function '''
-            import numpy as np
-            from ROOT import TCanvas , TGraph
-            x , y = zip( *data )
-            xa = np.array( x )
-            ya = np.array( y )
-            canv = TCanvas(title,title)
-            graph = TGraph(len(x),xa,ya)
-            if title :
-                graph.SetTitle( title )
-            if data :
-                graph.Draw('A*')
-            canv.Update()
-            return [ canv , graph ]
-
-        def plot_graph_pyplot( name = None , title = None , data = None , **opts ) :
+        def plot_graph( name = None , title = None , data = None , **opts ) :
             import numpy as np
             import matplotlib
             matplotlib.use( 'Agg' )
@@ -793,10 +777,6 @@ class garmin_file(object) :
             plt.savefig('%s.png' % name)
             return '%s.png' % name
 
-        def plot_graph( name = None , title = None , data = None , **opts ) :
-            #return plot_graph_root( name , title , data )
-            return plot_graph_pyplot( name , title , data , **opts )
-        
         def make_mercator_map( name = None , title = None , lats = None , lons = None , **opts ) :
             import matplotlib
             matplotlib.use( 'Agg' )
