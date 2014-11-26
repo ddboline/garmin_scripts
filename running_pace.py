@@ -15,12 +15,46 @@ def pow_func( x , *p ) :
     return p[0] * x**p[1]
 
 def do_fit( data , func , p0 ) :
-    p , c = optimize.curve_fit( func , data[:,0] , data[:,1] , p0 = p0 )
+    datax = data[:,0]
+    datay = data[:,1]
+    p , c = optimize.curve_fit( func , datax , datay , p0 = p0 )
     l , v = np.linalg.eig( c )
     sig = v.dot( np.sqrt( np.diag( l ) ) ).dot( v.T )
     dp = np.sqrt( np.sum( sig.dot( v )**2 , axis=0 ) )
     
-    return p , dp
+    errfunc = lambda p, x, y: func(x,*p) - y
+    
+    residuals = errfunc( p, datax, datay)
+    s_res = np.std(residuals)
+    ps = []
+    datayerrors = None
+    # 100 random data sets are generated and fitted
+    for _ in range(100):
+      if datayerrors is None:
+          randomDelta = np.random.normal(0., s_res, len(datay))
+          randomdataY = datay + randomDelta
+      else:
+          randomDelta =  np.array( [ \
+                             np.random.normal(0., derr,1)[0] \
+                             for derr in datayerrors ] )
+          randomdataY = datay + randomDelta
+      randomfit, randomcov = \
+          optimize.leastsq( errfunc, p0, args=(datax, randomdataY),\
+                            full_output=0)
+      ps.append( randomfit )
+
+    ps = np.array(ps)
+    mean_pfit = np.mean(ps,0)
+    Nsigma = 1. # 1sigma gets approximately the same as methods above
+                # 1sigma corresponds to 68.3% confidence interval
+                # 2sigma corresponds to 95.44% confidence interval
+    err_pfit = Nsigma * np.std(ps,0)
+
+    pfit_bootstrap = mean_pfit
+    perr_bootstrap = err_pfit
+    
+    # return p , dp
+    return pfit_bootstrap , perr_bootstrap
 
 def read_result_file( fname ) :
     running_paces = []
@@ -34,7 +68,6 @@ def read_result_file( fname ) :
         include_race = int(e[4])
         race_name = ' '.join( e[5:] )
         t = ( pace_minute + pace_second/60. )
-        # running_paces.append( running_pace( d = dist_meters , t = ( pace_minute*60. + pace_second ) , y = race_year , inc = include_race , name = race_name ) )
         if include_race :
             running_paces.append( [ dist_meters , t ] )
     
