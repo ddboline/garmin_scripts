@@ -1,0 +1,117 @@
+    1.0000       05 29   2014    1       Farmingdale Main St Mile
+    3.1069       05 38   1997    1       Hennepin Lake Classic
+    5.0000       05 48   1999    0       Easy Does It 5 miler
+    3.1069       05 54   2011    1       Firecracker 5K 2011 IL
+    3.1069       05 59   1999    0       Hennepin Lake Classic
+    3.1069       06 12   2011    1       Ho Ho Ho Holiday 5k Run 2011    NY
+    3.1069       06 13   2012    1       NYS Parks Winter Run Series 2012    NY
+    3.1069       06 14   2012    1       NYS Parks Winter Run Series 2012 - Caumsett 5k  NY
+    6.2137       06 16   2011    1       MDRA Victory 10K and 5K 2011 - Run-10K  MN
+    2.6000       06 17   2014    1       Sarcoidosis 2.6mi
+    3.1069       06 17   2011    1       MDRA Victory 10K and 5K 2011 - Run-5K   MN
+    3.1069       06 20   2012    1       NYS Parks Winter Run Series 2012 - Jones Beach  NY
+    3.1069       06 20   2014    1       Corporate Challenge
+    6.2137       06 21   2000    0       Hennepin Lake Classic
+    2.4855       06 22   2014    1       VA 4k Race
+    3.1069       06 22   2014    1       Community Ambulance Corp 5k
+    3.1069       06 23   2012    1       NYS Parks Winter Run Series 2012 - Heckscher 5k NY
+    3.1069       06 26   2013    1       The Bench 5k    NY
+    6.2137       06 26   2011    1       Windrunner 10K 2011 IL
+    4.0000       06 27   2014    1       Summerfest 4mi
+    3.1069       06 28   2013    1       Debbie Whittemore Memorial 5k Run/Walk  NY
+    3.1069       06 29   2014    1       Caumsett 5k
+    3.1069       06 30   2012    1       Ho Ho Ho 5k Race 2012   NY
+    3.1069       06 31   2014    1       Belmont Lake 5k
+    3.1069       06 32   2014    1       Diamond Dash 5k
+    4.0000       06 32   2013    1       Sayville Summerfest Hon. John Cohalan 4 Mile Run    NY
+    4.0000       06 33   2014    1       Cystic Fibrosis 4mi
+   10.0000       06 34   2012    1       Sayville Running Company 10 Mile Run to the Brewery 2012    NY
+   13.1094       06 34   1999    0       Mora Half Marathon
+    4.0000       06 34   2014    1       Bellmore 4mi
+    3.1069       06 35   2013    1       NYS Parks Winter Series - Heckscher State Park  NY
+    4.0000       06 35   2013    1       Blazing Trails 4-Autism Four Mile Run   NY
+    3.1069       06 36   2013    1       Ho Ho Ho Holiday run    NY
+    3.1069       06 36   2014    1       Massapequa Firecracker 5k
+    6.2137       06 37   2014    1       Angel's on the Bay 10k
+    3.1069       06 38   2014    1       Bethpage 5k
+    4.0000       06 38   2014    1       Fly with the Owls 4mi
+    3.1069       06 39   2012    1       Village of Brightwaters 12th Annual Pumpkin Run 2012    NY
+    3.1069       06 39   2014    1       Run for the Ranch 5k
+    6.2137       06 40   2013    1       The Great Cow Harbor 10k Run - 10K Run  NY
+    3.1069       06 41   2014    1       Keith Nintzel 5k
+    3.1069       06 41   2014    1       Robert Moses 5k
+    6.2137       06 41   2014    1       Dirty Sock Run 10k
+    3.1069       06 42   2012    1       Santa's 5k Toy Trot 2012    NY
+    3.1069       06 42   2013    1       Shwachman-Diamond Dash for a Cure 5K    NY
+    5.0000       06 42   2000    0       Easy Does It 5 miler
+    6.2137       06 42   1999    0       FIRECRACKER RUN 10K 1999    MN
+    6.2137       06 43   2013    1       MDRA Victory - 10K Run  MN
+    3.1069       06 44   2002    1       Grand Old Day On the Go 2002 - Run-5K   MN
+    3.1069       06 45   1999    0       William Irvin 5K, Duluth MN
+    3.1069       06 45   2013    1       MDRA Victory - 5K Run   MN
+    6.2137       06 45   2014    1       The Great Cow Harbor 10k Run - 10K Run  NY
+    4.9710       06 47   2014    1       New Hyde Park 8k
+   13.1094       06 48   2011    1       Chicago Half Marathon & 5K 2011 - Run-Half Marathon IL
+    5.0000       06 48   2012    1       Wantagh Snowball 5 Mile Run 2012    NY
+    6.2137       06 49   2012    1       Drumstick Dash 2012 MN
+    6.2137       06 51   2012    1       The Great Cow Harbor 10k Run 2012   NY
+   13.1094       06 52   2001    1       Mora Half Marathon 2001 MN
+    3.1069       06 53   2013    1       NYS Parks Winter Run Series 2013    NY
+    6.2137       06 53   2014    1       Shelter Island 10k
+    3.1069       06 54   2011    1       Stony Brook Turkey Trot 5K Run/Walk 2011    NY
+    3.1069       06 54   2014    1       Thunder Run 5k
+    3.1069       06 55   2014    1       NYS Parks Winter Run Series - Jones Beach State Park NY
+   13.1094       06 57   2001    1       Whistlestop Marathon 2001 - Run -Half Marathon  WI
+    4.0000       06 57   2012    1       Nickerson 4 Mile Run 2012 Open 2012 NY
+    6.2137       06 57   2014    1       Sunken Meadow 10k
+    5.0000       07 00   2014    1       Jones Beach 5mi
+    3.1069       07 01   2012    1       Conquer The Hills 5K 2012   NY
+    4.0000       07 01   2014    1       4mi Run Around the Lake
+    6.2137       07 02   2013    1       Drumstick Dash 10K - 10K Run    MN
+   10.0000       07 03   2013    1       Sayville Running Company 10 Mile Run to the Brewery NY
+    5.0000       07 03   2014    1       Heckscher 5mi
+   13.1094       07 06   2013    1       Great South Bay Run - Half Marathon NY
+    3.1069       07 07   2014    1       NYS Parks Winter Run Series - Caumsett State Park   NY
+   15.5343       07 08   2012    1       Caumsett Park 50K/25K 2012 - Run-25K    NY
+    3.1069       07 08   2014    1       Doug Wood 5k XC Trail Run
+    4.0000       07 08   2013    1       Cystic Fibrosis 4Mi Run   NY
+   10.0000       07 10   2014    1       10 Mile Run To The Brewery  NY
+    6.2137       07 15   2014    1       Aspire 10k
+   13.1094       07 25   2002    1       New Prague Half Marathon    MN
+   13.1094       07 29   2013    1       Suffolk County Half Marathon - Half Marathon    NY
+   13.1094       07 33   2012    1       13.1 Marathon NYC
+   13.1094       07 36   2014    1       Great South Bay Run - Half Marathon NY
+    3.1069       07 37   2014    1       NYS State Parks Winter Run Series Robert Moses 5K   NY
+   10.3600       07 44   2013    1       Tesla Hertz 10 mile trail run
+    3.1069       07 47   2014    1       NYS Parks Winter Series - Heckscher NY
+    4.9710       07 50   2013    1       Tough Cookie 8k Trail Race  NY
+   26.2188       07 51   2002    1       Twin Cities Marathon - Run - 26.2Miles  MN
+   26.2188       07 56   2004    1       Grandma's Marathon 2004 MN
+   26.2188       07 57   2013    1       Philadelphia Marathon & Half Marathon, 8k - Marathon    PA
+   15.5343       08 02   2013    1       GLIRC 25K/50K Caumsett Park Run - 25k Run   NY
+   26.2188       08 07   2002    1       Grandma's Marathon 2002 MN
+    5.0000       08 08   2014    1       Run the Farm 5miler
+   26.2188       08 13   2003    1       Cerrone Ocean State Marathon RI
+   26.2188       08 14   2001    1       Grandma's Marathon 2001 MN
+   26.2188       08 19   2003    1       Grandma's Marathon 2003 - Run - 26.22Mi MN
+   26.2188       08 19   2012    1       Whistle Stop Marathon 2012 - Run-Marathon   WI
+    9.3206       08 22   2014    1       Manorville Hills 15k Trail Race
+   26.2188       08 29   2004    1       Twin Cities Marathon 2004 - Run Marathon    MN
+   26.2188       08 29   2013    1       Minneapolis Marathon - Marathon MN
+   31.0686       08 49   2014    1       Caumsett 50k USATF Championships
+   13.1094       08 54   2014    0       Paine to Pain Half Marathon, New Rochelle NY
+    6.2137       08 56   2014    0       Leatherman's Loop 10k Trail Run
+   26.2188       09 07   2005    0       Grandma's Marathon 2005 - Marathon  MN
+   26.2188       09 19   2011    0       Towpath Marathon - Run-Marathon OH
+   14.1000       09 26   2012    0       Rodeo Valley Trail Run – Winter - Trail-Half-Marathon   CA
+   26.2188       09 49   2012    0       Long Island Marathon - Half Marathon 2012 - Run-Marathon    NY
+   26.2188       10 01   2010    0       Grandma's Marathon 2010 - Grandma's Marathon    MN
+   31.0686       10 28   2014    1       Tesla Hertz 50k trail run
+   32.9000       10 38   2014    1       GLIRC 6 Hour Birthday Run
+   13.1094       10 40   2013    0       North Face Endurance Challenge - Half Marathon Trail    NY
+   50.0000       12 51   2014    1       Ocean to Sound 50 mile
+   50.0000       13 07   2014    1       JFK 50 miler
+   43.4960       13 35   2014    1       Paumanok Pursuit 70k Trail Run
+   31.0686       14 13   2014    1       Greenbelt 50k
+   31.0686       14 16   2014    1       Wildcat Ridge 50k
+   31.0686       14 17   2014    1       North Face Endurance Challenge NY
