@@ -20,7 +20,7 @@ def do_fit( data , func , p0 ) :
     p , c = optimize.curve_fit( func , datax , datay , p0 = p0 )
     l , v = np.linalg.eig( c )
     sig = v.dot( np.sqrt( np.diag( l ) ) ).dot( v.T )
-    dp = np.sqrt( np.sum( sig.dot( v )**2 , axis=0 ) )
+    dp = np.sqrt( np.sum( sig.dot( v )**2 , axis=1 ) )
     
     errfunc = lambda p, x, y: func(x,*p) - y
     
@@ -53,8 +53,13 @@ def do_fit( data , func , p0 ) :
     pfit_bootstrap = mean_pfit
     perr_bootstrap = err_pfit
     
-    # return p , dp
-    return pfit_bootstrap , perr_bootstrap
+    print 'p',p
+    print 'pb',pfit_bootstrap
+    print 'dp',dp
+    print 'dpb',perr_bootstrap
+    
+    return p , dp
+    # return pfit_bootstrap , perr_bootstrap
 
 def read_result_file( fname ) :
     running_paces = []
