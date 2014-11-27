@@ -188,7 +188,7 @@ class garmin_point(object) :
         self.avg_speed_value_permi = None
         self.avg_speed_value_mph = None
 
-    def read_point_xml( self , ent ) :
+    def read_point_xml_new( self , ent ) :
         for e in ent :
             if '@time' in e :
                 self.time = convert_date_string( e.split('=')[1] )
@@ -223,7 +223,7 @@ class garmin_point(object) :
             self.heart_rate = int( hr )
         return None
 
-    def read_point_tcx( self , ent ) :
+    def read_point_tcx_new( self , ent ) :
         if len(ent) > 0 :
             if 'Time' in ent[0] :
                 self.time = convert_date_string( ent[0].split('=')[1] )
@@ -303,7 +303,7 @@ class garmin_lap(object) :
         self.lap_number = lap_number
         self.lap_start_string = ''
 
-    def read_lap_xml( self , ent ) :
+    def read_lap_xml_new( self , ent ) :
         ''' read lap from xml file '''
         for e in ent :
             if 'type' in e :
@@ -352,7 +352,7 @@ class garmin_lap(object) :
         self.lap_intensity = getText(node.getElementsByTagName('intensity')[0])
         return None
 
-    def read_lap_tcx( self , ent ) :
+    def read_lap_tcx_new( self , ent ) :
         if len(ent) > 0 :
             if 'StartTime' in ent[0] :
                 self.lap_start_string = ent[0].split('=')[1]
@@ -418,6 +418,8 @@ class garmin_file(object) :
             functions:
                 read_file() , read_file_tcx() , read_file_xml() , print_file_string() , calculate_speed() , print_splits() , do_map( gpx_filename ) , do_plots()
     '''
+    use_new_xml = False
+    
     def __init__( self , filename = '' , is_tcx = False , is_txt = False ) :
         self.filename = filename
         self.track_points = []
@@ -556,6 +558,12 @@ class garmin_file(object) :
         return None
 
     def read_file_tcx( self ) :
+        if use_new_xml :
+            return self.read_file_tcx_new()
+        else :
+            return self.read_file_tcx_old()
+
+    def read_file_tcx_new( self ) :
         is_bad_run = False
         is_bad_bike = False
         cur_lap = None
@@ -581,8 +589,8 @@ class garmin_file(object) :
                             temp_points.append( cur_point )
                         elif 'Time' in ent[7] :
                             cur_point = garmin_point()
-                        cur_point.read_point_tcx(ent[7:])
-                cur_lap.read_lap_tcx( ent[5:] )
+                        cur_point.read_point_tcx_new(ent[7:])
+                cur_lap.read_lap_tcx_new( ent[5:] )
 
         if cur_lap not in self.laps :
             self.laps.append( cur_lap )
@@ -683,6 +691,12 @@ class garmin_file(object) :
         return None
 
     def read_file_xml( self ) :
+        if use_new_xml :
+            return self.read_file_xml_new()
+        else :
+            return self.read_file_xml_old()
+
+    def read_file_xml_new( self ) :
         cur_lap = None
         cur_point = None
         last_ent = None
@@ -697,13 +711,13 @@ class garmin_file(object) :
                     self.laps.append( cur_lap )
                 elif 'type' in ent[3] :
                     cur_lap = garmin_lap()
-                cur_lap.read_lap_xml(ent[3:])
+                cur_lap.read_lap_xml_new(ent[3:])
             elif ent[2] == 'point' :
                 if len(ent) < 4 :
                     temp_points.append( cur_point )
                 elif 'type' in ent[3] :
                     cur_point = garmin_point()
-                cur_point.read_point_xml( ent[3:] )
+                cur_point.read_point_xml_new( ent[3:] )
             else :
                 pass
             if ent[2] != 'lap' and last_ent and last_ent[2] == 'lap' :
@@ -763,7 +777,7 @@ class garmin_file(object) :
         corrected_laps = {}
         for node in doc.getElementsByTagName('lap') :
             cur_lap = garmin_lap()
-            cur_lap.read_lap_xml( node )
+            cur_lap.read_lap_xml_old( node )
             cur_lap.lap_number = lap_number
             if len(self.laps) ==  0 and print_date_string( cur_lap.lap_start ) in list_of_corrected_laps :
                 corrected_laps = list_of_corrected_laps[print_date_string( cur_lap.lap_start )]
@@ -785,7 +799,7 @@ class garmin_file(object) :
 
         for node in doc.getElementsByTagName('point'):
             cur_point = garmin_point()
-            cur_point.read_point_xml( node )
+            cur_point.read_point_xml_old( node )
 
             if len(self.points) == 0 :
                 cur_point.duration_from_last = 0
