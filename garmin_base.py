@@ -418,7 +418,7 @@ class garmin_file(object) :
             functions:
                 read_file() , read_file_tcx() , read_file_xml() , print_file_string() , calculate_speed() , print_splits() , do_map( gpx_filename ) , do_plots()
     '''
-    use_new_xml = False
+    use_new_xml = True
     
     def __init__( self , filename = '' , is_tcx = False , is_txt = False ) :
         self.filename = filename
@@ -558,7 +558,7 @@ class garmin_file(object) :
         return None
 
     def read_file_tcx( self ) :
-        if use_new_xml :
+        if self.use_new_xml :
             return self.read_file_tcx_new()
         else :
             return self.read_file_tcx_old()
@@ -691,7 +691,7 @@ class garmin_file(object) :
         return None
 
     def read_file_xml( self ) :
-        if use_new_xml :
+        if self.use_new_xml :
             return self.read_file_xml_new()
         else :
             return self.read_file_xml_old()
