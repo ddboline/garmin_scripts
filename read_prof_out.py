@@ -1,5 +1,5 @@
 import pstats
-stats = pstats.Stats( 'prof.out' )
+stats = pstats.Stats('prof.out')
 stats.strip_dirs().sort_stats('time').reverse_order().print_stats()
 #stats.strip_dirs().sort_stats('ncalls').reverse_order().print_stats()
 #stats.strip_dirs().sort_stats('cumtime').reverse_order().print_stats()
