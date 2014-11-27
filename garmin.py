@@ -91,7 +91,10 @@ if __name__ == '__main__' :
         os.putenv( 'PATH' , '%s:%s/bin' % ( os.getenv( 'PATH' ) , script_path ) )
 
     if len(os.sys.argv)>1 :
-        if os.sys.argv[1] == 'get' and not os.path.exists( '%s/run' % script_path ) :
+        if os.sys.argv[1] in [ 'h' , 'help' , '-h' , '--help' ] :
+            print 'usage: ./garmin.py <get|build|sync|backup|year|(file)|(directory)|(year(-month(-day)))|(sport)|occur|update>'
+            exit(0)
+        elif os.sys.argv[1] == 'get' and not os.path.exists( '%s/run' % script_path ) :
             run_command( 'mkdir -p %s/run/' % script_path )
             os.chdir( '%s/run' % script_path )
             run_command( 'wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/backup/garmin_data.tar.gz' )
