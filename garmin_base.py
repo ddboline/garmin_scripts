@@ -1151,7 +1151,6 @@ def do_summary( directory , **options ) :
 
         if ( reduced_gmn_filename not in filename_md5_dict ) or filename_md5_dict[reduced_gmn_filename].md5sum != gmn_md5sum or ( do_update and print_date_string( filename_md5_dict[reduced_gmn_filename].begin_time ) in list_of_corrected_laps ) :
             pickle_file_is_modified[0] = True
-            print gmn_filename
             gfile = garmin_summary( gmn_filename , md5sum = gmn_md5sum )
             if gfile.read_file() :
                 filename_md5_dict[reduced_gmn_filename] = gfile
