@@ -112,18 +112,21 @@ def getText(nodelist):
 
 def convert_gmn_to_gpx(gmn_filename):
     ''' create temporary gpx file from gmn or tcx files '''
-    if gmn_filename.find('.fit') >= 0 or gmn_filename.find('.FIT') >= 0:
+    if '.fit' in gmn_filename.lower():
         tcx_filename = convert_fit_to_tcx(gmn_filename)
         run_command('gpsbabel -i gtrnctr -f %s -o gpx -F /tmp/temp.gpx ' % (tcx_filename))
-    elif gmn_filename.find('.tcx') >= 0 or gmn_filename.find('.TCX') >= 0:
+    elif '.tcx' in gmn_filename.lower():
         run_command('gpsbabel -i gtrnctr -f %s -o gpx -F /tmp/temp.gpx' % gmn_filename)
+    elif '.txt' in gmn_filename.lower():
+        print 'TEXT FILE!!!'
+        return None
     else:
         run_command('garmin_gpx %s > /tmp/temp.gpx' % gmn_filename)
     return '/tmp/temp.gpx'
 
 def convert_fit_to_tcx(fit_filename):
     ''' fit files to tcx files '''
-    if fit_filename.find('.fit') >= 0 or fit_filename.find('.FIT') >= 0:
+    if '.fit' in fit_filename.lower():
         run_command('fit2tcx %s > /tmp/temp.tcx' % fit_filename)
     else:
         return False
@@ -158,7 +161,7 @@ def convert_gmn_to_xml(gmn_filename):
             if 'sport' in line:
                 line = line.replace('running', 'walking')
         if is_stair:
-            if line.find('sport') >= 0:
+            if 'sport' in line:
                 line = line.replace('running', 'stairs')
         xml_file.write(line + '\n')
     xml_file.write('</root>\n')
@@ -396,7 +399,7 @@ class garmin_file(object):
             cur_point = garmin_point()
 
             for ent in line.strip().split():
-                if ent.find('=') < 0:
+                if '=' in ent:
                     continue
                 key = ent.split('=')[0]
                 val = ent.split('=')[1]
@@ -424,9 +427,9 @@ class garmin_file(object):
                     cur_lap.lap_duration = float(convert_time_string(val))
                     cur_point.time = self.points[-1].time + datetime.timedelta(seconds=cur_lap.lap_duration)
                 if key == 'dis':
-                    if val.find('mi') >= 0: # specify mi, m or assume it's meters
+                    if 'mi' in val: # specify mi, m or assume it's meters
                         cur_lap.lap_distance = float(val.split('mi')[0]) * meters_per_mile
-                    elif val.find('m') >= 0:
+                    elif 'm' in val:
                         cur_lap.lap_distance = float(val.split('m')[0])
                     else:
                         cur_lap.lap_distance = float(val)
