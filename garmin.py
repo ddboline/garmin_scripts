@@ -3,11 +3,17 @@
 
 import os
 import datetime
-from garmin_base import garmin_file, do_summary, meters_per_mile, sport_types, convert_gmn_to_gpx
+from garmin_base import garmin_file, do_summary, meters_per_mile, sport_types, convert_gmn_to_gpx, do_plots
 from util import run_command
+import cPickle
 
 def read_garmin_file(fname, **options):
     gfile = garmin_file(fname)
+
+    pkl_fname = '%s.pkl' % fname.split('.')[0]
+    pkl_file = open(pkl_fname, 'wb')
+    cPickle.dump(gfile, pkl_file, cPickle.HIGHEST_PROTOCOL)
+    pkl_file.close()
 
     gfile.print_file_string()
     if gfile.is_txt:
@@ -44,7 +50,7 @@ def read_garmin_file(fname, **options):
 
     gpx_filename = convert_gmn_to_gpx(fname)
     if 'do_plot' in options and options['do_plot']:
-        gfile.do_plots()
+        do_plots(gfile)
 
 def compare_with_remote(script_path):
     from urllib2 import urlopen

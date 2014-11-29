@@ -175,7 +175,7 @@ class garmin_point(object):
             functions:
                 read_point_xml(node), read_point_tcx(node)
     '''
-    def __init__(self, time=None, latitude=None, longitude=None, altitude=0, distance=0, heart_rate=0):
+    def __init__(self, time=None, latitude=None, longitude=None, altitude=None, distance=None, heart_rate=None):
         self.time = time
         self.latitude = latitude
         self.longitude = longitude
@@ -324,7 +324,7 @@ class garmin_file(object):
     '''
         class representing a full xml file
             functions:
-                read_file(), read_file_tcx(), read_file_xml(), print_file_string(), calculate_speed(), print_splits(), do_map(gpx_filename), do_plots()
+                read_file(), read_file_tcx(), read_file_xml(), print_file_string(), calculate_speed(), print_splits()
     '''
     def __init__(self, filename='', is_tcx=False, is_txt=False):
         self.filename = filename
@@ -340,7 +340,6 @@ class garmin_file(object):
         self.points = []
         self.is_tcx = is_tcx
         self.is_txt = is_txt
-        self.graphs = []
 
         if self.filename:
             self.determine_file_type()
@@ -717,184 +716,186 @@ class garmin_file(object):
 
         return split_vector
 
-    def do_map(self, gpx_filename):
-        ''' wrapper around gpxviewer '''
-        if gpx_filename:
-            run_command('gpxviewer %s' % gpx_filename)
+def do_map(gpx_filename):
+    ''' wrapper around gpxviewer '''
+    if gpx_filename:
+        run_command('gpxviewer %s' % gpx_filename)
 
-    def do_plots(self, use_time=False):
-        ''' create pretty plots '''
-        avg_hr = 0
-        sum_time = 0
-        max_hr = 0
-        hr_vals = []
-        hr_values = []
-        alt_vals = []
-        alt_values = []
-        vertical_climb = 0
-        speed_values = filter(lambda x: x[1] < 20, self.print_splits(400., print_out=False))
-        mph_speed_values = []
-        avg_speed_values = []
-        avg_mph_speed_values = []
-        lat_vals = []
-        lon_vals = []
-        mile_split_vals = self.print_splits(meters_per_mile, print_out=False)
-        for point in self.points:
-            if use_time:
-                xval = point.duration_from_begin
-            else:
-                xval = point.distance / meters_per_mile
-            if xval > 0 and point.heart_rate > 0:
-                avg_hr += point.heart_rate * point.duration_from_last
-                sum_time += point.duration_from_last
-                hr_vals.append(point.heart_rate)
-                hr_values.append([xval, point.heart_rate])
-            if point.altitude > 0:
-                alt_vals.append(point.altitude)
-                if len(alt_vals) > 1 and alt_vals[-1] > alt_vals[-2]:
-                    vertical_climb += alt_vals[-1] - alt_vals[-2]
-                alt_values.append([xval, point.altitude])
-            # if point.speed_permi > 0 and point.speed_permi < 20:
-                # speed_values.append([xval, point.speed_permi])
-            if point.speed_mph > 0 and point.speed_mph < 20:
-                mph_speed_values.append([xval, point.speed_mph])
-            if point.avg_speed_value_permi > 0 and point.avg_speed_value_permi < 20:
-                avg_speed_values.append([xval, point.avg_speed_value_permi])
-            if point.avg_speed_value_mph > 0:
-                avg_mph_speed_values.append([xval, point.avg_speed_value_mph])
-            if point.latitude and point.longitude:
-                lat_vals.append(point.latitude)
-                lon_vals.append(point.longitude)
-        if sum_time > 0:
-            avg_hr /= sum_time
-            max_hr = max(hr_vals)
+def plot_graph(name=None, title=None, data=None, **opts):
+    import numpy as np
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    popts = {}
+    if 'plotopt' in opts:
+        popts = opts['plotopt']
+    plt.clf()
+    x, y = zip(*data)
+    xa = np.array(x)
+    ya = np.array(y)
+    plt.plot(xa, ya, **popts)
+    xmin, xmax, ymin, ymax = plt.axis()
+    xmin, ymin = map(lambda z: z - 0.1 * abs(z), [xmin, ymin])
+    xmax, ymax = map(lambda z: z + 0.1 * abs(z), [xmax, ymax])
+    plt.axis([xmin, xmax, ymin, ymax])
+    plt.title(title)
+    plt.savefig('%s.png' % name)
+    return '%s.png' % name
 
-        if len(hr_vals) > 0:
-            print 'Heart Rate %2.2f avg %2.2f max' % (avg_hr, max(hr_vals))
+def make_mercator_map(name=None, title=None, lats=None, lons=None, **opts):
+    import matplotlib
+    matplotlib.use('Agg')
+    from mpl_toolkits.basemap import Basemap
+    import numpy as np
+    import matplotlib.pyplot as plt
+    plt.clf()
+    x = np.array(lons)
+    y = np.array(lats)
 
-        if len(alt_vals) > 0:
-            print 'max altitude diff: %.2f m' % (max(alt_vals) - min(alt_vals))
-            print 'vertical climb: %.2f m' % vertical_climb
+    latcent = (y.max() + y.min()) / 2.
+    loncent = (x.max() + x.min()) / 2.
+    latwidth = abs(y.max() - y.min())
+    lonwidth = abs(x.max() - x.min())
+    width = max(latwidth, lonwidth)
+    latmin = latcent - 0.6 * width
+    latmax = latcent + 0.6 * width
+    lonmin = loncent - 0.6 * width
+    lonmax = loncent + 0.6 * width
 
-        def plot_graph(name=None, title=None, data=None, **opts):
-            import numpy as np
-            import matplotlib
-            matplotlib.use('Agg')
-            import matplotlib.pyplot as plt
-            popts = {}
-            if 'plotopt' in opts:
-                popts = opts['plotopt']
-            plt.clf()
-            x, y = zip(*data)
-            xa = np.array(x)
-            ya = np.array(y)
-            plt.plot(xa, ya, **popts)
-            xmin, xmax, ymin, ymax = plt.axis()
-            xmin, ymin = map(lambda z: z - 0.1 * abs(z), [xmin, ymin])
-            xmax, ymax = map(lambda z: z + 0.1 * abs(z), [xmax, ymax])
-            plt.axis([xmin, xmax, ymin, ymax])
-            plt.title(title)
-            plt.savefig('%s.png' % name)
-            return '%s.png' % name
+    m = Basemap(projection='merc', llcrnrlat=latmin, urcrnrlat=latmax, llcrnrlon=lonmin, urcrnrlon=lonmax, resolution='h')
+    m.drawcoastlines()
+    try:
+        m.drawlsmask(ocean_color='aqua')
+    except:
+        pass
+    m.fillcontinents(color='white', lake_color='aqua')
+    m.drawstates()
+    m.drawcounties()
 
-        def make_mercator_map(name=None, title=None, lats=None, lons=None, **opts):
-            import matplotlib
-            matplotlib.use('Agg')
-            from mpl_toolkits.basemap import Basemap
-            import numpy as np
-            import matplotlib.pyplot as plt
-            plt.clf()
-            x = np.array(lons)
-            y = np.array(lats)
+    m.plot(x, y, latlon=True)
 
-            latcent = (y.max() + y.min()) / 2.
-            loncent = (x.max() + x.min()) / 2.
-            latwidth = abs(y.max() - y.min())
-            lonwidth = abs(x.max() - x.min())
-            width = max(latwidth, lonwidth)
-            latmin = latcent - 0.6 * width
-            latmax = latcent + 0.6 * width
-            lonmin = loncent - 0.6 * width
-            lonmax = loncent + 0.6 * width
+    plt.title(title)
+    plt.xlabel('longitude deg')
+    plt.ylabel('latitude deg')
+    plt.savefig('%s.png' % name)
+    return '%s.png' % name
 
-            m = Basemap(projection='merc', llcrnrlat=latmin, urcrnrlat=latmax, llcrnrlon=lonmin, urcrnrlon=lonmax, resolution='h')
-            m.drawcoastlines()
-            try:
-                m.drawlsmask(ocean_color='aqua')
-            except:
-                pass
-            m.fillcontinents(color='white', lake_color='aqua')
-            m.drawstates()
-            m.drawcounties()
 
-            m.plot(x, y, latlon=True)
+def do_plots(gfile, use_time=False):
+    ''' create pretty plots '''
+    avg_hr = 0
+    sum_time = 0
+    max_hr = 0
+    hr_vals = []
+    hr_values = []
+    alt_vals = []
+    alt_values = []
+    vertical_climb = 0
+    speed_values = filter(lambda x: x[1] < 20, gfile.print_splits(400., print_out=False))
+    mph_speed_values = []
+    avg_speed_values = []
+    avg_mph_speed_values = []
+    lat_vals = []
+    lon_vals = []
+    graphs = []
+    mile_split_vals = gfile.print_splits(meters_per_mile, print_out=False)
+    for point in gfile.points:
+        if use_time:
+            xval = point.duration_from_begin
+        else:
+            xval = point.distance / meters_per_mile
+        if xval > 0 and point.heart_rate > 0:
+            avg_hr += point.heart_rate * point.duration_from_last
+            sum_time += point.duration_from_last
+            hr_vals.append(point.heart_rate)
+            hr_values.append([xval, point.heart_rate])
+        if point.altitude > 0:
+            alt_vals.append(point.altitude)
+            if len(alt_vals) > 1 and alt_vals[-1] > alt_vals[-2]:
+                vertical_climb += alt_vals[-1] - alt_vals[-2]
+            alt_values.append([xval, point.altitude])
+        # if point.speed_permi > 0 and point.speed_permi < 20:
+            # speed_values.append([xval, point.speed_permi])
+        if point.speed_mph > 0 and point.speed_mph < 20:
+            mph_speed_values.append([xval, point.speed_mph])
+        if point.avg_speed_value_permi > 0 and point.avg_speed_value_permi < 20:
+            avg_speed_values.append([xval, point.avg_speed_value_permi])
+        if point.avg_speed_value_mph > 0:
+            avg_mph_speed_values.append([xval, point.avg_speed_value_mph])
+        if point.latitude and point.longitude:
+            lat_vals.append(point.latitude)
+            lon_vals.append(point.longitude)
+    if sum_time > 0:
+        avg_hr /= sum_time
+        max_hr = max(hr_vals)
 
-            plt.title(title)
-            plt.xlabel('longitude deg')
-            plt.ylabel('latitude deg')
-            plt.savefig('%s.png' % name)
-            return '%s.png' % name
+    if len(hr_vals) > 0:
+        print 'Heart Rate %2.2f avg %2.2f max' % (avg_hr, max(hr_vals))
 
-        curpath = os.path.realpath(os.path.curdir)
-        print curpath
-        if not os.path.exists('%s/html' % curpath):
-            os.makedirs('%s/html' % curpath)
-        os.chdir('%s/html' % curpath)
-        htmlfile = open('index.html', 'w')
-        if len(lat_vals) > 0 and len(lon_vals) > 0 and len(lat_vals) == len(lon_vals):
-            minlat , maxlat = min(lat_vals) , max(lat_vals)
-            minlon , maxlon = min(lon_vals) , max(lon_vals)
-            central_lat = ( maxlat + minlat )/2.
-            central_lon = ( maxlon + minlon )/2.
-            for line in open( '%s/MAP_TEMPLATE.html' % curpath , 'r' ) :
-                if 'INSERTMAPSEGMENTSHERE' in line :
-                    for idx in range( 0 , len(lat_vals) ) :
-                        htmlfile.write( 'new google.maps.LatLng(%f,%f),\n' % ( lat_vals[idx] , lon_vals[idx] ) )
-                elif 'MINLAT' in line or 'MAXLAT' in line or 'MINLON' in line or 'MAXLON' in line:
-                    htmlfile.write( line.replace( 'MINLAT' , '%s' % minlat ).replace( 'MAXLAT' , '%s' % maxlat ).replace( 'MINLON' , '%s' % minlon ).replace( 'MAXLON' , '%s' % maxlon ) )
-                elif 'CENTRALLAT' in line or 'CENTRALLON' in line:
-                    htmlfile.write( line.replace('CENTRALLAT', '%s' % central_lat).replace('CENTRALLON', '%s' % central_lon) )
-                elif 'INSERTOTHERIMAGESHERE' in line :
-                    break
-                else :
-                    htmlfile.write( line )
-        else :
-            htmlfile.write('<!DOCTYPE HTML>\n<html>\n<body>\n')
-        
-        #if len(lat_vals) > 0 and len(lon_vals) > 0:
-            #self.graphs.append(make_mercator_map(name='route_map', title='Route Map', lats=lat_vals, lons=lon_vals))
+    if len(alt_vals) > 0:
+        print 'max altitude diff: %.2f m' % (max(alt_vals) - min(alt_vals))
+        print 'vertical climb: %.2f m' % vertical_climb
 
-        if len(mile_split_vals) > 0:
-            options = {'plotopt': {'marker': 'o'}}
-            self.graphs.append(plot_graph(name='mile_splits', title='Pace per Mile every mi', data=mile_split_vals, **options))
+    curpath = os.path.realpath(os.path.curdir)
+    print curpath
+    if not os.path.exists('%s/html' % curpath):
+        os.makedirs('%s/html' % curpath)
+    os.chdir('%s/html' % curpath)
+    htmlfile = open('index.html', 'w')
+    if len(lat_vals) > 0 and len(lon_vals) > 0 and len(lat_vals) == len(lon_vals):
+        minlat, maxlat = min(lat_vals), max(lat_vals)
+        minlon, maxlon = min(lon_vals), max(lon_vals)
+        central_lat = (maxlat + minlat)/2.
+        central_lon = (maxlon + minlon)/2.
+        for line in open('%s/MAP_TEMPLATE.html' % curpath, 'r') :
+            if 'INSERTMAPSEGMENTSHERE' in line :
+                for idx in range(0, len(lat_vals)) :
+                    htmlfile.write('new google.maps.LatLng(%f,%f),\n' % (lat_vals[idx], lon_vals[idx]))
+            elif 'MINLAT' in line or 'MAXLAT' in line or 'MINLON' in line or 'MAXLON' in line:
+                htmlfile.write(line.replace('MINLAT', '%s' % minlat).replace('MAXLAT', '%s' % maxlat).replace('MINLON', '%s' % minlon).replace('MAXLON', '%s' % maxlon))
+            elif 'CENTRALLAT' in line or 'CENTRALLON' in line:
+                htmlfile.write(line.replace('CENTRALLAT', '%s' % central_lat).replace('CENTRALLON', '%s' % central_lon))
+            elif 'INSERTOTHERIMAGESHERE' in line :
+                break
+            else :
+                htmlfile.write(line)
+    else :
+        htmlfile.write('<!DOCTYPE HTML>\n<html>\n<body>\n')
 
-        if len(hr_values) > 0:
-            self.graphs.append(plot_graph(name='heart_rate', title='Heart Rate %2.2f avg %2.2f max' % (avg_hr, max_hr), data=hr_values))
-        if len(alt_values) > 0:
-            self.graphs.append(plot_graph(name='altitude', title='Altitude', data=alt_values))
-        if len(speed_values) > 0:
-            self.graphs.append(plot_graph(name='speed_minpermi', title='Speed min/mi every 1/4 mi', data=speed_values))
-            self.graphs.append(plot_graph(name='speed_mph', title='Speed mph', data=mph_speed_values))
+    #if len(lat_vals) > 0 and len(lon_vals) > 0:
+        #graphs.append(make_mercator_map(name='route_map', title='Route Map', lats=lat_vals, lons=lon_vals))
 
-        if len(avg_speed_values) > 0:
-            avg_speed_value_min = int(avg_speed_values[-1][1])
-            avg_speed_value_sec = int((avg_speed_values[-1][1] - avg_speed_value_min) * 60.)
-            self.graphs.append(plot_graph(name='avg_speed_minpermi', title='Avg Speed %i:%02i min/mi' % (avg_speed_value_min, avg_speed_value_sec), data=avg_speed_values))
+    if len(mile_split_vals) > 0:
+        options = {'plotopt': {'marker': 'o'}}
+        graphs.append(plot_graph(name='mile_splits', title='Pace per Mile every mi', data=mile_split_vals, **options))
 
-        if len(avg_mph_speed_values) > 0:
-            avg_mph_speed_value = avg_mph_speed_values[-1][1]
-            self.graphs.append(plot_graph(name=' avg_speed_mph', title='Avg Speed %.2f mph' % avg_mph_speed_value, data=avg_mph_speed_values))
+    if len(hr_values) > 0:
+        graphs.append(plot_graph(name='heart_rate', title='Heart Rate %2.2f avg %2.2f max' % (avg_hr, max_hr), data=hr_values))
+    if len(alt_values) > 0:
+        graphs.append(plot_graph(name='altitude', title='Altitude', data=alt_values))
+    if len(speed_values) > 0:
+        graphs.append(plot_graph(name='speed_minpermi', title='Speed min/mi every 1/4 mi', data=speed_values))
+        graphs.append(plot_graph(name='speed_mph', title='Speed mph', data=mph_speed_values))
 
-        for f in self.graphs:
-            htmlfile.write('<p>\n<img src="%s">\n</p>' % f)
+    if len(avg_speed_values) > 0:
+        avg_speed_value_min = int(avg_speed_values[-1][1])
+        avg_speed_value_sec = int((avg_speed_values[-1][1] - avg_speed_value_min) * 60.)
+        graphs.append(plot_graph(name='avg_speed_minpermi', title='Avg Speed %i:%02i min/mi' % (avg_speed_value_min, avg_speed_value_sec), data=avg_speed_values))
 
-        htmlfile.write('</body>\n</html>\n')
-        htmlfile.close()
-        os.chdir(curpath)
-        if os.path.exists('%s/html' % curpath) and os.path.exists('%s/public_html/garmin' % os.getenv('HOME')):
-            if os.path.exists('%s/public_html/garmin/html' % os.getenv('HOME')):
-                run_command('rm -rf %s/public_html/garmin/html' % os.getenv('HOME'))
-            run_command('mv %s/html %s/public_html/garmin' % (curpath, os.getenv('HOME')))
+    if len(avg_mph_speed_values) > 0:
+        avg_mph_speed_value = avg_mph_speed_values[-1][1]
+        graphs.append(plot_graph(name=' avg_speed_mph', title='Avg Speed %.2f mph' % avg_mph_speed_value, data=avg_mph_speed_values))
+
+    for f in graphs:
+        htmlfile.write('<p>\n<img src="%s">\n</p>' % f)
+
+    htmlfile.write('</body>\n</html>\n')
+    htmlfile.close()
+    os.chdir(curpath)
+    if os.path.exists('%s/html' % curpath) and os.path.exists('%s/public_html/garmin' % os.getenv('HOME')):
+        if os.path.exists('%s/public_html/garmin/html' % os.getenv('HOME')):
+            run_command('rm -rf %s/public_html/garmin/html' % os.getenv('HOME'))
+        run_command('mv %s/html %s/public_html/garmin' % (curpath, os.getenv('HOME')))
 
 def compute_file_md5sum(filename):
     ''' wrapper around md5sum '''
