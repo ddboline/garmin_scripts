@@ -841,10 +841,28 @@ class garmin_file(object):
             os.makedirs('%s/html' % curpath)
         os.chdir('%s/html' % curpath)
         htmlfile = open('index.html', 'w')
-        htmlfile.write('<!DOCTYPE HTML>\n<html>\n<body>\n')
-
-        if len(lat_vals) > 0 and len(lon_vals) > 0:
-            self.graphs.append(make_mercator_map(name='route_map', title='Route Map', lats=lat_vals, lons=lon_vals))
+        if len(lat_vals) > 0 and len(lon_vals) > 0 and len(lat_vals) == len(lon_vals):
+            minlat , maxlat = min(lat_vals) , max(lat_vals)
+            minlon , maxlon = min(lon_vals) , max(lon_vals)
+            central_lat = ( maxlat + minlat )/2.
+            central_lon = ( maxlon + minlon )/2.
+            for line in open( '%s/MAP_TEMPLATE.html' % curpath , 'r' ) :
+                if 'INSERTMAPSEGMENTSHERE' in line :
+                    for idx in range( 0 , len(lat_vals) ) :
+                        htmlfile.write( 'new google.maps.LatLng(%f,%f),\n' % ( lat_vals[idx] , lon_vals[idx] ) )
+                elif 'MINLAT' in line or 'MAXLAT' in line or 'MINLON' in line or 'MAXLON' in line:
+                    htmlfile.write( line.replace( 'MINLAT' , '%s' % minlat ).replace( 'MAXLAT' , '%s' % maxlat ).replace( 'MINLON' , '%s' % minlon ).replace( 'MAXLON' , '%s' % maxlon ) )
+                elif 'CENTRALLAT' in line or 'CENTRALLON' in line:
+                    htmlfile.write( line.replace('CENTRALLAT', '%s' % central_lat).replace('CENTRALLON', '%s' % central_lon) )
+                elif 'INSERTOTHERIMAGESHERE' in line :
+                    break
+                else :
+                    htmlfile.write( line )
+        else :
+            htmlfile.write('<!DOCTYPE HTML>\n<html>\n<body>\n')
+        
+        #if len(lat_vals) > 0 and len(lon_vals) > 0:
+            #self.graphs.append(make_mercator_map(name='route_map', title='Route Map', lats=lat_vals, lons=lon_vals))
 
         if len(mile_split_vals) > 0:
             options = {'plotopt': {'marker': 'o'}}
