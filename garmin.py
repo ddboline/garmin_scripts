@@ -10,11 +10,6 @@ import cPickle
 def read_garmin_file(fname, **options):
     gfile = garmin_file(fname)
 
-    pkl_fname = '%s.pkl' % fname.split('.')[0]
-    pkl_file = open(pkl_fname, 'wb')
-    cPickle.dump(gfile, pkl_file, cPickle.HIGHEST_PROTOCOL)
-    pkl_file.close()
-
     gfile.print_file_string()
     if gfile.is_txt:
         return
