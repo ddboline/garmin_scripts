@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import xml.dom.minidom
 import tempfile
 import datetime
 import cPickle
@@ -60,11 +59,9 @@ def days_in_year(year=datetime.date.today().year):
 
 def days_in_month(month=datetime.date.today().month, year=datetime.date.today().year):
     ''' return number of days in a given month '''
-    y1 = year
-    m1 = month + 1
+    y1 , m1 = year , month + 1
     if m1 == 13:
-        m1 = 1
-        y1 += 1
+        y1 , m1 = 1 , y1 + 1
     return (datetime.date(year=y1, month=m1, day=1)-datetime.date(year=year, month=month, day=1)).days
 
 ### maybe change output to datetime object?
@@ -463,9 +460,6 @@ class garmin_file(object):
         return None
 
     def read_file_tcx(self):
-        return self.read_file_tcx()
-
-    def read_file_tcx(self):
         is_bad_run = False
         is_bad_bike = False
         cur_lap = None
@@ -529,9 +523,6 @@ class garmin_file(object):
                 self.points.append(cur_point)
 
         return None
-
-    def read_file_xml(self):
-        return self.read_file_xml()
 
     def read_file_xml(self):
         cur_lap = None
