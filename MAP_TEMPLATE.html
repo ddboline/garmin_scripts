@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Simple Polylines</title>
+    <title>SPORTTITLEDATE</title>
     <style>
       html, body, #map-canvas {
         height: 80%;
@@ -19,7 +19,7 @@
       function initialize() {
         var mapOptions = {
           center: { lat: CENTRALLAT, lng: CENTRALLON},
-          zoom: 11 ,
+          zoom: ZOOMVALUE ,
           mapTypeId: google.maps.MapTypeId.SATELLITE
         };
         var map = new google.maps.Map(document.getElementById('map-canvas'),
@@ -44,6 +44,8 @@
     </script>
   </head>
   <body>
+
+<h1><center><b>SPORTTITLEDATE</b></center></h1>
 
 <div id="map-canvas"></div>
 
