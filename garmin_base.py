@@ -653,7 +653,12 @@ class garmin_file(object):
             cur_point_time = point.duration_from_begin
             if (cur_point_me - last_point_me) <= 0:
                 continue
-            avg_hrt_rate += point.heart_rate * (cur_point_time - last_point_time)
+            if point.heart_rate:
+                try:
+                    avg_hrt_rate += point.heart_rate * (cur_point_time - last_point_time)
+                except:
+                    print point.heart_rate , cur_point_time , last_point_me
+                    exit(0)
             nmiles = int(cur_point_me/split_distance_in_meters) - int(last_point_me/split_distance_in_meters)
             if nmiles > 0:
                 cur_split_me = int(cur_point_me/split_distance_in_meters)*split_distance_in_meters
@@ -838,8 +843,19 @@ def do_plots(gfile, use_time=False):
         minlon, maxlon = min(lon_vals), max(lon_vals)
         central_lat = (maxlat + minlat)/2.
         central_lon = (maxlon + minlon)/2.
-        for line in open('%s/MAP_TEMPLATE.html' % curpath, 'r') :
-            if 'INSERTMAPSEGMENTSHERE' in line :
+        latlon_min = max((maxlat-minlat), (maxlon-minlon))
+        print 'latlon', latlon_min
+        latlon_thresholds = [ [ 15 , 0.015 ] , [ 14 , 0.038 ] , [ 13 , 0.07 ] , [ 12 , 0.12 ] , [ 11 , 0.20 ] , [ 10 , 0.4 ] ]
+        for line in open('%s/MAP_TEMPLATE.html' % curpath, 'r'):
+            if 'SPORTTITLEDATE' in line:
+                newtitle = 'Garmin Event %s on %s' % ( gfile.sport.title() , gfile.begin_date )
+                htmlfile.write(line.replace('SPORTTITLEDATE',newtitle))
+            elif 'ZOOMVALUE' in line:
+                for zoom , thresh in latlon_thresholds:
+                    if latlon_min < thresh or zoom == 10:
+                        htmlfile.write(line.replace('ZOOMVALUE','%d' % zoom))
+                        break
+            elif 'INSERTMAPSEGMENTSHERE' in line :
                 for idx in range(0, len(lat_vals)) :
                     htmlfile.write('new google.maps.LatLng(%f,%f),\n' % (lat_vals[idx], lon_vals[idx]))
             elif 'MINLAT' in line or 'MAXLAT' in line or 'MINLON' in line or 'MAXLON' in line:
