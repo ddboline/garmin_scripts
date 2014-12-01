@@ -141,7 +141,6 @@ if __name__ == '__main__':
             elif arg == 'bike':
                 options['do_sport'] = 'biking'
             elif '-' in arg:
-                print arg
                 ent = arg.split('-')
                 year = ent[0]
                 if len(ent) > 1:
@@ -153,6 +152,10 @@ if __name__ == '__main__':
                 if len(files) == 1:
                     gfil = files[0]
                 else:
+                    basenames = [f.split('/')[-1] for f in sorted(files)]
+                    if len(filter( lambda x : x[:10] == basenames[0][:10] , basenames )) == len(basenames):
+                        for f in basenames:
+                            print f
                     gdir += files
     if not gdir:
         gdir.append('%s/run' % script_path)
