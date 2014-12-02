@@ -61,7 +61,7 @@ def days_in_month(month=datetime.date.today().month, year=datetime.date.today().
     ''' return number of days in a given month '''
     y1, m1 = year, month + 1
     if m1 == 13:
-        y1, m1 = 1, y1 + 1
+        y1, m1 = y1 + 1, 1
     return (datetime.date(year=y1, month=m1, day=1)-datetime.date(year=year, month=month, day=1)).days
 
 ### maybe change output to datetime object?
