@@ -777,7 +777,7 @@ def make_mercator_map(name=None, title=None, lats=None, lons=None, **opts):
     return '%s.png' % name
 
 
-def do_plots(gfile, use_time=False):
+def do_plots(gfile, use_time=False, **options):
     ''' create pretty plots '''
     avg_hr = 0
     sum_time = 0
@@ -832,7 +832,7 @@ def do_plots(gfile, use_time=False):
         print 'max altitude diff: %.2f m' % (max(alt_vals) - min(alt_vals))
         print 'vertical climb: %.2f m' % vertical_climb
 
-    curpath = os.path.realpath(os.path.curdir)
+    curpath = options['script_path']
     print curpath
     if not os.path.exists('%s/html' % curpath):
         os.makedirs('%s/html' % curpath)

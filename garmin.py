@@ -79,6 +79,7 @@ def compare_with_remote(script_path):
             print fn, remote_file_chksum[fn], remote_file_path[fn]
             run_command('wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/garmin/files/%s/%s' % (remote_file_path[fn], fn))
             if os.path.exists(fn):
+                run_command('mkdir -p %s/run/%s/' % (script_path, remote_file_path[fn]))
                 run_command('mv %s %s/run/%s/%s' % (fn, script_path, remote_file_path[fn], fn))
     return
 
@@ -111,7 +112,8 @@ if __name__ == '__main__':
         exit(0)
 
     options = {'do_plot': False, 'do_year': False, 'do_month': False, 'do_week': False, 'do_day': False, 'do_file': False, 'do_sport': None, 'do_update': False}
-
+    options['script_path'] = script_path
+    
     gdir = []
     gfil = None
     for arg in os.sys.argv[1:]:
