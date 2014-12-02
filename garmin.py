@@ -153,7 +153,7 @@ if __name__ == '__main__':
                     gfil = files[0]
                 else:
                     basenames = [f.split('/')[-1] for f in sorted(files)]
-                    if len(filter( lambda x : x[:10] == basenames[0][:10] , basenames )) == len(basenames):
+                    if len(filter(lambda x : x[:10] == basenames[0][:10], basenames)) == len(basenames):
                         for f in basenames:
                             print f
                     gdir += files

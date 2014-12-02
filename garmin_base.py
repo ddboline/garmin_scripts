@@ -59,9 +59,9 @@ def days_in_year(year=datetime.date.today().year):
 
 def days_in_month(month=datetime.date.today().month, year=datetime.date.today().year):
     ''' return number of days in a given month '''
-    y1 , m1 = year , month + 1
+    y1, m1 = year, month + 1
     if m1 == 13:
-        y1 , m1 = 1 , y1 + 1
+        y1, m1 = 1, y1 + 1
     return (datetime.date(year=y1, month=m1, day=1)-datetime.date(year=year, month=month, day=1)).days
 
 ### maybe change output to datetime object?
@@ -657,7 +657,7 @@ class garmin_file(object):
                 try:
                     avg_hrt_rate += point.heart_rate * (cur_point_time - last_point_time)
                 except:
-                    print point.heart_rate , cur_point_time , last_point_me
+                    print point.heart_rate, cur_point_time, last_point_me
                     exit(0)
             nmiles = int(cur_point_me/split_distance_in_meters) - int(last_point_me/split_distance_in_meters)
             if nmiles > 0:
@@ -845,13 +845,13 @@ def do_plots(gfile, use_time=False):
         central_lon = (maxlon + minlon)/2.
         latlon_min = max((maxlat-minlat), (maxlon-minlon))
         print 'latlon', latlon_min
-        latlon_thresholds = [ [ 15 , 0.015 ] , [ 14 , 0.038 ] , [ 13 , 0.07 ] , [ 12 , 0.12 ] , [ 11 , 0.20 ] , [ 10 , 0.4 ] ]
+        latlon_thresholds = [[15, 0.015], [14, 0.038], [13, 0.07], [12, 0.12], [11, 0.20], [10, 0.4]]
         for line in open('%s/MAP_TEMPLATE.html' % curpath, 'r'):
             if 'SPORTTITLEDATE' in line:
-                newtitle = 'Garmin Event %s on %s' % ( gfile.sport.title() , gfile.begin_date )
+                newtitle = 'Garmin Event %s on %s' % (gfile.sport.title(), gfile.begin_date)
                 htmlfile.write(line.replace('SPORTTITLEDATE',newtitle))
             elif 'ZOOMVALUE' in line:
-                for zoom , thresh in latlon_thresholds:
+                for zoom, thresh in latlon_thresholds:
                     if latlon_min < thresh or zoom == 10:
                         htmlfile.write(line.replace('ZOOMVALUE','%d' % zoom))
                         break
