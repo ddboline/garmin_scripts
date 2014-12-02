@@ -88,19 +88,19 @@ def read_result_file(fname):
     plt.ylim([0, 16])
 
     # Set x ticks
-    xtickarray = np.log(np.array([meters_per_mile , 10e3 , 42e3, 50*meters_per_mile])/meters_per_mile)
+    xtickarray = np.log(np.array([meters_per_mile, 10e3, 42e3, 50*meters_per_mile])/meters_per_mile)
     ytickarray = np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
-    
-    plt.xticks( xtickarray , [ '1mi', '5k','10k', 'Marathon', '50mi'] )
+
+    plt.xticks(xtickarray, ['1mi', '5k','10k', 'Marathon', '50mi'])
 
     # Set y ticks
     plt.yticks(ytickarray, ['5:00/mi', '6:00/mi', '7:00/mi', '8:00/mi', '9:00/mi', '10:00/mi', '11:00/mi', '12:00/mi', '13:00/mi', '14:00/mi', '15:00/mi'])
-    
+
     plt.legend(loc='upper left')
 
     x = np.linspace(1, marathon_distance_mi, 100)
-    rp_low = rp[rp[:, 0]<marathon_distance_mi]
-    rp_high = rp[rp[:,0]>=marathon_distance_mi]
+    rp_low = rp[rp[:, 0] < marathon_distance_mi]
+    rp_high = rp[rp[:, 0] >= marathon_distance_mi]
     p, dp = do_fit(rp_low, pow_func, p0=[0.5, 0.5])
     pp, pm = p+dp, p-dp
     plt.plot(np.log(x), pow_func(x, *p), 'b', linewidth=2.5)
