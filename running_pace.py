@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import scipy.optimize as optimize
 from util import print_h_m_s, print_m_s
 
+meters_per_mile = 1609.344 # meters
+marathon_distance_m = 42195 # meters
+marathon_distance_mi = marathon_distance_m / meters_per_mile # meters
+
 def lin_func(x, *p):
     return p[0] + p[1] * x + p[2] * x**2
 
@@ -77,22 +81,38 @@ def read_result_file(fname):
             running_paces.append([dist_meters, t])
 
     rp = np.array(running_paces)
-    p, dp = do_fit(rp, lin_func, p0=[1, 1, 1])
-    pp, pm = p+dp, p-dp
-    plt.scatter(rp[:, 0], rp[:, 1])
-    plt.xlim([0, 60])
+    #p, dp = do_fit(rp, lin_func, p0=[1, 1, 1])
+    #pp, pm = p+dp, p-dp
+    plt.scatter(np.log(rp[:, 0]), rp[:, 1], label='race results')
+    plt.xlim(np.log([0.9, 60]))
     plt.ylim([0, 16])
 
-    x = np.linspace(0, 60, 100)
-    plt.plot(x, lin_func(x, *p), 'r', linewidth=2.5)
-    plt.plot(x, lin_func(x, *pp), 'r--')
-    plt.plot(x, lin_func(x, *pm), 'r--')
+    # Set x ticks
+    xtickarray = np.log(np.array([meters_per_mile , 10e3 , 42e3, 50*meters_per_mile])/meters_per_mile)
+    ytickarray = np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+    
+    plt.xticks( xtickarray , [ '1mi', '5k','10k', 'Marathon', '50mi'] )
 
-    p, dp = do_fit(rp, pow_func, p0=[0.5, 0.5])
+    # Set y ticks
+    plt.yticks(ytickarray, ['5:00/mi', '6:00/mi', '7:00/mi', '8:00/mi', '9:00/mi', '10:00/mi', '11:00/mi', '12:00/mi', '13:00/mi', '14:00/mi', '15:00/mi'])
+    
+    plt.legend(loc='upper left')
+
+    x = np.linspace(1, marathon_distance_mi, 100)
+    rp_low = rp[rp[:, 0]<marathon_distance_mi]
+    rp_high = rp[rp[:,0]>=marathon_distance_mi]
+    p, dp = do_fit(rp_low, pow_func, p0=[0.5, 0.5])
     pp, pm = p+dp, p-dp
-    plt.plot(x, pow_func(x, *p), 'b', linewidth=2.5)
-    plt.plot(x, pow_func(x, *pp), 'b--')
-    plt.plot(x, pow_func(x, *pm), 'b--')
+    plt.plot(np.log(x), pow_func(x, *p), 'b', linewidth=2.5)
+    plt.plot(np.log(x), pow_func(x, *pp), 'b--')
+    plt.plot(np.log(x), pow_func(x, *pm), 'b--')
+
+    x = np.linspace(marathon_distance_mi, 60, 100)
+    p, dp = do_fit(rp_high, pow_func, p0=[0.5, 0.5])
+    pp, pm = p+dp, p-dp
+    plt.plot(np.log(x), pow_func(x, *p), 'b', linewidth=2.5)
+    plt.plot(np.log(x), pow_func(x, *pp), 'b--')
+    plt.plot(np.log(x), pow_func(x, *pm), 'b--')
 
     plt.savefig('running_pace.png')
 
