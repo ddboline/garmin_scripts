@@ -45,7 +45,7 @@ def read_garmin_file(fname, **options):
 
     gpx_filename = convert_gmn_to_gpx(fname)
     if 'do_plot' in options and options['do_plot']:
-        do_plots(gfile)
+        do_plots(gfile,**options)
 
 def compare_with_remote(script_path):
     from urllib2 import urlopen
