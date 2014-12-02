@@ -159,7 +159,7 @@ if __name__ == '__main__':
                 print 'unhandled argument:',arg
     if not gdir:
         gdir.append('%s/run' % script_path)
-    if len(gdir) == 1 and os.path.isfile( gdir[0] )
+    if len(gdir) == 1 and os.path.isfile( gdir[0] ):
         read_garmin_file(gdir[0], **options)
     else:
         do_summary(gdir, **options)
