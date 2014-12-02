@@ -115,7 +115,6 @@ if __name__ == '__main__':
     options['script_path'] = script_path
     
     gdir = []
-    gfil = None
     for arg in os.sys.argv[1:]:
         if arg == 'build':
             options['build'] = True
@@ -125,7 +124,7 @@ if __name__ == '__main__':
         elif arg == 'occur':
             options['occur'] = True
         elif os.path.isfile(arg):
-            gfil = arg
+            gdir.append( arg )
             # read_garmin_file(arg)
             # exit(0)
         elif arg != 'run' and os.path.isdir(arg):
@@ -151,19 +150,16 @@ if __name__ == '__main__':
                 else:
                     month = '*'
                 files = glob.glob('%s/run/%s/%s/%s*' % (script_path, year, month, arg)) + glob.glob('%s/run/%s/%s/%s*' % (script_path, year, month, ''.join(ent)))
-                if len(files) == 1:
-                    gfil = files[0]
-                else:
-                    basenames = [f.split('/')[-1] for f in sorted(files)]
-                    if len(filter(lambda x : x[:10] == basenames[0][:10], basenames)) == len(basenames):
-                        for f in basenames:
-                            print f
-                    gdir += files
+                basenames = [f.split('/')[-1] for f in sorted(files)]
+                if len(filter(lambda x : x[:10] == basenames[0][:10], basenames)) == len(basenames):
+                    for f in basenames:
+                        print f
+                gdir += files
             else:
-                print 'unhandeld argument:',arg
+                print 'unhandled argument:',arg
     if not gdir:
         gdir.append('%s/run' % script_path)
-    if gfil:
-        read_garmin_file(gfil, **options)
+    if len(gdir) == 1 and os.path.isfile( gdir[0] )
+        read_garmin_file(gdir[0], **options)
     else:
         do_summary(gdir, **options)
