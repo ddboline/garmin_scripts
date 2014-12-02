@@ -112,6 +112,6 @@
    50.0000       12 51   2014    1       Ocean to Sound 50 mile
    50.0000       13 07   2014    1       JFK 50 miler
    43.4960       13 35   2014    1       Paumanok Pursuit 70k Trail Run
-   31.0686       14 13   2014    1       Greenbelt 50k
-   31.0686       14 16   2014    1       Wildcat Ridge 50k
-   31.0686       14 17   2014    1       North Face Endurance Challenge NY
+   31.0686       14 13   2014    0       Greenbelt 50k
+   31.0686       14 16   2014    0       Wildcat Ridge 50k
+   31.0686       14 17   2014    0       North Face Endurance Challenge NY
