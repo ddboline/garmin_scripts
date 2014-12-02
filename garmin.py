@@ -159,6 +159,8 @@ if __name__ == '__main__':
                         for f in basenames:
                             print f
                     gdir += files
+            else:
+                print 'unhandeld argument:',arg
     if not gdir:
         gdir.append('%s/run' % script_path)
     if gfil:
