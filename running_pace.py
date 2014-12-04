@@ -15,9 +15,6 @@ marathon_distance_mi = marathon_distance_m / meters_per_mile # meters
 def lin_func(x, *p):
     return p[0] + p[1] * x + p[2] * x**2
 
-def pow_func(x, *p):
-    return p[0] * x**p[1]
-
 def do_fit(data, func, p0):
     datax = data[:, 0]
     datay = data[:, 1]
@@ -57,10 +54,10 @@ def do_fit(data, func, p0):
     pfit_bootstrap = mean_pfit
     perr_bootstrap = err_pfit
 
-    print 'p', p
-    print 'pb', pfit_bootstrap
-    print 'dp', dp
-    print 'dpb', perr_bootstrap
+    # print 'p', p
+    # print 'pb', pfit_bootstrap
+    # print 'dp', dp
+    # print 'dpb', perr_bootstrap
 
     return p, dp
     # return pfit_bootstrap, perr_bootstrap
@@ -85,34 +82,84 @@ def read_result_file(fname):
     #pp, pm = p+dp, p-dp
     plt.scatter(np.log(rp[:, 0]), rp[:, 1], label='race results')
     plt.xlim(np.log([0.9, 60]))
-    plt.ylim([0, 16])
+    plt.ylim([5, 16])
 
     # Set x ticks
-    xtickarray = np.log(np.array([meters_per_mile, 10e3, 42e3, 50*meters_per_mile])/meters_per_mile)
+    xtickarray = np.log(np.array([meters_per_mile, 5e3, 10e3, marathon_distance_m/2., marathon_distance_m, 50*meters_per_mile])/meters_per_mile)
     ytickarray = np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
 
-    plt.xticks(xtickarray, ['1mi', '5k','10k', 'Marathon', '50mi'])
+    plt.xticks(xtickarray, ['1mi', '5k','10k', '', 'Marathon', '50mi'])
 
     # Set y ticks
     plt.yticks(ytickarray, ['5:00/mi', '6:00/mi', '7:00/mi', '8:00/mi', '9:00/mi', '10:00/mi', '11:00/mi', '12:00/mi', '13:00/mi', '14:00/mi', '15:00/mi'])
 
+    for xt in xtickarray:
+        plt.plot([xt, xt], [5, 16], color='black', linewidth=0.5, linestyle=':')
+
+    for yt in ytickarray:
+        plt.plot(np.log([0.9,60]), [yt, yt], color='black', linewidth=0.5, linestyle=':')
+
     plt.legend(loc='upper left')
+
+    p0 = np.mean(rp[np.abs(rp[:,0]-marathon_distance_mi)<1][:,1])
+    print 'average marathon pace',print_m_s(p0*60)
+    pbest = np.min(rp[np.abs(rp[:,0]-marathon_distance_mi)<1][:,1])
+    print 'best marathon pace',print_m_s(pbest*60)
+
+    def pow_func(x, *p):
+        x0 = marathon_distance_m/meters_per_mile
+        return p0*(x/x0)**p[0]
 
     x = np.linspace(1, marathon_distance_mi, 100)
     rp_low = rp[rp[:, 0] < marathon_distance_mi]
     rp_high = rp[rp[:, 0] >= marathon_distance_mi]
-    p, dp = do_fit(rp_low, pow_func, p0=[0.5, 0.5])
+    p, dp = do_fit(rp_low, pow_func, p0=[0.5])
     pp, pm = p+dp, p-dp
     plt.plot(np.log(x), pow_func(x, *p), 'b', linewidth=2.5)
     plt.plot(np.log(x), pow_func(x, *pp), 'b--')
     plt.plot(np.log(x), pow_func(x, *pm), 'b--')
 
+    print 'p',p,'+/-',dp
+
     x = np.linspace(marathon_distance_mi, 60, 100)
-    p, dp = do_fit(rp_high, pow_func, p0=[0.5, 0.5])
+    p, dp = do_fit(rp_high, pow_func, p0=[0.5])
     pp, pm = p+dp, p-dp
     plt.plot(np.log(x), pow_func(x, *p), 'b', linewidth=2.5)
     plt.plot(np.log(x), pow_func(x, *pp), 'b--')
     plt.plot(np.log(x), pow_func(x, *pm), 'b--')
+
+    print 'p',p,'+/-',dp
+
+    def pow_func_best(x, *p):
+        x0 = marathon_distance_m/meters_per_mile
+        return pbest*(x/x0)**p[0]
+
+    p50k = pow_func_best( 50e3/meters_per_mile , 0.28938393 )*60
+    p50m = pow_func_best( 50 , 0.28938393 )*60
+    print 'optimistic 50k estimate', print_m_s( p50k ), print_h_m_s( p50k * 50e3/meters_per_mile )
+    print 'optimistic 50mi estimate', print_m_s( p50m ), print_h_m_s( p50m * 50 )
+
+    p315 = ( 3*60 + 15 ) / (marathon_distance_m/meters_per_mile)
+    def pow_func_315(x, *p):
+        x0 = marathon_distance_m/meters_per_mile
+        return p315*(x/x0)**p[0]
+
+    p50k = pow_func_315( 50e3/meters_per_mile , 0.28938393 )*60
+    p50m = pow_func_315( 50 , 0.28938393 )*60
+    print '3:15 marathon pace', print_m_s( p315*60 )
+    print '3:15marathon 50k estimate', print_m_s( p50k ), print_h_m_s( p50k * 50e3/meters_per_mile )
+    print '3:15marathon 50mi estimate', print_m_s( p50m ), print_h_m_s( p50m * 50 )
+
+    p300 = ( 3*60 ) / (marathon_distance_m/meters_per_mile)
+    def pow_func_300(x, *p):
+        x0 = marathon_distance_m/meters_per_mile
+        return p300*(x/x0)**p[0]
+
+    p50k = pow_func_300( 50e3/meters_per_mile , 0.28938393 )*60
+    p50m = pow_func_300( 50 , 0.28938393 )*60
+    print '3:00 marathon pace', print_m_s( p300*60 )
+    print '3:00marathon 50k estimate', print_m_s( p50k ), print_h_m_s( p50k * 50e3/meters_per_mile )
+    print '3:00marathon 50mi estimate', print_m_s( p50m ), print_h_m_s( p50m * 50 )
 
     plt.savefig('running_pace.png')
 
