@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
+import os , glob
 import datetime
 from garmin_base import garmin_file, do_summary, meters_per_mile, sport_types, convert_gmn_to_gpx, do_plots
 from util import run_command
@@ -145,7 +145,6 @@ if __name__ == '__main__':
                 ent = arg.split('-')
                 year = ent[0]
                 if len(ent) > 1:
-                    import glob
                     month = ent[1]
                 else:
                     month = '*'
@@ -154,6 +153,9 @@ if __name__ == '__main__':
                 if len(filter(lambda x : x[:10] == basenames[0][:10], basenames)) == len(basenames):
                     for f in basenames:
                         print f
+                gdir += files
+            elif '.gmn' in arg or 'T' in arg:
+                files = glob.glob('%s/run/*/*/%s' % ( script_path , arg ))
                 gdir += files
             else:
                 print 'unhandled argument:',arg
