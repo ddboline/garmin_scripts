@@ -69,6 +69,7 @@
     4.0000       07 01   2014    1       4mi Run Around the Lake
     6.2137       07 02   2013    1       Drumstick Dash 10K - 10K Run    MN
    10.0000       07 03   2013    1       Sayville Running Company 10 Mile Run to the Brewery NY
+    3.1069       07 03   2014    1       Rob's Run 5k
     5.0000       07 03   2014    1       Heckscher 5mi
    13.1094       07 06   2013    1       Great South Bay Run - Half Marathon NY
     3.1069       07 07   2014    1       NYS Parks Winter Run Series - Caumsett State Park   NY
