@@ -12,24 +12,6 @@ HOMEDIR = os.getenv('HOME')
 
 paces = []
 
-def func0(a, x):
-    return a[0]+ a[1]* x
-
-def func1(a, x):
-    return a[0]* (x**0.06) / (26.2**1.06)
-
-def residual0(a, XY):
-    res = []
-    for x, y in XY:
-        res.append(y - func0(a, x))
-    return res
-
-def residual1(a, XY):
-    res = []
-    for x, y in XY:
-        res.append(y - func1(a, x))
-    return res
-
 def print_time(pace, dist):
     print print_m_s(pace), print_h_m_s(dist * pace)
 
@@ -192,54 +174,55 @@ def running_pace(do_plotting=False):
 
     #print '\n\n'
 
-    print 'Ocean2Sound 50mi Cumulative Time'
-    print '%10s' % '',
-    for dist in dist_o2s50:
-        print '%6s%4s' % ('%0.1fmi' % dist, ''),
-    print ''
-    print 'pace%6s' % '',
-    for dist in dist_o2s50_cum:
-        print '%6s%4s' % ('%0.1fmi' % dist, ''),
-    print ''
-    for a in range(0, 120):
-        os.sys.stdout.write('-')
-        os.sys.stdout.flush()
-    print ''
-    for second in range(4*60+50, 17*60, 10):
-        pace = print_h_m_s(second)
-        print '%8s%2s' % (pace, ''),
-        for idx in range(0, len(pace_o2s50_cum)):
-            pace_o2s50_cum[idx][1] = print_h_m_s(pace_o2s50_cum[idx][0]* second)
-            #print '%s ' % pace_o2s50_cum[idx][1],
-            print '%8s%2s' % (pace_o2s50_cum[idx][1], ''),
-        print ''
+    # print 'Ocean2Sound 50mi Cumulative Time'
+    # print '%10s' % '',
+    # for dist in dist_o2s50:
+    #     print '%6s%4s' % ('%0.1fmi' % dist, ''),
+    # print ''
+    # print 'pace%6s' % '',
+    # for dist in dist_o2s50_cum:
+    #     print '%6s%4s' % ('%0.1fmi' % dist, ''),
+    # print ''
+    # for a in range(0, 120):
+    #     os.sys.stdout.write('-')
+    #     os.sys.stdout.flush()
+    # print ''
+    # for second in range(4*60+50, 17*60, 10):
+    #     pace = print_h_m_s(second)
+    #     print '%8s%2s' % (pace, ''),
+    #     for idx in range(0, len(pace_o2s50_cum)):
+    #         pace_o2s50_cum[idx][1] = print_h_m_s(pace_o2s50_cum[idx][0]* second)
+    #         #print '%s ' % pace_o2s50_cum[idx][1],
+    #         print '%8s%2s' % (pace_o2s50_cum[idx][1], ''),
+    #     print ''
 
-    print '\n\n'
+    # print '\n\n'
 
-    print 'JFK 50mi Cumulative Time'
-    print '%10s' % '',
-    for dist in dist_jfk50:
-        print '%6s%4s' % ('%0.1fmi' % dist, ''),
-    print ''
-    print 'pace%6s' % '',
-    for dist in dist_jfk50_cum:
-        print '%6s%4s' % ('%0.1fmi' % dist, ''),
-    print ''
-    for a in range(0, 120):
-        os.sys.stdout.write('-')
-        os.sys.stdout.flush()
-    print ''
-    for second in range(4*60+50, 17*60, 10):
-        pace = print_h_m_s(second)
-        print '%8s%2s' % (pace, ''),
-        for idx in range(0, len(pace_jfk50_cum)):
-            pace_jfk50_cum[idx][1] = print_h_m_s(pace_jfk50_cum[idx][0]* second)
-            #print '%s ' % pace_jfk50_cum[idx][1],
-            print '%8s%2s' % (pace_jfk50_cum[idx][1], ''),
-        print ''
+    # print 'JFK 50mi Cumulative Time'
+    # print '%10s' % '',
+    # for dist in dist_jfk50:
+    #     print '%6s%4s' % ('%0.1fmi' % dist, ''),
+    # print ''
+    # print 'pace%6s' % '',
+    # for dist in dist_jfk50_cum:
+    #     print '%6s%4s' % ('%0.1fmi' % dist, ''),
+    # print ''
+    # for a in range(0, 120):
+    #     os.sys.stdout.write('-')
+    #     os.sys.stdout.flush()
+    # print ''
+    # for second in range(4*60+50, 17*60, 10):
+    #     pace = print_h_m_s(second)
+    #     print '%8s%2s' % (pace, ''),
+    #     for idx in range(0, len(pace_jfk50_cum)):
+    #         pace_jfk50_cum[idx][1] = print_h_m_s(pace_jfk50_cum[idx][0]* second)
+    #         #print '%s ' % pace_jfk50_cum[idx][1],
+    #         print '%8s%2s' % (pace_jfk50_cum[idx][1], ''),
+    #     print ''
 
-    print '\n\n'
+    # print '\n\n'
 
+def fit_to_pace_file():
     if os.path.exists('running_paces.txt'):
         pace_file = open('running_paces.txt', 'r')
     elif os.path.exists('%s/scripts/running_paces.txt' % HOMEDIR):
@@ -343,33 +326,6 @@ def running_pace(do_plotting=False):
     print ''
     print '%i\t%.4f\t\t%.1f\t\t%.4f\t\t' % (marathon_distance_m, marathon_distance_mi, marathon_distance_m/2., marathon_distance_mi/2.)
     print '%.4f\t%.4f\t\t%.4f\t\t%.4f' % (5000/meters_per_mile, 10000/meters_per_mile, 15000/meters_per_mile, 25000/meters_per_mile)
-
-    if do_plotting:
-        from ROOT import TCanvas
-        canv = TCanvas('race_canv', 'race_canv')
-        graph.Draw('A*')
-        graph.GetXaxis().SetLimits(0, max_mile)
-        graph.GetYaxis().SetRangeUser(0, 15)
-
-        flin0.SetLineColor(kBlue)
-        flinp.SetLineColor(kBlue)
-        flinn.SetLineColor(kBlue)
-        fpow0.SetLineColor(kRed)
-        fpowp.SetLineColor(kRed)
-        fpown.SetLineColor(kRed)
-        flin0.Draw('sames')
-        flinp.Draw('sames')
-        flinn.Draw('sames')
-        fpow0.Draw('sames')
-        fpowp.Draw('sames')
-        fpown.Draw('sames')
-
-        canv.Update()
-        canv.SaveAs('race_pace_projections.png')
-
-        canv = TCanvas('race_canv_log', 'race_canv_log')
-        graphlog.Draw('A*')
-        canv.SaveAs('race_pace_log.png')
 
 if __name__ == '__main__':
     do_plot = False
