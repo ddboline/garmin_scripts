@@ -891,7 +891,7 @@ def do_plots(gfile, use_time=False, **options):
 
     if len(avg_mph_speed_values) > 0:
         avg_mph_speed_value = avg_mph_speed_values[-1][1]
-        graphs.append(plot_graph(name=' avg_speed_mph', title='Avg Speed %.2f mph' % avg_mph_speed_value, data=avg_mph_speed_values))
+        graphs.append(plot_graph(name='avg_speed_mph', title='Avg Speed %.2f mph' % avg_mph_speed_value, data=avg_mph_speed_values))
 
     for f in graphs:
         htmlfile.write('<p>\n<img src="%s">\n</p>' % f)
