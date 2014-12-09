@@ -738,25 +738,49 @@ def plot_graph(name=None, title=None, data=None, **opts):
     plt.savefig('%s.png' % name)
     return '%s.png' % name
 
-def make_mercator_map(name=None, title=None, lats=None, lons=None, **opts):
+def make_mercator_map(name=None, title=None, lats=None, lons=None, latlon_list=None, **opts):
     import matplotlib
     matplotlib.use('Agg')
     from mpl_toolkits.basemap import Basemap
     import numpy as np
     import matplotlib.pyplot as plt
     plt.clf()
-    x = np.array(lons)
-    y = np.array(lats)
+    
+    if lats and lons:
+        x = np.array(lons)
+        y = np.array(lats)
 
-    latcent = (y.max() + y.min()) / 2.
-    loncent = (x.max() + x.min()) / 2.
-    latwidth = abs(y.max() - y.min())
-    lonwidth = abs(x.max() - x.min())
-    width = max(latwidth, lonwidth)
-    latmin = latcent - 0.6 * width
-    latmax = latcent + 0.6 * width
-    lonmin = loncent - 0.6 * width
-    lonmax = loncent + 0.6 * width
+        latcent = (y.max() + y.min()) / 2.
+        loncent = (x.max() + x.min()) / 2.
+        latwidth = abs(y.max() - y.min())
+        lonwidth = abs(x.max() - x.min())
+        width = max(latwidth, lonwidth)
+        latmin = latcent - 0.6 * width
+        latmax = latcent + 0.6 * width
+        lonmin = loncent - 0.6 * width
+        lonmax = loncent + 0.6 * width
+    elif latlon_list:
+        latlon_arrays = []
+        latvals = []
+        lonvals = []
+        for latl, lonl in latlon_list:
+            x = np.array(lonl)
+            y = np.array(latl)
+            latvals.extend( latl )
+            lonvals.extend( lonl )
+            latlon_arrays.append( [ x , y ] )
+        
+        xtemp = np.array( lonvals )
+        ytemp = np.array( latvals )
+        latcent = (ytemp.max() + ytemp.min()) / 2.
+        loncent = (xtemp.max() + xtemp.min()) / 2.
+        latwidth = abs(ytemp.max() - ytemp.min())
+        lonwidth = abs(xtemp.max() - xtemp.min())
+        width = max(latwidth, lonwidth)
+        latmin = latcent - 0.6 * width
+        latmax = latcent + 0.6 * width
+        lonmin = loncent - 0.6 * width
+        lonmax = loncent + 0.6 * width
 
     m = Basemap(projection='merc', llcrnrlat=latmin, urcrnrlat=latmax, llcrnrlon=lonmin, urcrnrlon=lonmax, resolution='h')
     m.drawcoastlines()
@@ -768,7 +792,11 @@ def make_mercator_map(name=None, title=None, lats=None, lons=None, **opts):
     m.drawstates()
     m.drawcounties()
 
-    m.plot(x, y, latlon=True)
+    if lats and lons:
+        m.plot(x, y, latlon=True)
+    elif latlon_arrays:
+        for x, y in latlon_arrays:
+            m.plot(x, y, latlon=True)
 
     plt.title(title)
     plt.xlabel('longitude deg')
