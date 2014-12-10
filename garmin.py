@@ -76,11 +76,22 @@ def compare_with_remote(script_path):
 
     for fn in remote_file_chksum.keys():
         if fn not in local_file_chksum.keys():
-            print fn, remote_file_chksum[fn], remote_file_path[fn]
-            run_command('wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/garmin/files/%s/%s' % (remote_file_path[fn], fn))
-            if os.path.exists(fn):
-                run_command('mkdir -p %s/run/%s/' % (script_path, remote_file_path[fn]))
-                run_command('mv %s %s/run/%s/%s' % (fn, script_path, remote_file_path[fn], fn))
+            print fn, remote_file_chksum[fn], remote_file_path[fn] , script_path
+            if not os.path.exists( '%s/run/%s/' % (script_path, remote_file_path[fn]) ):
+                os.makedirs( '%s/run/%s/' % (script_path, remote_file_path[fn]) )
+            if not os.path.exists( '%s/run/%s/%s' % (script_path, remote_file_path[fn], fn) ):
+                outfile = open( '%s/run/%s/%s' % (script_path, remote_file_path[fn], fn) , 'wb' )
+                urlout = urlopen( 'https://ddbolineathome.mooo.com/~ddboline/garmin/files/%s/%s' % (remote_file_path[fn], fn) )
+                if urlout.getcode() != 200:
+                    print 'something bad happened %d' % urlout.getcode()
+                    exit(0)
+                for line in urlout:
+                    outfile.write( line )
+                outfile.close()
+            # run_command('wget --quiet --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/garmin/files/%s/%s' % (remote_file_path[fn], fn))
+            # if os.path.exists(fn):
+            #     run_command('mkdir -p %s/run/%s/' % (script_path, remote_file_path[fn]))
+            #     run_command('mv %s %s/run/%s/%s' % (fn, script_path, remote_file_path[fn], fn))
     return
 
 if __name__ == '__main__':
