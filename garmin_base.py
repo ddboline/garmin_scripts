@@ -1182,6 +1182,10 @@ class garmin_summary(object):
         print '%16s' % ('%.1f / %i days' % (float(number_days) / number_of_weeks, 7))
         return True
 
+def do_summary_sql( directory, **options ):
+    ''' get summary of files in directory, use sql database instead of pickle '''
+    return
+
 def do_summary(directory, **options):
     ''' get summary of files in directory '''
     opts = ['do_plot', 'do_year', 'do_month', 'do_week', 'do_day', 'do_file', 'do_sport', 'do_update']

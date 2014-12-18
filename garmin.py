@@ -5,7 +5,6 @@ import os , glob
 import datetime
 from garmin_base import garmin_file, do_summary, meters_per_mile, sport_types, convert_gmn_to_gpx, do_plots
 from util import run_command
-import cPickle
 
 def read_garmin_file(fname, **options):
     gfile = garmin_file(fname)
