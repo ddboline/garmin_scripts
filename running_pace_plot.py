@@ -132,34 +132,34 @@ def read_result_file(fname):
         x0 = marathon_distance_m/meters_per_mile
         return pbest*(x/x0)**p[0]
 
-    p50k = pow_func_best( 50e3/meters_per_mile , 0.28938393 )*60
-    p50m = pow_func_best( 50 , 0.28938393 )*60
-    print 'optimistic 50k estimate', print_m_s( p50k ), print_h_m_s( p50k * 50e3/meters_per_mile )
-    print 'optimistic 50mi estimate', print_m_s( p50m ), print_h_m_s( p50m * 50 )
+    p50k = pow_func_best(50e3/meters_per_mile, 0.28938393)*60
+    p50m = pow_func_best(50, 0.28938393)*60
+    print 'optimistic 50k estimate', print_m_s(p50k), print_h_m_s(p50k * 50e3/meters_per_mile)
+    print 'optimistic 50mi estimate', print_m_s(p50m), print_h_m_s(p50m * 50)
     print ''
 
-    p315 = ( 3*60 + 15 ) / (marathon_distance_m/meters_per_mile)
+    p315 = (3*60 + 15) / (marathon_distance_m/meters_per_mile)
     def pow_func_315(x, *p):
         x0 = marathon_distance_m/meters_per_mile
         return p315*(x/x0)**p[0]
 
-    p50k = pow_func_315( 50e3/meters_per_mile , 0.28938393 )*60
-    p50m = pow_func_315( 50 , 0.28938393 )*60
-    print '3:15 marathon pace', print_m_s( p315*60 )
-    print '3:15marathon 50k estimate', print_m_s( p50k ), print_h_m_s( p50k * 50e3/meters_per_mile )
-    print '3:15marathon 50mi estimate', print_m_s( p50m ), print_h_m_s( p50m * 50 )
+    p50k = pow_func_315(50e3/meters_per_mile, 0.28938393)*60
+    p50m = pow_func_315(50, 0.28938393)*60
+    print '3:15 marathon pace', print_m_s(p315*60)
+    print '3:15marathon 50k estimate', print_m_s(p50k), print_h_m_s(p50k * 50e3/meters_per_mile)
+    print '3:15marathon 50mi estimate', print_m_s(p50m), print_h_m_s(p50m * 50)
     print ''
 
-    p300 = ( 3*60 ) / (marathon_distance_m/meters_per_mile)
+    p300 = (3*60) / (marathon_distance_m/meters_per_mile)
     def pow_func_300(x, *p):
         x0 = marathon_distance_m/meters_per_mile
         return p300*(x/x0)**p[0]
 
-    p50k = pow_func_300( 50e3/meters_per_mile , 0.28938393 )*60
-    p50m = pow_func_300( 50 , 0.28938393 )*60
-    print '3:00 marathon pace', print_m_s( p300*60 )
-    print '3:00marathon 50k estimate', print_m_s( p50k ), print_h_m_s( p50k * 50e3/meters_per_mile )
-    print '3:00marathon 50mi estimate', print_m_s( p50m ), print_h_m_s( p50m * 50 )
+    p50k = pow_func_300(50e3/meters_per_mile, 0.28938393)*60
+    p50m = pow_func_300(50, 0.28938393)*60
+    print '3:00 marathon pace', print_m_s(p300*60)
+    print '3:00marathon 50k estimate', print_m_s(p50k), print_h_m_s(p50k * 50e3/meters_per_mile)
+    print '3:00marathon 50mi estimate', print_m_s(p50m), print_h_m_s(p50m * 50)
 
     plt.savefig('running_pace.png')
 

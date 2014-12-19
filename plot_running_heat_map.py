@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os , glob
+import os, glob
 import datetime
 from garmin_base import garmin_file, make_mercator_map
 from util import run_command
@@ -11,7 +11,7 @@ def plot_running_heat_map():
     latlon_lists = []
     gdir = []
     script_path = '/'.join(os.path.abspath(os.sys.argv[0]).split('/')[:-1])
-    
+
     for arg in os.sys.argv[1:]:
         if os.path.isdir(arg):
             gdir.append(arg)
@@ -26,17 +26,17 @@ def plot_running_heat_map():
                 month = '*'
             files = glob.glob('%s/run/%s/%s/%s*' % (script_path, year, month, arg)) + glob.glob('%s/run/%s/%s/%s*' % (script_path, year, month, ''.join(ent)))
             basenames = [f.split('/')[-1] for f in sorted(files)]
-            if len(filter(lambda x : x[:10] == basenames[0][:10], basenames)) == len(basenames):
+            if len(filter(lambda x: x[:10] == basenames[0][:10], basenames)) == len(basenames):
                 for f in basenames:
                     print f
             gdir += files
         elif '.gmn' in arg or 'T' in arg:
-            files = glob.glob('%s/run/*/*/%s' % ( script_path , arg ))
+            files = glob.glob('%s/run/*/*/%s' % (script_path, arg))
             gdir += files
         else:
             print 'unhandled argument:',arg
 
-    def extract_latlon( fname ):
+    def extract_latlon(fname):
         lat_vals = []
         lon_vals = []
         gfile = garmin_file(fname)
@@ -45,7 +45,7 @@ def plot_running_heat_map():
             if point.latitude and point.longitude:
                 lat_vals.append(point.latitude)
                 lon_vals.append(point.longitude)
-        latlon_lists.append( [ lat_vals , lon_vals ] )
+        latlon_lists.append([lat_vals, lon_vals])
 
     def process_files(_, dirname, names):
         for name in names:

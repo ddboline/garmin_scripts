@@ -745,7 +745,7 @@ def make_mercator_map(name=None, title=None, lats=None, lons=None, latlon_list=N
     import numpy as np
     import matplotlib.pyplot as plt
     plt.clf()
-    
+
     if lats and lons:
         x = np.array(lons)
         y = np.array(lats)
@@ -766,12 +766,12 @@ def make_mercator_map(name=None, title=None, lats=None, lons=None, latlon_list=N
         for latl, lonl in latlon_list:
             x = np.array(lonl)
             y = np.array(latl)
-            latvals.extend( latl )
-            lonvals.extend( lonl )
-            latlon_arrays.append( [ x , y ] )
-        
-        xtemp = np.array( lonvals )
-        ytemp = np.array( latvals )
+            latvals.extend(latl)
+            lonvals.extend(lonl)
+            latlon_arrays.append([x, y])
+
+        xtemp = np.array(lonvals)
+        ytemp = np.array(latvals)
         latcent = (ytemp.max() + ytemp.min()) / 2.
         loncent = (xtemp.max() + xtemp.min()) / 2.
         latwidth = abs(ytemp.max() - ytemp.min())
@@ -883,18 +883,18 @@ def do_plots(gfile, use_time=False, **options):
                     if latlon_min < thresh or zoom == 10:
                         htmlfile.write(line.replace('ZOOMVALUE','%d' % zoom))
                         break
-            elif 'INSERTMAPSEGMENTSHERE' in line :
-                for idx in range(0, len(lat_vals)) :
+            elif 'INSERTMAPSEGMENTSHERE' in line:
+                for idx in range(0, len(lat_vals)):
                     htmlfile.write('new google.maps.LatLng(%f,%f),\n' % (lat_vals[idx], lon_vals[idx]))
             elif 'MINLAT' in line or 'MAXLAT' in line or 'MINLON' in line or 'MAXLON' in line:
                 htmlfile.write(line.replace('MINLAT', '%s' % minlat).replace('MAXLAT', '%s' % maxlat).replace('MINLON', '%s' % minlon).replace('MAXLON', '%s' % maxlon))
             elif 'CENTRALLAT' in line or 'CENTRALLON' in line:
                 htmlfile.write(line.replace('CENTRALLAT', '%s' % central_lat).replace('CENTRALLON', '%s' % central_lon))
-            elif 'INSERTOTHERIMAGESHERE' in line :
+            elif 'INSERTOTHERIMAGESHERE' in line:
                 break
-            else :
+            else:
                 htmlfile.write(line)
-    else :
+    else:
         htmlfile.write('<!DOCTYPE HTML>\n<html>\n<body>\n')
 
     #if len(lat_vals) > 0 and len(lon_vals) > 0:
@@ -1182,7 +1182,7 @@ class garmin_summary(object):
         print '%16s' % ('%.1f / %i days' % (float(number_days) / number_of_weeks, 7))
         return True
 
-def do_summary_sql( directory, **options ):
+def do_summary_sql(directory, **options):
     ''' get summary of files in directory, use sql database instead of pickle '''
     return
 
