@@ -29,6 +29,7 @@
    13.1094       06 34   1999    0       Mora Half Marathon
     4.0000       06 34   2014    1       Bellmore 4mi
     3.1069       06 35   2013    1       NYS Parks Winter Series - Heckscher State Park  NY
+    3.1069       06 35   2014    1       Ho Ho Ho Holiday run    NY
     4.0000       06 35   2013    1       Blazing Trails 4-Autism Four Mile Run   NY
     3.1069       06 36   2013    1       Ho Ho Ho Holiday run    NY
     3.1069       06 36   2014    1       Massapequa Firecracker 5k
@@ -77,6 +78,7 @@
     3.1069       07 08   2014    1       Doug Wood 5k XC Trail Run
     4.0000       07 08   2013    1       Cystic Fibrosis 4Mi Run   NY
    10.0000       07 10   2014    1       10 Mile Run To The Brewery  NY
+    9.3206       07 11   2014    1       Indian Island 15k
     6.2137       07 15   2014    1       Aspire 10k
    13.1094       07 25   2002    1       New Prague Half Marathon    MN
    13.1094       07 29   2013    1       Suffolk County Half Marathon - Half Marathon    NY
@@ -89,6 +91,7 @@
    26.2188       07 51   2002    1       Twin Cities Marathon - Run - 26.2Miles  MN
    26.2188       07 56   2004    1       Grandma's Marathon 2004 MN
    26.2188       07 57   2013    1       Philadelphia Marathon & Half Marathon, 8k - Marathon    PA
+    5.3500       07 59   2014    1       Tough Cookie "8k"
    15.5343       08 02   2013    1       GLIRC 25K/50K Caumsett Park Run - 25k Run   NY
    26.2188       08 07   2002    1       Grandma's Marathon 2002 MN
     5.0000       08 08   2014    1       Run the Farm 5miler
