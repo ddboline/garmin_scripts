@@ -656,8 +656,8 @@ class garmin_file(object):
             if point.heart_rate:
                 try:
                     avg_hrt_rate += point.heart_rate * (cur_point_time - last_point_time)
-                except:
-                    print point.heart_rate, cur_point_time, last_point_me
+                except Exception as exc:
+                    print 'Exception:', exc, point.heart_rate, cur_point_time, last_point_me
                     exit(0)
             nmiles = int(cur_point_me/split_distance_in_meters) - int(last_point_me/split_distance_in_meters)
             if nmiles > 0:
@@ -786,7 +786,8 @@ def make_mercator_map(name=None, title=None, lats=None, lons=None, latlon_list=N
     m.drawcoastlines()
     try:
         m.drawlsmask(ocean_color='aqua')
-    except:
+    except Exception as exc:
+        print 'Exception:', exc
         pass
     m.fillcontinents(color='white', lake_color='aqua')
     m.drawstates()
