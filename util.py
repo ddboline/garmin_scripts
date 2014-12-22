@@ -171,7 +171,7 @@ def write_single_line_to_file(fname, line, turn_on_commands=True):
 
 def dateTimeString(d):
     ''' input should be datetime object, output is string '''
-    if not hasattr( d , 'strftime' ):
+    if not hasattr(d, 'strftime'):
         return d
     s = d.strftime('%Y-%m-%dT%H:%M:%S%z')
     if len(s) == 24 or len(s) == 20:
@@ -179,6 +179,6 @@ def dateTimeString(d):
     elif len(s) == 19 and 'Z' not in s:
         return '%sZ' % s
 
-def datetimefromstring(tstr):
+def datetimefromstring(tstr, ignore_tz=False):
     import dateutil.parser
-    return dateutil.parser.parse(tstr)
+    return dateutil.parser.parse(tstr, ignoretz=ignore_tz)
