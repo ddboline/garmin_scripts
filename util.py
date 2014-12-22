@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 
 import os
 
@@ -8,7 +9,7 @@ HOMEDIR = os.getenv('HOME')
 def run_command(command, do_popen=False, turn_on_commands=True):
     ''' wrapper around os.system '''
     if not turn_on_commands:
-        print command
+        print(command)
         return command
     elif do_popen:
         return os.popen(command)
@@ -21,7 +22,7 @@ def run_remote_command(command, is_remote=False, sshclient=None):
         return run_command(command, do_popen=True)
     elif not sshclient:
         cmd = 'ssh %s \"%s\"' % (is_remote, command)
-        print cmd
+        print(cmd)
         return os.popen(cmd).read()
     else:
         sshclient.sendline(command)
@@ -42,8 +43,8 @@ def send_command(ostr, host='localhost', portno=10888, socketfile=None):
     s = socket.socket(net_type, stm_type)
     try:
         err = s.connect(addr_obj)
-    except:
-        print 'failed to open socket'
+    except Exception:
+        print('failed to open socket')
         return False
 
     s.send('%s\n' % ostr)
@@ -72,9 +73,12 @@ def get_length_of_mpg(fname='%s/netflix/mpg/test_roku_0.mpg' % HOMEDIR):
         _line = line.split()
         if _line[0] == 'Duration:':
             items = _line[1].strip(',').split(':')
-            nhour = int(items[0])
-            nmin = int(items[1])
-            nsecs = int(float(items[2])) + nmin*60 + nhour*60*60
+            try:
+                nhour = int(items[0])
+                nmin = int(items[1])
+                nsecs = int(float(items[2])) + nmin*60 + nhour*60*60
+            except ValueError:
+                nsecs = -1
     return nsecs
 
 def get_random_hex_string(n):
@@ -89,6 +93,7 @@ def make_thumbnails(prefix='test_roku', input_file='', begin_time=0, output_dir=
     if input_file == '':
         input_file = '%s/netflix/mpg/%s_0.mpg' % (HOMEDIR, prefix)
     if not os.path.exists(input_file):
+        run_command('rm -rf %s' % TMPDIR)
         return -1
     run_command('mkdir -p %s' % output_dir)
     if use_mplayer:
@@ -121,17 +126,17 @@ def run_fix_pvr(turn_on_commands=True, unload_module=True):
     import time
     from get_dev import is_module_loaded
     if unload_module:
-        run_command('sudo modprobe -r usbserial', turn_on_commands)
-        run_command('sudo modprobe -r pvrusb2', turn_on_commands)
+        run_command('sudo modprobe -r usbserial', turn_on_commands=turn_on_commands)
+        run_command('sudo modprobe -r pvrusb2', turn_on_commands=turn_on_commands)
         time.sleep(10)
         while is_module_loaded('pvrusb2'):
             time.sleep(10)
-        run_command('sudo modprobe pvrusb2', turn_on_commands)
+        run_command('sudo modprobe pvrusb2', turn_on_commands=turn_on_commands)
         time.sleep(20)
         while not is_module_loaded('pvrusb2'):
             time.sleep(10)
-    run_command('sudo chown -R ddboline:ddboline /sys/class/pvrusb2/sn-5370885/', turn_on_commands)
-    run_command('sudo chown ddboline:ddboline /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor', turn_on_commands)
+    run_command('sudo chown -R ddboline:ddboline /sys/class/pvrusb2/sn-5370885/', turn_on_commands=turn_on_commands)
+    run_command('sudo chown ddboline:ddboline /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor', turn_on_commands=turn_on_commands)
 
     sdir = '/sys/class/pvrusb2/sn-5370885'
 
@@ -151,9 +156,8 @@ oops_messages = [
 
 def check_dmesg_for_ooops():
     for l in os.popen('dmesg').readlines():
-        for mes in oops_messages:
-            if mes in l:
-                return True
+        if any(mes in l for mes in oops_messages):
+            return True
     return False
 
 def write_single_line_to_file(fname, line, turn_on_commands=True):
@@ -163,4 +167,18 @@ def write_single_line_to_file(fname, line, turn_on_commands=True):
         f.write(line)
         f.close()
     else:
-        print 'write %s to %s' % (line, fname)
+        print('write %s to %s' % (line, fname))
+
+def dateTimeString(d):
+    ''' input should be datetime object, output is string '''
+    if not hasattr( d , 'strftime' ):
+        return d
+    s = d.strftime('%Y-%m-%dT%H:%M:%S%z')
+    if len(s) == 24 or len(s) == 20:
+        return s
+    elif len(s) == 19 and 'Z' not in s:
+        return '%sZ' % s
+
+def datetimefromstring(tstr):
+    import dateutil.parser
+    return dateutil.parser.parse(tstr)
