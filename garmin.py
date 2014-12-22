@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import os, glob
 import datetime
-from garmin_base import garmin_file, do_summary, meters_per_mile, sport_types, convert_gmn_to_gpx, do_plots
+from garmin_base import garmin_file, do_summary, METERS_PER_MILE, SPORT_TYPES, convert_gmn_to_gpx, do_plots
 from util import run_command
 
 def read_garmin_file(fname, **options):
@@ -14,7 +14,7 @@ def read_garmin_file(fname, **options):
     if gfile.is_txt:
         return
     print('')
-    gfile.print_splits(meters_per_mile)
+    gfile.print_splits(METERS_PER_MILE)
     print('')
     gfile.print_splits(5000., 'km')
 
@@ -147,7 +147,7 @@ if __name__ == '__main__':
         elif 'do_%s' % arg in options:
             options['do_%s' % arg] = True
         else:
-            spts = filter(lambda x: arg in x, list(sport_types))
+            spts = filter(lambda x: arg in x, list(SPORT_TYPES))
             if len(spts) > 0:
                 options['do_sport'] = spts[0]
             elif arg == 'bike':
