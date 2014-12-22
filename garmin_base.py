@@ -6,7 +6,7 @@ import tempfile
 import datetime
 import cPickle
 import lockfile
-from util import run_command
+from util import run_command, datetimefromstring
 
 from garmin_list_of_corrected_laps import list_of_corrected_laps, \
     is_biking_file, is_running_file, is_walking_file, is_stair_file, \
@@ -15,43 +15,14 @@ from garmin_list_of_corrected_laps import list_of_corrected_laps, \
 hostname = os.uname()[1]
 
 ### Useful constants
-meters_per_mile = 1609.344 # meters
-marathon_distance_m = 42195 # meters
-marathon_distance_mi = marathon_distance_m / meters_per_mile # meters
+METERS_PER_MILE = 1609.344 # meters
+MARATHON_DISTANCE_M = 42195 # meters
+MARATHON_DISTANCE_MI = MARATHON_DISTANCE_M / METERS_PER_MILE # meters
 
 ### explicitly specify available types...
-sport_types = ('running', 'biking', 'walking', 'ultimate', 'elliptical', 'stairs', 'lifting', 'swimming', 'other', 'snowshoeing', 'skiing')
-
-month_names = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
-
-weekday_names = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
-
-if hostname == 'dilepton-tower' or hostname == 'dilepton2':
-    mainlock = '/home/ddboline/Dropbox/backup/.garmin.lock.new'
-else:
-    mainlock = '/tmp/.garmin.lock.new'
-
-global_lockfiles = {}
-
-def get_lockfile(lf=mainlock):
-    ''' function to obtain lockfile '''
-    if hostname != 'dilepton-tower' and hostname != 'dilepton2':
-        return
-    global_lockfiles[lf] = lockfile.FileLock(lf)
-    try:
-        global_lockfiles[lf].acquire(timeout=60)
-    except lockfile.LockTimeout:
-        global_lockfiles[lf].break_lock()
-        global_lockfiles[lf].acquire()
-
-def remove_lockfile(lf=mainlock):
-    ''' function to unlock, remove lockfile '''
-    if hostname != 'dilepton-tower' and hostname != 'dilepton2':
-        return
-    if lf in global_lockfiles:
-        global_lockfiles[lf].release()
-    else:
-        os.remove(lf)
+SPORT_TYPES = ('running', 'biking', 'walking', 'ultimate', 'elliptical', 'stairs', 'lifting', 'swimming', 'other', 'snowshoeing', 'skiing')
+MONTH_NAMES = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
+WEEKDAY_NAMES = ('Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun')
 
 def days_in_year(year=datetime.date.today().year):
     ''' return number of days in a given year '''
@@ -67,8 +38,7 @@ def days_in_month(month=datetime.date.today().month, year=datetime.date.today().
 ### maybe change output to datetime object?
 def convert_date_string(date_str):
     ''' convert date string to datetime object '''
-    import dateutil.parser
-    return dateutil.parser.parse(date_str, ignoretz=True)
+    return datetimefromstring(date_str, ignore_tz=True)
 
 def expected_calories(weight=175, pace_min_per_mile=10.0, distance=1.0):
     ''' return expected calories for running at a given pace '''
@@ -98,14 +68,6 @@ def print_h_m_s(second, do_hours=True):
             return '00:%02i:%02i' % (minutes, seconds)
         else:
             return '%02i:%02i' % (minutes, seconds)
-
-def getText(nodelist):
-    ''' global function for reading xml file '''
-    rc = []
-    for node in nodelist.childNodes:
-        if node.nodeType == node.TEXT_NODE:
-            rc.append(node.data)
-    return ''.join(rc)
 
 def convert_gmn_to_gpx(gmn_filename):
     ''' create temporary gpx file from gmn or tcx files '''
@@ -223,9 +185,9 @@ class garmin_point(object):
                 if len(ent) > 2:
                     if 'Speed' in ent[2]:
                         self.speed_mps = float(ent[2].split('=')[1])
-                        self.speed_mph = self.speed_mps * 3600. / meters_per_mile
+                        self.speed_mph = self.speed_mps * 3600. / METERS_PER_MILE
                         if self.speed_mps > 0.:
-                            self.speed_permi = meters_per_mile / self.speed_mps / 60.
+                            self.speed_permi = METERS_PER_MILE / self.speed_mps / 60.
         return None
 
 class garmin_lap(object):
@@ -305,10 +267,10 @@ class garmin_lap(object):
 
     def print_lap_string(self, sport):
         ''' print nice output for a lap '''
-        print '%s lap %i %.2f mi %s %s calories %.2f min' % (sport, self.lap_number, self.lap_distance / meters_per_mile, print_h_m_s(self.lap_duration), self.lap_calories, self.lap_duration / 60.),
+        print '%s lap %i %.2f mi %s %s calories %.2f min' % (sport, self.lap_number, self.lap_distance / METERS_PER_MILE, print_h_m_s(self.lap_duration), self.lap_calories, self.lap_duration / 60.),
         if sport == 'running':
             if self.lap_distance > 0:
-                print print_h_m_s(self.lap_duration / (self.lap_distance / meters_per_mile), False), '/ mi ',
+                print print_h_m_s(self.lap_duration / (self.lap_distance / METERS_PER_MILE), False), '/ mi ',
                 print print_h_m_s(self.lap_duration / (self.lap_distance / 1000.), False), '/ km',
         if self.lap_avg_hr > 0:
             print '%i bpm' % self.lap_avg_hr
@@ -337,25 +299,20 @@ class garmin_file(object):
         self.points = []
         self.is_tcx = is_tcx
         self.is_txt = is_txt
-
         if self.filename:
             self.determine_file_type()
-            self.filename = convert_gmn_to_xml(self.filename)
             self.read_file()
-
-    def __del__(self):
-        if self.filename and not self.is_tcx and not self.is_txt:
-            run_command('rm %s' % self.filename)
-            pass
 
     def determine_file_type(self):
         if '.tcx' in self.filename or '.TCX' in self.filename:
             self.is_tcx = True
-        if '.txt' in self.filename or '.TXT' in self.filename:
+        elif '.txt' in self.filename or '.TXT' in self.filename:
             self.is_txt = True
-        if '.fit' in self.filename or '.FIT' in self.filename:
+        elif '.fit' in self.filename or '.FIT' in self.filename:
             self.filename = convert_fit_to_tcx(self.filename)
             self.is_tcx = True
+        else:
+            self.filename = convert_gmn_to_xml(self.filename)
 
     def is_running(self):
         ''' is running? or other sport? '''
@@ -388,14 +345,14 @@ class garmin_file(object):
 
     def read_file_txt(self):
         ''' read txt file, these just contain summary information '''
-        for line in open(self.filename, 'r').readlines():
+        for line in open(self.filename, 'r'):
             if len(line.strip()) == 0:
                 continue
-            cur_lap = garmin_lap()
-            cur_point = garmin_point()
+            cur_lap = None
+            cur_point = None
 
             for ent in line.strip().split():
-                if '=' in ent:
+                if '=' not in ent:
                     continue
                 key = ent.split('=')[0]
                 val = ent.split('=')[1]
@@ -403,6 +360,10 @@ class garmin_file(object):
                     year = int(val[0:4])
                     month = int(val[4:6])
                     day = int(val[6:8])
+                    if not cur_lap:
+                        cur_lap = garmin_lap()
+                    if not cur_point:
+                        cur_point = garmin_point()
                     cur_lap.lap_start = datetime.datetime(year, month, day)
                     cur_point.time = datetime.datetime(year, month, day)
                     if len(self.points) == 0:
@@ -424,12 +385,14 @@ class garmin_file(object):
                     cur_point.time = self.points[-1].time + datetime.timedelta(seconds=cur_lap.lap_duration)
                 if key == 'dis':
                     if 'mi' in val: # specify mi, m or assume it's meters
-                        cur_lap.lap_distance = float(val.split('mi')[0]) * meters_per_mile
+                        cur_lap.lap_distance = float(val.split('mi')[0]) * METERS_PER_MILE
                     elif 'm' in val:
                         cur_lap.lap_distance = float(val.split('m')[0])
                     else:
                         cur_lap.lap_distance = float(val)
-                    cur_point.distance = self.points[-1].distance + cur_lap.lap_distance
+                    cur_point.distance = cur_lap.lap_distance
+                    if self.points[-1].distance:
+                        cur_point.distance += self.points[-1].distance
                 if key == 'cal':
                     cur_lap.lap_calories = int(val)
                 if key == 'avghr':
@@ -437,7 +400,7 @@ class garmin_file(object):
                     cur_point.heart_rate = cur_lap.lap_avg_hr
             if cur_lap.lap_calories == -1:
                 dur = cur_lap.lap_duration / 60.
-                dis = cur_lap.lap_distance / meters_per_mile
+                dis = cur_lap.lap_distance / METERS_PER_MILE
                 pace = dur / dis
                 cur_lap.lap_calories = int(expected_calories(weight=175, pace_min_per_mile=pace, distance=dis))
             self.total_calories += cur_lap.lap_calories
@@ -499,9 +462,9 @@ class garmin_file(object):
         for lap_number, cur_lap in enumerate(self.laps):
             if lap_number in corrected_laps:
                 if type(corrected_laps[lap_number]) in [float, int]:
-                    cur_lap.lap_distance = corrected_laps[lap_number] * meters_per_mile
+                    cur_lap.lap_distance = corrected_laps[lap_number] * METERS_PER_MILE
                 elif type(corrected_laps[lap_number]) == list:
-                    cur_lap.lap_distance = corrected_laps[lap_number][0] * meters_per_mile
+                    cur_lap.lap_distance = corrected_laps[lap_number][0] * METERS_PER_MILE
                     cur_lap.lap_duration = corrected_laps[lap_number][1]
             cur_lap.lap_number = lap_number
             self.total_distance += cur_lap.lap_distance
@@ -561,9 +524,9 @@ class garmin_file(object):
         for lap_number, cur_lap in enumerate(self.laps):
             if lap_number in corrected_laps:
                 if type(corrected_laps[lap_number]) == float or len(corrected_laps[lap_number]) == 1:
-                    cur_lap.lap_distance = corrected_laps[lap_number] * meters_per_mile
+                    cur_lap.lap_distance = corrected_laps[lap_number] * METERS_PER_MILE
                 else:
-                    cur_lap.lap_distance = corrected_laps[lap_number][0] * meters_per_mile
+                    cur_lap.lap_distance = corrected_laps[lap_number][0] * METERS_PER_MILE
                     cur_lap.lap_duration = corrected_laps[lap_number][1]
             cur_lap.lap_number = lap_number
             self.total_distance += cur_lap.lap_distance
@@ -603,14 +566,14 @@ class garmin_file(object):
         min_mile = 0
         mi_per_hr = 0
         if self.total_distance > 0:
-            min_mile = (self.total_duration / 60.) / (self.total_distance / meters_per_mile)
+            min_mile = (self.total_duration / 60.) / (self.total_distance / METERS_PER_MILE)
         if self.total_duration > 0:
-            mi_per_hr = (self.total_distance / meters_per_mile) / (self.total_duration/60./60.)
+            mi_per_hr = (self.total_distance / METERS_PER_MILE) / (self.total_duration/60./60.)
 
         if self.is_running():
-            print 'total %.2f mi %s calories %s time %s min/mi %s min/km' % (self.total_distance / meters_per_mile, self.total_calories, print_h_m_s(self.total_duration), print_h_m_s(min_mile*60, False), print_h_m_s(min_mile*60 / meters_per_mile * 1000., False)),
+            print 'total %.2f mi %s calories %s time %s min/mi %s min/km' % (self.total_distance / METERS_PER_MILE, self.total_calories, print_h_m_s(self.total_duration), print_h_m_s(min_mile*60, False), print_h_m_s(min_mile*60 / METERS_PER_MILE * 1000., False)),
         else:
-            print 'total %.2f mi %s calories %s time %.2f mph' % (self.total_distance / meters_per_mile, self.total_calories, print_h_m_s(self.total_duration), mi_per_hr),
+            print 'total %.2f mi %s calories %s time %.2f mph' % (self.total_distance / METERS_PER_MILE, self.total_calories, print_h_m_s(self.total_duration), mi_per_hr),
         if self.total_hr_dur > 0:
             print '%i bpm' % (self.total_hr_dur / self.total_duration)
         else:
@@ -626,19 +589,21 @@ class garmin_file(object):
             t0 = self.points[jdx].time
             d1 = self.points[idx].distance
             d0 = self.points[jdx].distance
+            if any([x == None for x in [t1, t0, d1, d0]]):
+                continue
             totdur = (t1 - t0).total_seconds() # seconds
             totdis = d1 - d0 # meters
             if totdis > 0 and not self.points[idx].speed_permi:
-                self.points[idx].speed_permi = (totdur/60.) / (totdis/meters_per_mile)
+                self.points[idx].speed_permi = (totdur/60.) / (totdis/METERS_PER_MILE)
             if totdur > 0 and not self.points[idx].speed_mph:
-                self.points[idx].speed_mph = (totdis/meters_per_mile) / (totdur/60./60.)
+                self.points[idx].speed_mph = (totdis/METERS_PER_MILE) / (totdur/60./60.)
             if d1 > 0:
-                self.points[idx].avg_speed_value_permi = ((t1 - self.points[0].time).total_seconds()/60.) / (d1/meters_per_mile)
+                self.points[idx].avg_speed_value_permi = ((t1 - self.points[0].time).total_seconds()/60.) / (d1/METERS_PER_MILE)
             if (t1 - self.points[0].time).total_seconds() > 0:
-                self.points[idx].avg_speed_value_mph = (self.points[idx].distance/meters_per_mile) / ((t1 - self.points[0].time).total_seconds()/60./60.)
+                self.points[idx].avg_speed_value_mph = (self.points[idx].distance/METERS_PER_MILE) / ((t1 - self.points[0].time).total_seconds()/60./60.)
         return None
 
-    def print_splits(self, split_distance_in_meters=meters_per_mile, label='mi', print_out=True):
+    def print_splits(self, split_distance_in_meters=METERS_PER_MILE, label='mi', print_out=True):
         ''' print split time for given split distance '''
         if len(self.points) == 0: return None
         last_point_me = 0
@@ -672,37 +637,37 @@ class garmin_file(object):
                     for nmi in range(0, nmiles):
                         if self.is_running():
                             if print_out:
-                                print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val  / nmiles), '\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / meters_per_mile), False), '/ mi\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / meters_per_mile) * marathon_distance_mi),
+                                print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val  / nmiles), '\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE), False), '/ mi\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) * MARATHON_DISTANCE_MI),
                                 if avg_hrt_rate > 0:
                                     print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
                                 else:
                                     print ''
-                            split_vector.append([split_dist/nmiles + nmi, time_val / nmiles / (split_distance_in_meters / meters_per_mile) / 60.])
+                            split_vector.append([split_dist/nmiles + nmi, time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60.])
                         else:
                             if print_out:
-                                print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val / nmiles), '\t', '%.2f mph' % (1. / (time_val / nmiles / (split_distance_in_meters / meters_per_mile) / 60. / 60.)),
+                                print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val / nmiles), '\t', '%.2f mph' % (1. / (time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)),
                                 if avg_hrt_rate > 0:
                                     print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
                                 else:
                                     print ''
-                            split_vector.append([split_dist/nmiles + nmi, 1. / (time_val / nmiles / (split_distance_in_meters / meters_per_mile) / 60. / 60.)])
+                            split_vector.append([split_dist/nmiles + nmi, 1. / (time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)])
                 else:
                     if self.is_running():
                         if print_out:
-                            print '%i %s \t' % (split_dist, label), print_h_m_s(time_val), '\t', print_h_m_s(time_val / (split_distance_in_meters / meters_per_mile), False), '/ mi\t', print_h_m_s(time_val / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / (split_distance_in_meters / meters_per_mile) * marathon_distance_mi),
+                            print '%i %s \t' % (split_dist, label), print_h_m_s(time_val), '\t', print_h_m_s(time_val / (split_distance_in_meters / METERS_PER_MILE), False), '/ mi\t', print_h_m_s(time_val / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / (split_distance_in_meters / METERS_PER_MILE) * MARATHON_DISTANCE_MI),
                             if avg_hrt_rate > 0:
                                 print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
                             else:
                                 print ''
-                        split_vector.append([cur_point_me/meters_per_mile, time_val / (split_distance_in_meters / meters_per_mile) / 60.])
+                        split_vector.append([cur_point_me/METERS_PER_MILE, time_val / (split_distance_in_meters / METERS_PER_MILE) / 60.])
                     else:
                         if print_out:
-                            print '%i %s \t' % (cur_point_me/meters_per_mile, label), print_h_m_s(time_val), '\t', '%.2f mph' % (1. / (time_val / (split_distance_in_meters / meters_per_mile) / 60. / 60.)),
+                            print '%i %s \t' % (cur_point_me/METERS_PER_MILE, label), print_h_m_s(time_val), '\t', '%.2f mph' % (1. / (time_val / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)),
                             if avg_hrt_rate > 0:
                                 print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
                             else:
                                 print ''
-                        split_vector.append([cur_point_me/meters_per_mile, 1. / (time_val / (split_distance_in_meters / meters_per_mile) / 60. / 60.)])
+                        split_vector.append([cur_point_me/METERS_PER_MILE, 1. / (time_val / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)])
 
                 prev_split_me = cur_split_me
                 prev_split_time = cur_split_time
@@ -823,12 +788,12 @@ def do_plots(gfile, use_time=False, **options):
     lat_vals = []
     lon_vals = []
     graphs = []
-    mile_split_vals = gfile.print_splits(meters_per_mile, print_out=False)
+    mile_split_vals = gfile.print_splits(METERS_PER_MILE, print_out=False)
     for point in gfile.points:
         if use_time:
             xval = point.duration_from_begin
         else:
-            xval = point.distance / meters_per_mile
+            xval = point.distance / METERS_PER_MILE
         if xval > 0 and point.heart_rate > 0:
             avg_hr += point.heart_rate * point.duration_from_last
             sum_time += point.duration_from_last
@@ -973,14 +938,14 @@ class garmin_summary(object):
         self.number_of_items += 1
 
         if self.total_calories == 0 and self.sport == 'running' and self.total_distance > 0.0:
-            self.total_calories = int(expected_calories(weight=175, pace_min_per_mile=(self.total_duration / 60.) / (self.total_distance / meters_per_mile), distance=self.total_distance / meters_per_mile))
+            self.total_calories = int(expected_calories(weight=175, pace_min_per_mile=(self.total_duration / 60.) / (self.total_distance / METERS_PER_MILE), distance=self.total_distance / METERS_PER_MILE))
         elif self.total_calories == 0 and self.sport == 'stairs' and self.total_duration > 0:
             self.total_calories = 325 * (self.total_duration / 1100.89)
         elif self.total_calories == 0:
             return False
         if self.total_calories < 3:
             return False
-        if self.sport not in sport_types:
+        if self.sport not in SPORT_TYPES:
             print '%s not supported' % self.sport
             return False
 
@@ -1003,13 +968,13 @@ class garmin_summary(object):
 
     def print_total_summary(self, sport=None, number_days=0, total_days=0):
         ''' print summary of total information '''
-        print '%17s %10s \t %10s \t %10s \t' % (' ', sport, '%4.2f mi' % (self.total_distance/meters_per_mile), '%i cal' % self.total_calories),
+        print '%17s %10s \t %10s \t %10s \t' % (' ', sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories),
 
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / meters_per_mile), False)),
+            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
             print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / meters_per_mile) / (self.total_duration / 60. / 60.))),
+            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
         else:
             print ' %10s \t' % ' ',
         print ' %10s \t' % (print_h_m_s(self.total_duration)),
@@ -1031,12 +996,12 @@ class garmin_summary(object):
         if sport == 'total':
             print '%17s %10s \t %10s \t %10s \t' % (year, sport, ' ', '%i cal' % self.total_calories),
         else:
-            print '%17s %10s \t %10s \t %10s \t' % (year, sport, '%4.2f mi' % (self.total_distance/meters_per_mile), '%i cal' % self.total_calories),
+            print '%17s %10s \t %10s \t %10s \t' % (year, sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories),
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / meters_per_mile), False)),
+            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
             print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / meters_per_mile) / (self.total_duration / 60. / 60.))),
+            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
         else:
             print ' %10s \t' % ' ',
         print ' %10s \t' % (print_h_m_s(self.total_duration)),
@@ -1053,14 +1018,14 @@ class garmin_summary(object):
         if datetime.datetime.today().year == year and datetime.datetime.today().month == month:
             total_days = (datetime.datetime.today() - datetime.datetime(datetime.datetime.today().year, datetime.datetime.today().month, 1)).days
         if sport == 'total':
-            print '%17s %10s \t %10s \t %10s \t' % ('%i %s' % (year, month_names[month-1]), sport, ' ', '%i cal' % self.total_calories),
+            print '%17s %10s \t %10s \t %10s \t' % ('%i %s' % (year, MONTH_NAMES[month-1]), sport, ' ', '%i cal' % self.total_calories),
         else:
-            print '%17s %10s \t %10s \t %10s \t' % ('%i %s' % (year, month_names[month-1]), sport, '%4.2f mi' % (self.total_distance/meters_per_mile), '%i cal' % self.total_calories),
+            print '%17s %10s \t %10s \t %10s \t' % ('%i %s' % (year, MONTH_NAMES[month-1]), sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories),
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / meters_per_mile), False)),
+            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
             print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / meters_per_mile) / (self.total_duration / 60. / 60.))),
+            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
         else:
             print ' %10s \t' % ' ',
         print ' %10s \t' % (print_h_m_s(self.total_duration)),
@@ -1078,12 +1043,12 @@ class garmin_summary(object):
         if sport == 'total':
             print '%17s %10s \t %10s \t %10s \t' % ('average / month', sport, ' ', '%i cal' % (self.total_calories / number_of_months)),
         else:
-            print '%17s %10s \t %10s \t %10s \t' % ('average / month', sport, '%4.2f mi' % (self.total_distance/meters_per_mile/number_of_months), '%i cal' % (self.total_calories/number_of_months)),
+            print '%17s %10s \t %10s \t %10s \t' % ('average / month', sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE/number_of_months), '%i cal' % (self.total_calories/number_of_months)),
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / meters_per_mile), False)),
+            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
             print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / meters_per_mile) / (self.total_duration / 60. / 60.))),
+            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
         else:
             print ' %10s \t' % ' ',
         print ' %10s \t' % (print_h_m_s(self.total_duration/number_of_months)),
@@ -1097,13 +1062,13 @@ class garmin_summary(object):
     def print_day_summary(self, sport=None, cur_date=datetime.date.today()):
         ''' print day summary information '''
         week = cur_date.isocalendar()[1]
-        weekdayname = weekday_names[cur_date.weekday()]
+        weekdayname = WEEKDAY_NAMES[cur_date.weekday()]
         if sport == 'running' or sport == 'walking':
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/meters_per_mile), '%i cal' % self.total_calories, '%s / mi' % print_h_m_s(self.total_duration / (self.total_distance/meters_per_mile), False), '%s / km' % print_h_m_s(self.total_duration / (self.total_distance/1000.), False), print_h_m_s(self.total_duration)),
+            print '%17s %10s \t %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, '%s / mi' % print_h_m_s(self.total_duration / (self.total_distance/METERS_PER_MILE), False), '%s / km' % print_h_m_s(self.total_duration / (self.total_distance/1000.), False), print_h_m_s(self.total_duration)),
         elif sport == 'biking':
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/meters_per_mile), '%i cal' % self.total_calories, '%.2f mph' % ((self.total_distance/meters_per_mile) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration)),
+            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, '%.2f mph' % ((self.total_distance/METERS_PER_MILE) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration)),
         else:
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/meters_per_mile), '%i cal' % self.total_calories, ' ', print_h_m_s(self.total_duration)),
+            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, ' ', print_h_m_s(self.total_duration)),
         if self.total_hr_dur > 0:
             print '\t %7s' % ('%i bpm' % (self.total_hr_dur / self.total_duration))
         else:
@@ -1115,11 +1080,11 @@ class garmin_summary(object):
         if number_days == 0:
             return False
         if sport == 'running' or sport == 'walking':
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/meters_per_mile/number_days), '%i cal' % (self.total_calories/number_days), '%s / mi' % print_h_m_s(self.total_duration / (self.total_distance/meters_per_mile), False), '%s / km' % print_h_m_s(self.total_duration / (self.total_distance/1000.), False), print_h_m_s(self.total_duration/number_days)),
+            print '%17s %10s \t %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), '%s / mi' % print_h_m_s(self.total_duration / (self.total_distance/METERS_PER_MILE), False), '%s / km' % print_h_m_s(self.total_duration / (self.total_distance/1000.), False), print_h_m_s(self.total_duration/number_days)),
         elif sport == 'biking':
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/meters_per_mile/number_days), '%i cal' % (self.total_calories/number_days), '%.2f mph' % ((self.total_distance/meters_per_mile) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration/number_days)),
+            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), '%.2f mph' % ((self.total_distance/METERS_PER_MILE) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration/number_days)),
         else:
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/meters_per_mile/number_days), '%i cal' % (self.total_calories/number_days), ' ', print_h_m_s(self.total_duration/number_days)),
+            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), ' ', print_h_m_s(self.total_duration/number_days)),
         if self.total_hr_dur > 0:
             print '\t %7s' % ('%i bpm' % (self.total_hr_dur / self.total_duration))
         else:
@@ -1142,13 +1107,13 @@ class garmin_summary(object):
         if sport == 'total':
             print '%17s %10s \t %10s \t %10s \t' % ('%i week %02i' % (isoyear, isoweek), sport, ' ', '%i cal' % self.total_calories),
         else:
-            print '%17s %10s \t %10s \t %10s \t' % ('%i week %02i' % (isoyear, isoweek), sport, '%4.2f mi' % (self.total_distance/meters_per_mile), '%i cal' % self.total_calories),
+            print '%17s %10s \t %10s \t %10s \t' % ('%i week %02i' % (isoyear, isoweek), sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories),
 
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / meters_per_mile), False)),
+            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
             print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / meters_per_mile) / (self.total_duration / 60. / 60.))),
+            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
         else:
             print ' %10s \t' % ' ',
         print ' %10s \t' % (print_h_m_s(self.total_duration)),
@@ -1166,13 +1131,13 @@ class garmin_summary(object):
         if sport == 'total':
             print '%17s %10s \t %10s \t %10s \t' % ('avg / %3s weeks' % number_of_weeks, sport, ' ', '%i cal' % (self.total_calories/number_of_weeks)),
         else:
-            print '%17s %10s \t %10s \t %10s \t' % ('avg / %3s weeks' % number_of_weeks, sport, '%4.2f mi' % (self.total_distance/meters_per_mile/number_of_weeks), '%i cal' % (self.total_calories/number_of_weeks)),
+            print '%17s %10s \t %10s \t %10s \t' % ('avg / %3s weeks' % number_of_weeks, sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE/number_of_weeks), '%i cal' % (self.total_calories/number_of_weeks)),
 
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / meters_per_mile), False)),
+            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
             print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / meters_per_mile) / (self.total_duration / 60. / 60.))),
+            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
         else:
             print ' %10s \t' % ' ',
         print ' %10s \t' % (print_h_m_s(self.total_duration / number_of_weeks)),
@@ -1364,7 +1329,7 @@ def do_summary(directory, **options):
     ### If more than one year, default to year-to-year summary
     print ''
     if do_file:
-        for sport in sport_types:
+        for sport in SPORT_TYPES:
             if sport not in sport_set:
                 continue
             for gfile in file_vector:
@@ -1375,7 +1340,7 @@ def do_summary(directory, **options):
             print ''
         print ''
     if do_day:
-        for sport in sport_types:
+        for sport in SPORT_TYPES:
             if sport not in sport_set:
                 continue
             for cur_date in day_set:
@@ -1394,7 +1359,7 @@ def do_summary(directory, **options):
             total_summary.print_day_average('total', len(day_set))
             print ''
     if do_week:
-        for sport in sport_types:
+        for sport in SPORT_TYPES:
             if sport not in sport_set:
                 continue
             for yearweek in week_set:
@@ -1417,7 +1382,7 @@ def do_summary(directory, **options):
             total_summary.print_week_average(sport='total', number_days=len(day_set), number_of_weeks=len(week_set))
             print ''
     if do_month:
-        for sport in sport_types:
+        for sport in SPORT_TYPES:
             if sport not in sport_set:
                 continue
             for yearmonth in month_set:
@@ -1443,7 +1408,7 @@ def do_summary(directory, **options):
             total_summary.print_month_average(sport='total', number_of_months=len(month_set))
             print ''
     if do_year:
-        for sport in sport_types:
+        for sport in SPORT_TYPES:
             if sport not in sport_set:
                 continue
             for year in year_set:
@@ -1458,7 +1423,7 @@ def do_summary(directory, **options):
             if not do_sport: year_summary[year].print_year_summary('total', year, len(year_day_set[year]))
         print ''
 
-    for sport in sport_types:
+    for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
         if len(total_sport_day_set[sport]) > 1 and not do_day:
@@ -1467,7 +1432,7 @@ def do_summary(directory, **options):
         print ''
         total_summary.print_day_average('total', len(day_set))
         print ''
-    for sport in sport_types:
+    for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
         if len(week_sport_set[sport]) > 1 and not do_week:
@@ -1476,7 +1441,7 @@ def do_summary(directory, **options):
         print ''
         total_summary.print_week_average('total', number_days=len(day_set), number_of_weeks=len(week_set))
         print ''
-    for sport in sport_types:
+    for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
         if len(month_sport_day_set[sport]) > 1 and not do_month:
@@ -1488,7 +1453,7 @@ def do_summary(directory, **options):
     begin_date = day_set[0]
     end_date = day_set[-1]
     total_days = (end_date - begin_date).days
-    for sport in sport_types:
+    for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
         if len(total_sport_day_set[sport]) == 0:
