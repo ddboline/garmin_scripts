@@ -134,6 +134,8 @@ class garmin_point(object):
             functions:
                 read_point_xml(node), read_point_tcx(node)
     '''
+    __slots__ = ['time', 'latitude', 'longitude', 'altitude', 'distance', 'heart_rate', 'duration_from_last', 'duration_from_begin', 'speed_mps', 'speed_permi', 'speed_mph', 'avg_speed_value_permi', 'avg_speed_value_mph']
+    
     def __init__(self, time=None, latitude=None, longitude=None, altitude=None, distance=None, heart_rate=None):
         self.time = time
         self.latitude = latitude
@@ -196,6 +198,8 @@ class garmin_lap(object):
             functions:
                 read_lap_xml(node), read_lap_tcx(node), print_lap_string(node)
     '''
+    __slots__ = ['lap_type', 'lap_index', 'lap_start', 'lap_duration', 'lap_distance', 'lap_trigger', 'lap_max_speed', 'lap_calories', 'lap_avg_hr', 'lap_max_hr', 'lap_intensity', 'lap_number', 'lap_start_string']
+    
     def __init__(self, lap_type=None, lap_index=0, lap_start=None, lap_duration=0.0, lap_distance=0.0, lap_trigger=None, lap_max_speed=None, lap_calories=0, lap_avg_hr=-1, lap_max_hr=-1, lap_intensity=None, lap_number=0):
         self.lap_type = lap_type
         self.lap_index = lap_index
@@ -265,19 +269,19 @@ class garmin_lap(object):
                 self.lap_intensity = ent[0].split('=')[1]
         return None
 
-    def print_lap_string(self, sport):
-        ''' print nice output for a lap '''
-        print '%s lap %i %.2f mi %s %s calories %.2f min' % (sport, self.lap_number, self.lap_distance / METERS_PER_MILE, print_h_m_s(self.lap_duration), self.lap_calories, self.lap_duration / 60.),
-        if sport == 'running':
-            if self.lap_distance > 0:
-                print print_h_m_s(self.lap_duration / (self.lap_distance / METERS_PER_MILE), False), '/ mi ',
-                print print_h_m_s(self.lap_duration / (self.lap_distance / 1000.), False), '/ km',
-        if self.lap_avg_hr > 0:
-            print '%i bpm' % self.lap_avg_hr
-        else:
-            print ''
+def print_lap_string(glap, sport):
+    ''' print nice output for a lap '''
+    print '%s lap %i %.2f mi %s %s calories %.2f min' % (sport, glap.lap_number, glap.lap_distance / METERS_PER_MILE, print_h_m_s(glap.lap_duration), glap.lap_calories, glap.lap_duration / 60.),
+    if sport == 'running':
+        if glap.lap_distance > 0:
+            print print_h_m_s(glap.lap_duration / (glap.lap_distance / METERS_PER_MILE), False), '/ mi ',
+            print print_h_m_s(glap.lap_duration / (glap.lap_distance / 1000.), False), '/ km',
+    if glap.lap_avg_hr > 0:
+        print '%i bpm' % glap.lap_avg_hr
+    else:
+        print ''
 
-        return None
+    return None
 
 class garmin_file(object):
     '''
@@ -285,6 +289,8 @@ class garmin_file(object):
             functions:
                 read_file(), read_file_tcx(), read_file_xml(), print_file_string(), calculate_speed(), print_splits()
     '''
+    __slots__ = ['filename', 'track_points', 'begin_time', 'begin_date', 'sport', 'total_calories', 'total_distance', 'total_duration', 'total_hr_dur', 'laps', 'points', 'is_tcx', 'is_txt']
+    
     def __init__(self, filename='', is_tcx=False, is_txt=False):
         self.filename = filename
         self.track_points = []
@@ -440,7 +446,6 @@ class garmin_file(object):
                 elif 'StartTime' in ent[5]:
                     cur_lap = garmin_lap()
                 elif ent[5] == 'Track':
-                    #print ent[6:]
                     if len(ent[6:]) == 0:
                         continue
                     elif ent[6] == 'Trackpoint':
@@ -549,38 +554,6 @@ class garmin_file(object):
 
         return None
 
-    def print_file_string(self, do_html=False):
-        ''' nice output string for a file '''
-        retval = []
-        if do_html:
-            retval.append('<table>Start time %s' % print_date_string(self.begin_time))
-        else:
-            print 'Start time', print_date_string(self.begin_time)
-
-        for lap in self.laps:
-            if do_html:
-                pass
-            else:
-                lap.print_lap_string(self.sport)
-
-        min_mile = 0
-        mi_per_hr = 0
-        if self.total_distance > 0:
-            min_mile = (self.total_duration / 60.) / (self.total_distance / METERS_PER_MILE)
-        if self.total_duration > 0:
-            mi_per_hr = (self.total_distance / METERS_PER_MILE) / (self.total_duration/60./60.)
-
-        if self.is_running():
-            print 'total %.2f mi %s calories %s time %s min/mi %s min/km' % (self.total_distance / METERS_PER_MILE, self.total_calories, print_h_m_s(self.total_duration), print_h_m_s(min_mile*60, False), print_h_m_s(min_mile*60 / METERS_PER_MILE * 1000., False)),
-        else:
-            print 'total %.2f mi %s calories %s time %.2f mph' % (self.total_distance / METERS_PER_MILE, self.total_calories, print_h_m_s(self.total_duration), mi_per_hr),
-        if self.total_hr_dur > 0:
-            print '%i bpm' % (self.total_hr_dur / self.total_duration)
-        else:
-            print ''
-
-        return None
-
     def calculate_speed(self):
         ''' calculate instantaneous speed (could maybe be a bit more elaborate?) '''
         for idx in range(1, len(self.points)):
@@ -603,79 +576,111 @@ class garmin_file(object):
                 self.points[idx].avg_speed_value_mph = (self.points[idx].distance/METERS_PER_MILE) / ((t1 - self.points[0].time).total_seconds()/60./60.)
         return None
 
-    def print_splits(self, split_distance_in_meters=METERS_PER_MILE, label='mi', print_out=True):
-        ''' print split time for given split distance '''
-        if len(self.points) == 0: return None
-        last_point_me = 0
-        last_point_time = 0
-        prev_split_me = 0
-        prev_split_time = 0
-        avg_hrt_rate = 0
-        split_vector = []
+def print_file_string(gfile, do_html=False):
+    ''' nice output string for a file '''
+    retval = []
+    if do_html:
+        retval.append('<table>Start time %s' % print_date_string(gfile.begin_time))
+    else:
+        print 'Start time', print_date_string(gfile.begin_time)
 
-        for point in self.points:
-            cur_point_me = point.distance
-            cur_point_time = point.duration_from_begin
-            if (cur_point_me - last_point_me) <= 0:
-                continue
-            if point.heart_rate:
-                try:
-                    avg_hrt_rate += point.heart_rate * (cur_point_time - last_point_time)
-                except Exception as exc:
-                    print 'Exception:', exc, point.heart_rate, cur_point_time, last_point_me
-                    exit(0)
-            nmiles = int(cur_point_me/split_distance_in_meters) - int(last_point_me/split_distance_in_meters)
-            if nmiles > 0:
-                cur_split_me = int(cur_point_me/split_distance_in_meters)*split_distance_in_meters
-                cur_split_time = last_point_time + (cur_point_time - last_point_time) / (cur_point_me - last_point_me) * (cur_split_me - last_point_me)
-                time_val = (cur_split_time - prev_split_time)
-                split_dist = cur_point_me/split_distance_in_meters
-                if label == 'km':
-                    split_dist = cur_point_me/1000.
+    for lap in gfile.laps:
+        if do_html:
+            pass
+        else:
+            print_lap_string(lap, gfile.sport)
 
-                if nmiles > 1:
-                    for nmi in range(0, nmiles):
-                        if self.is_running():
-                            if print_out:
-                                print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val  / nmiles), '\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE), False), '/ mi\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) * MARATHON_DISTANCE_MI),
-                                if avg_hrt_rate > 0:
-                                    print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
-                                else:
-                                    print ''
-                            split_vector.append([split_dist/nmiles + nmi, time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60.])
-                        else:
-                            if print_out:
-                                print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val / nmiles), '\t', '%.2f mph' % (1. / (time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)),
-                                if avg_hrt_rate > 0:
-                                    print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
-                                else:
-                                    print ''
-                            split_vector.append([split_dist/nmiles + nmi, 1. / (time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)])
-                else:
-                    if self.is_running():
+    min_mile = 0
+    mi_per_hr = 0
+    if gfile.total_distance > 0:
+        min_mile = (gfile.total_duration / 60.) / (gfile.total_distance / METERS_PER_MILE)
+    if gfile.total_duration > 0:
+        mi_per_hr = (gfile.total_distance / METERS_PER_MILE) / (gfile.total_duration/60./60.)
+
+    if gfile.is_running():
+        print 'total %.2f mi %s calories %s time %s min/mi %s min/km' % (gfile.total_distance / METERS_PER_MILE, gfile.total_calories, print_h_m_s(gfile.total_duration), print_h_m_s(min_mile*60, False), print_h_m_s(min_mile*60 / METERS_PER_MILE * 1000., False)),
+    else:
+        print 'total %.2f mi %s calories %s time %.2f mph' % (gfile.total_distance / METERS_PER_MILE, gfile.total_calories, print_h_m_s(gfile.total_duration), mi_per_hr),
+    if gfile.total_hr_dur > 0:
+        print '%i bpm' % (gfile.total_hr_dur / gfile.total_duration)
+    else:
+        print ''
+
+    return None
+
+def print_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', print_out=True):
+    ''' print split time for given split distance '''
+    if len(gfile.points) == 0: return None
+    last_point_me = 0
+    last_point_time = 0
+    prev_split_me = 0
+    prev_split_time = 0
+    avg_hrt_rate = 0
+    split_vector = []
+
+    for point in gfile.points:
+        cur_point_me = point.distance
+        cur_point_time = point.duration_from_begin
+        if (cur_point_me - last_point_me) <= 0:
+            continue
+        if point.heart_rate:
+            try:
+                avg_hrt_rate += point.heart_rate * (cur_point_time - last_point_time)
+            except Exception as exc:
+                print 'Exception:', exc, point.heart_rate, cur_point_time, last_point_me
+                exit(0)
+        nmiles = int(cur_point_me/split_distance_in_meters) - int(last_point_me/split_distance_in_meters)
+        if nmiles > 0:
+            cur_split_me = int(cur_point_me/split_distance_in_meters)*split_distance_in_meters
+            cur_split_time = last_point_time + (cur_point_time - last_point_time) / (cur_point_me - last_point_me) * (cur_split_me - last_point_me)
+            time_val = (cur_split_time - prev_split_time)
+            split_dist = cur_point_me/split_distance_in_meters
+            if label == 'km':
+                split_dist = cur_point_me/1000.
+
+            if nmiles > 1:
+                for nmi in range(0, nmiles):
+                    if gfile.is_running():
                         if print_out:
-                            print '%i %s \t' % (split_dist, label), print_h_m_s(time_val), '\t', print_h_m_s(time_val / (split_distance_in_meters / METERS_PER_MILE), False), '/ mi\t', print_h_m_s(time_val / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / (split_distance_in_meters / METERS_PER_MILE) * MARATHON_DISTANCE_MI),
+                            print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val  / nmiles), '\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE), False), '/ mi\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) * MARATHON_DISTANCE_MI),
                             if avg_hrt_rate > 0:
                                 print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
                             else:
                                 print ''
-                        split_vector.append([cur_point_me/METERS_PER_MILE, time_val / (split_distance_in_meters / METERS_PER_MILE) / 60.])
+                        split_vector.append([split_dist/nmiles + nmi, time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60.])
                     else:
                         if print_out:
-                            print '%i %s \t' % (cur_point_me/METERS_PER_MILE, label), print_h_m_s(time_val), '\t', '%.2f mph' % (1. / (time_val / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)),
+                            print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val / nmiles), '\t', '%.2f mph' % (1. / (time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)),
                             if avg_hrt_rate > 0:
                                 print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
                             else:
                                 print ''
-                        split_vector.append([cur_point_me/METERS_PER_MILE, 1. / (time_val / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)])
+                        split_vector.append([split_dist/nmiles + nmi, 1. / (time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)])
+            else:
+                if gfile.is_running():
+                    if print_out:
+                        print '%i %s \t' % (split_dist, label), print_h_m_s(time_val), '\t', print_h_m_s(time_val / (split_distance_in_meters / METERS_PER_MILE), False), '/ mi\t', print_h_m_s(time_val / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / (split_distance_in_meters / METERS_PER_MILE) * MARATHON_DISTANCE_MI),
+                        if avg_hrt_rate > 0:
+                            print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
+                        else:
+                            print ''
+                    split_vector.append([cur_point_me/METERS_PER_MILE, time_val / (split_distance_in_meters / METERS_PER_MILE) / 60.])
+                else:
+                    if print_out:
+                        print '%i %s \t' % (cur_point_me/METERS_PER_MILE, label), print_h_m_s(time_val), '\t', '%.2f mph' % (1. / (time_val / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)),
+                        if avg_hrt_rate > 0:
+                            print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
+                        else:
+                            print ''
+                    split_vector.append([cur_point_me/METERS_PER_MILE, 1. / (time_val / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)])
 
-                prev_split_me = cur_split_me
-                prev_split_time = cur_split_time
-                avg_hrt_rate = 0
-            last_point_me = cur_point_me
-            last_point_time = cur_point_time
+            prev_split_me = cur_split_me
+            prev_split_time = cur_split_time
+            avg_hrt_rate = 0
+        last_point_me = cur_point_me
+        last_point_time = cur_point_time
 
-        return split_vector
+    return split_vector
 
 def do_map(gpx_filename):
     ''' wrapper around gpxviewer '''
@@ -781,14 +786,14 @@ def do_plots(gfile, use_time=False, **options):
     alt_vals = []
     alt_values = []
     vertical_climb = 0
-    speed_values = filter(lambda x: x[1] < 20, gfile.print_splits(400., print_out=False))
+    speed_values = filter(lambda x: x[1] < 20, print_splits(gfile, 400., print_out=False))
     mph_speed_values = []
     avg_speed_values = []
     avg_mph_speed_values = []
     lat_vals = []
     lon_vals = []
     graphs = []
-    mile_split_vals = gfile.print_splits(METERS_PER_MILE, print_out=False)
+    mile_split_vals = print_splits(gfile, METERS_PER_MILE, print_out=False)
     for point in gfile.points:
         if use_time:
             xval = point.duration_from_begin
