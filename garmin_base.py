@@ -6,8 +6,9 @@ import tempfile
 import datetime
 import cPickle
 import lockfile
-from util import run_command, datetimefromstring
+import pandas as pd
 
+from util import run_command, datetimefromstring
 from garmin_list_of_corrected_laps import list_of_corrected_laps, \
     is_biking_file, is_running_file, is_walking_file, is_stair_file, \
     list_of_skiing_files, list_of_snowshoeing_files, list_of_running_files_by_time, list_of_walking_files_by_time, list_of_biking_files_by_time
@@ -128,6 +129,24 @@ def convert_gmn_to_xml(gmn_filename):
     os.system('cp %s /tmp/temp.xml' % xml_file.name)
     return xml_filename
 
+
+class garmin_dataframe(object):
+    ''' dump list of garmin_points to pandas.DataFrame '''
+    def __init__(self, garmin_class=None, garmin_list=None):
+        self.dataframe = None
+        if garmin_class and garmin_list:
+            self.fill_dataframe(garmin_class.__slots__, garmin_list)
+        
+    def fill_dataframe(self, attrs, arr):
+        inp_array = []
+        for it in arr:
+            tmp_array = []
+            for attr in attrs:
+                tmp_array.append(getattr(it, attr))
+            inp_array.append(tmp_array)
+        self.dataframe = pd.DataFrame(inp_array, columns=attrs)
+
+
 class garmin_point(object):
     '''
         point representing each gps point
@@ -191,6 +210,7 @@ class garmin_point(object):
                         if self.speed_mps > 0.:
                             self.speed_permi = METERS_PER_MILE / self.speed_mps / 60.
         return None
+
 
 class garmin_lap(object):
     '''
@@ -570,6 +590,8 @@ class garmin_file(object):
                 self.points[idx].speed_permi = (totdur/60.) / (totdis/METERS_PER_MILE)
             if totdur > 0 and not self.points[idx].speed_mph:
                 self.points[idx].speed_mph = (totdis/METERS_PER_MILE) / (totdur/60./60.)
+            if totdur > 0 and not self.points[idx].speed_mps:
+                self.points[idx].speed_mps = totdis / totdur
             if d1 > 0:
                 self.points[idx].avg_speed_value_permi = ((t1 - self.points[0].time).total_seconds()/60.) / (d1/METERS_PER_MILE)
             if (t1 - self.points[0].time).total_seconds() > 0:
@@ -912,6 +934,8 @@ def compute_file_md5sum(filename):
 
 class garmin_summary(object):
     ''' summary class for a file '''
+    __slots__ = ['filename', 'begin_time', 'begin_date', 'sport', 'total_calories', 'total_distance', 'total_duration', 'total_hr_dur', 'is_tcx', 'is_txt', 'number_of_items', 'md5sum']
+    
     def __init__(self, filename='', is_tcx=False, is_txt=False, md5sum=None):
         self.filename = filename
         self.begin_time = None
@@ -1152,10 +1176,6 @@ class garmin_summary(object):
             print ' %7s %2s' % (' ', ' '),
         print '%16s' % ('%.1f / %i days' % (float(number_days) / number_of_weeks, 7))
         return True
-
-def do_summary_sql(directory, **options):
-    ''' get summary of files in directory, use sql database instead of pickle '''
-    return
 
 def do_summary(directory, **options):
     ''' get summary of files in directory '''
