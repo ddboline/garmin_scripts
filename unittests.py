@@ -47,7 +47,7 @@ class TestGarminScript(unittest.TestCase):
         outfile = garmin_base.convert_fit_to_tcx(fitfile)
         self.assertEqual('/tmp/temp.tcx', outfile)
         md5 = run_command('cat %s | md5sum' % outfile, do_popen=True).read().split()[0]
-        self.assertEqual(md5, 'e2a7c37233f57c9b7c5da52a01c94210')
+        self.assertEqual(md5, '1c304e508709540ccdf44fd70b3c5dcc')
 
         for f in tcxfile, fitfile:
             self.assertEqual(f, garmin_base.convert_gmn_to_xml(f))
@@ -86,6 +86,29 @@ class TestGarminScript(unittest.TestCase):
         gfile.read_file()
         self.assertEqual(gfile.begin_date, datetime.date(year=2013, month=1, day=16))
 
+        gfile = garmin_base.garmin_file(gmnfile)
+        garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe.to_csv('temp.csv', index=False)
+        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+        self.assertEqual(md5, 'bd68a0bac5267ccac01139e05883aa8f')
+        garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe.to_csv('temp.csv', index=False)
+        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+        self.assertEqual(md5, '90a35d56c4a8a6a99d176407b22a2cad')
+
+        gfile = garmin_base.garmin_file(tcxfile)
+        garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe.to_csv('temp.csv', index=False)
+        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+        self.assertEqual(md5, '157e24fa921aaa169dbd6c09cfdd55d5')
+        garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe.to_csv('temp.csv', index=False)
+        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+        self.assertEqual(md5, '5973750ba6ffa5394bbc0a4569a2a922')
+        
+        gfile = garmin_base.garmin_file(fitfile)
+        garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe.to_csv('temp.csv', index=False)
+        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+        self.assertEqual(md5, '61efed856cab6799bd0bf83a79052c70')
+        garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe.to_csv('temp.csv', index=False)
+        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+        self.assertEqual(md5, '13fb54df90be4b3da668da4e2048dcee')
 
 if __name__ == '__main__':
     unittest.main()
