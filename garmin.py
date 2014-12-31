@@ -4,7 +4,8 @@ from __future__ import print_function
 
 import os, glob
 import datetime
-from garmin_base import garmin_file, do_summary, METERS_PER_MILE, SPORT_TYPES, convert_gmn_to_gpx, do_plots, print_file_string
+from garmin_base import garmin_file, do_summary, METERS_PER_MILE, SPORT_TYPES,\
+    convert_gmn_to_gpx, do_plots, print_file_string, print_splits
 from util import run_command
 
 def read_garmin_file(fname, **options):

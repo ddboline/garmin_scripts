@@ -283,17 +283,17 @@ def print_lap_string(glap, sport):
 
     return None
 
+
 class garmin_file(object):
     '''
         class representing a full xml file
             functions:
                 read_file(), read_file_tcx(), read_file_xml(), print_file_string(), calculate_speed(), print_splits()
     '''
-    __slots__ = ['filename', 'track_points', 'begin_time', 'begin_date', 'sport', 'total_calories', 'total_distance', 'total_duration', 'total_hr_dur', 'laps', 'points', 'is_tcx', 'is_txt']
+    __slots__ = ['filename', 'begin_time', 'begin_date', 'sport', 'total_calories', 'total_distance', 'total_duration', 'total_hr_dur', 'laps', 'points', 'is_tcx', 'is_txt']
     
     def __init__(self, filename='', is_tcx=False, is_txt=False):
         self.filename = filename
-        self.track_points = []
         self.begin_time = None
         self.begin_date = None
         self.sport = None
