@@ -303,6 +303,20 @@ def print_lap_string(glap, sport):
 
     return None
 
+def get_lap_html(glap, sport):
+    
+    values = [sport, 
+              glap.lap_number, 
+              '%.2f mi' % (glap.lap_distance/METERS_PER_MILE), 
+              print_h_m_s(glap.lap_duration), 
+              glap.lap_calories, 
+              '%.2f min' % (glap.lap_duration/60.),
+              '%s / mi' % print_h_m_s(glap.lap_duration / (glap.lap_distance / METERS_PER_MILE), False), 
+              '%s / km' % print_h_m_s(glap.lap_duration / (glap.lap_distance / 1000.), False),
+              '%i bpm' % glap.lap_avg_hr
+              ]
+
+    return ['<td>%s</td>' % v for v in values]
 
 class garmin_file(object):
     '''
@@ -598,19 +612,13 @@ class garmin_file(object):
                 self.points[idx].avg_speed_value_mph = (self.points[idx].distance/METERS_PER_MILE) / ((t1 - self.points[0].time).total_seconds()/60./60.)
         return None
 
-def print_file_string(gfile, do_html=False):
+def print_file_string(gfile):
     ''' nice output string for a file '''
     retval = []
-    if do_html:
-        retval.append('<table>Start time %s' % print_date_string(gfile.begin_time))
-    else:
-        print 'Start time', print_date_string(gfile.begin_time)
+    print 'Start time', print_date_string(gfile.begin_time)
 
     for lap in gfile.laps:
-        if do_html:
-            pass
-        else:
-            print_lap_string(lap, gfile.sport)
+        print_lap_string(lap, gfile.sport)
 
     min_mile = 0
     mi_per_hr = 0
@@ -630,8 +638,103 @@ def print_file_string(gfile, do_html=False):
 
     return None
 
-def print_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', print_out=True):
+def get_html_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi'):
     ''' print split time for given split distance '''
+    if len(gfile.points) == 0: return None
+
+    labels = ['Split', 'Time', 'Pace / mi', 'Pace / km', 'Marathon Time', 'Heart Rate']
+    values = []
+
+    split_vector = get_splits(gfile, split_distance_in_meters, label)
+    for d, t, h in split_vector:
+        tmp_vector = [ 
+                        '%i %s' % (d, label),
+                        print_h_m_s(t),
+                        print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE), False),
+                        print_h_m_s(t/(split_distance_in_meters/1000.), False),
+                        print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE)*MARATHON_DISTANCE_MI),
+                        '%i bpm' % h
+                    ]
+        values.append(tmp_vector)
+
+    retval = []
+    retval.append('<table border="1" class="dataframe">')
+    retval.append('<thead><tr style="text-align: center;">')
+    for label in labels:
+        retval.append('<th>%s</th>' % label)
+    retval.append('</tr></thead>')
+    retval.append('<tbody>')
+    for line in values:
+        retval.append('<tr style="text-align: center;">')
+        for val in line:
+            retval.append('<td>%s</td>' % val)
+        retval.append('</tr>')
+    retval.append('</tbody></table>')
+    
+    return '\n'.join(retval)
+
+def get_file_html(gfile):    
+    ''' nice output html for a file '''
+    retval = []
+    retval.append('<table border="1" class="dataframe">')
+    retval.append('<thead><tr style="text-align: center;"><th>Start Time</th><th>Sport</th></tr></thead>')
+    retval.append('<tbody><tr style="text-align: center;"><td>%s</td><td>%s</td></tr></tbody>' % (print_date_string(gfile.begin_time), gfile.sport))
+    retval.append('</table><br>')
+    
+    labels = ['Sport', 'Lap', 'Distance', 'Duration', 'Calories', 'Time', 'Pace / mi', 'Pace / km', 'Heart Rate']
+    retval.append('<table border="1" class="dataframe">')
+    retval.append('<thead><tr style="text-align: center;">')
+    for label in labels:
+        retval.append('<th>%s</th>' % label)
+    retval.append('</tr></thead>')
+    retval.append('<tbody><tr style="text-align: center;">')
+    for lap in gfile.laps:
+        retval.extend(get_lap_html(lap, gfile.sport))
+    retval.append('</tr></tbody></table><br>')
+
+    min_mile = 0
+    mi_per_hr = 0
+    if gfile.total_distance > 0:
+        min_mile = (gfile.total_duration / 60.) / (gfile.total_distance / METERS_PER_MILE)
+    if gfile.total_duration > 0:
+        mi_per_hr = (gfile.total_distance / METERS_PER_MILE) / (gfile.total_duration/60./60.)
+    
+    if gfile.is_running():
+        labels = ['', 'Distance', 'Calories', 'Time', 'Pace / mi', 'Pace / km']
+        values = ['total', 
+                  '%.2f mi' % (gfile.total_distance/METERS_PER_MILE), 
+                  gfile.total_calories,
+                  print_h_m_s(gfile.total_duration), 
+                  print_h_m_s(min_mile*60, False), 
+                  print_h_m_s(min_mile*60/METERS_PER_MILE*1000., False)
+                 ]
+    else:
+        labels = ['total', 'Disatnce', 'Calories', 'Time', 'Pace mph']
+        values = ['',
+                  '%.2f mi' % (gfile.total_distance/METERS_PER_MILE), 
+                  gfile.total_calories, 
+                  print_h_m_s(gfile.total_duration),
+                  mi_per_hr
+                 ]
+    if gfile.total_hr_dur > 0:
+        labels.append('Heart Rate')
+        values.append('%i bpm' % (gfile.total_hr_dur / gfile.total_duration))
+
+    retval.append('<table border="1" class="dataframe">')
+    retval.append('<thead><tr style="text-align: center;">')
+    for label in labels:
+        retval.append('<th>%s</th>' % label)
+    retval.append('</tr></thead>')
+    retval.append('<tbody><tr style="text-align: center;">')
+    for value in values:
+        retval.append('<td>%s</td>' % value)
+    retval.append('</tr></tbody></table>')
+    
+    return '\n'.join(retval)
+
+
+def get_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', do_heart_rate=True):
+    ''' get splits for given split distance '''
     if len(gfile.points) == 0: return None
     last_point_me = 0
     last_point_time = 0
@@ -659,42 +762,11 @@ def print_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', pr
             split_dist = cur_point_me/split_distance_in_meters
             if label == 'km':
                 split_dist = cur_point_me/1000.
-
-            if nmiles > 1:
-                for nmi in range(0, nmiles):
-                    if gfile.is_running():
-                        if print_out:
-                            print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val  / nmiles), '\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE), False), '/ mi\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) * MARATHON_DISTANCE_MI),
-                            if avg_hrt_rate > 0:
-                                print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
-                            else:
-                                print ''
-                        split_vector.append([split_dist/nmiles + nmi, time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60.])
-                    else:
-                        if print_out:
-                            print '%i %s \t' % (split_dist / nmiles + nmi, label), print_h_m_s(time_val / nmiles), '\t', '%.2f mph' % (1. / (time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)),
-                            if avg_hrt_rate > 0:
-                                print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
-                            else:
-                                print ''
-                        split_vector.append([split_dist/nmiles + nmi, 1. / (time_val / nmiles / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)])
-            else:
-                if gfile.is_running():
-                    if print_out:
-                        print '%i %s \t' % (split_dist, label), print_h_m_s(time_val), '\t', print_h_m_s(time_val / (split_distance_in_meters / METERS_PER_MILE), False), '/ mi\t', print_h_m_s(time_val / (split_distance_in_meters / 1000.), False), '/ km\t', print_h_m_s(time_val / (split_distance_in_meters / METERS_PER_MILE) * MARATHON_DISTANCE_MI),
-                        if avg_hrt_rate > 0:
-                            print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
-                        else:
-                            print ''
-                    split_vector.append([cur_point_me/METERS_PER_MILE, time_val / (split_distance_in_meters / METERS_PER_MILE) / 60.])
-                else:
-                    if print_out:
-                        print '%i %s \t' % (cur_point_me/METERS_PER_MILE, label), print_h_m_s(time_val), '\t', '%.2f mph' % (1. / (time_val / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)),
-                        if avg_hrt_rate > 0:
-                            print '\t %i bpm avg' % (avg_hrt_rate / (cur_split_time - prev_split_time))
-                        else:
-                            print ''
-                    split_vector.append([cur_point_me/METERS_PER_MILE, 1. / (time_val / (split_distance_in_meters / METERS_PER_MILE) / 60. / 60.)])
+            
+            tmp_vector = [split_dist, time_val]
+            if do_heart_rate:
+                tmp_vector.append(avg_hrt_rate / (cur_split_time - prev_split_time))
+            split_vector.append(tmp_vector)
 
             prev_split_me = cur_split_me
             prev_split_time = cur_split_time
@@ -703,6 +775,24 @@ def print_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', pr
         last_point_time = cur_point_time
 
     return split_vector
+
+def print_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', print_out=True):
+    ''' print split time for given split distance '''
+    if len(gfile.points) == 0: return None
+
+    split_vector = get_splits(gfile, split_distance_in_meters, label)
+    for d, t, h in split_vector:
+        print('%i %s \t %s \t %s / mi \t %s / km \t %s \t %i bpm avg' % (d,
+                                                                      label,
+                                                                      print_h_m_s(t),
+                                                                      print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE), False),
+                                                                      print_h_m_s(t/(split_distance_in_meters/1000.), False),
+                                                                      print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE)*MARATHON_DISTANCE_MI),
+                                                                      h
+                                                                      )
+             )    
+    return split_vector
+
 
 def do_map(gpx_filename):
     ''' wrapper around gpxviewer '''
@@ -808,14 +898,14 @@ def do_plots(gfile, use_time=False, **options):
     alt_vals = []
     alt_values = []
     vertical_climb = 0
-    speed_values = filter(lambda x: x[1] < 20, print_splits(gfile, 400., print_out=False))
+    speed_values = filter(lambda x: x[1] < 20, [[d/4., t/60.] for d, t in get_splits(gfile, 400., do_heart_rate=False)])
     mph_speed_values = []
     avg_speed_values = []
     avg_mph_speed_values = []
     lat_vals = []
     lon_vals = []
     graphs = []
-    mile_split_vals = print_splits(gfile, METERS_PER_MILE, print_out=False)
+    mile_split_vals = get_splits(gfile, METERS_PER_MILE, do_heart_rate=False)
     for point in gfile.points:
         if use_time:
             xval = point.duration_from_begin
@@ -876,6 +966,10 @@ def do_plots(gfile, use_time=False, **options):
                     if latlon_min < thresh or zoom == 10:
                         htmlfile.write(line.replace('ZOOMVALUE','%d' % zoom))
                         break
+            elif 'INSERTTABLESHERE' in line:
+                htmlfile.write('%s\n' % get_file_html(gfile))
+                htmlfile.write('<br><br>%s\n' % get_html_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi'))
+                htmlfile.write('<br><br>%s\n' % get_html_splits(gfile, split_distance_in_meters=5000., label='km'))
             elif 'INSERTMAPSEGMENTSHERE' in line:
                 for idx in range(0, len(lat_vals)):
                     htmlfile.write('new google.maps.LatLng(%f,%f),\n' % (lat_vals[idx], lon_vals[idx]))
@@ -1177,10 +1271,11 @@ class garmin_summary(object):
         print '%16s' % ('%.1f / %i days' % (float(number_days) / number_of_weeks, 7))
         return True
 
+
 def do_summary(directory, **options):
     ''' get summary of files in directory '''
-    opts = ['do_plot', 'do_year', 'do_month', 'do_week', 'do_day', 'do_file', 'do_sport', 'do_update']
-    do_plot, do_year, do_month, do_week, do_day, do_file, do_sport, do_update = [options[o] for o in opts]
+    opts = ['do_plot', 'do_year', 'do_month', 'do_week', 'do_day', 'do_file', 'do_sport', 'do_update', 'do_average']
+    do_plot, do_year, do_month, do_week, do_day, do_file, do_sport, do_update, do_average = [options[o] for o in opts]
 
     pickle_file_is_modified = [False]
     file_vector = []
@@ -1373,14 +1468,14 @@ def do_summary(directory, **options):
                     continue
                 day_sport_summary[sport][cur_date].print_day_summary(sport, cur_date)
             print ''
-            if not do_sport:
+            if not do_sport and do_average:
                 total_sport_summary[sport].print_day_average(sport, len(day_sport_set[sport]))
                 print ''
         if not do_sport:
             for cur_date in day_set:
                 day_summary[cur_date].print_day_summary('total', cur_date)
             print ''
-        if not do_sport:
+        if not do_sport and do_average:
             total_summary.print_day_average('total', len(day_set))
             print ''
     if do_week:
@@ -1394,7 +1489,7 @@ def do_summary(directory, **options):
                 isoweek = yearweek % 100
                 week_sport_summary[sport][yearweek].print_week_summary(sport, isoyear, isoweek, len(week_sport_day_set[sport][yearweek]))
             print ''
-            if not do_sport:
+            if not do_sport and do_average:
                 total_sport_summary[sport].print_week_average(sport=sport, number_days=len(total_sport_day_set[sport]), number_of_weeks=len(week_sport_set[sport]))
                 print ''
         for yearweek in week_set:
@@ -1402,7 +1497,7 @@ def do_summary(directory, **options):
             isoweek = yearweek % 100
             if not do_sport:
                 week_summary[yearweek].print_week_summary('total', isoyear, isoweek, len(week_day_set[yearweek]))
-        if not do_sport:
+        if not do_sport and do_average:
             print ''
             total_summary.print_week_average(sport='total', number_days=len(day_set), number_of_weeks=len(week_set))
             print ''
@@ -1417,7 +1512,7 @@ def do_summary(directory, **options):
                     continue
                 month_sport_summary[sport][yearmonth].print_month_summary(sport, year, month, len(month_sport_day_set[sport][yearmonth]))
             print ''
-            if not do_sport:
+            if not do_sport and do_average:
                 total_sport_summary[sport].print_month_average(sport, number_of_months=len(month_sport_day_set[sport]))
                 print ''
         print ''
@@ -1429,7 +1524,7 @@ def do_summary(directory, **options):
             if not do_sport:
                 month_summary[yearmonth].print_month_summary('total', year, month, len(month_day_set[yearmonth]))
         print ''
-        if not do_sport:
+        if not do_sport and do_average:
             total_summary.print_month_average(sport='total', number_of_months=len(month_set))
             print ''
     if do_year:
@@ -1451,27 +1546,27 @@ def do_summary(directory, **options):
     for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
-        if len(total_sport_day_set[sport]) > 1 and not do_day:
+        if len(total_sport_day_set[sport]) > 1 and not do_day and do_average:
             total_sport_summary[sport].print_day_average(sport, len(day_sport_set[sport]))
-    if not do_sport:
+    if not do_sport and do_average:
         print ''
         total_summary.print_day_average('total', len(day_set))
         print ''
     for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
-        if len(week_sport_set[sport]) > 1 and not do_week:
+        if len(week_sport_set[sport]) > 1 and not do_week and do_average:
             total_sport_summary[sport].print_week_average(sport=sport, number_days=len(total_sport_day_set[sport]), number_of_weeks=len(week_sport_set[sport]))
-    if not do_sport:
+    if not do_sport and do_average:
         print ''
         total_summary.print_week_average('total', number_days=len(day_set), number_of_weeks=len(week_set))
         print ''
     for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
-        if len(month_sport_day_set[sport]) > 1 and not do_month:
+        if len(month_sport_day_set[sport]) > 1 and not do_month and do_average:
             total_sport_summary[sport].print_month_average(sport, number_of_months=len(month_sport_day_set[sport]))
-    if not do_sport:
+    if not do_sport and do_average:
         print ''
         total_summary.print_month_average('total', number_of_months=len(month_set))
         print ''
