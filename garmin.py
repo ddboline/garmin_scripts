@@ -5,7 +5,7 @@ from __future__ import print_function
 import os, glob
 import datetime
 from garmin_base import garmin_file, do_summary, METERS_PER_MILE, SPORT_TYPES,\
-    convert_gmn_to_gpx, do_plots, print_file_string, print_splits
+    convert_gmn_to_gpx, do_plots, print_file_string, print_splits, get_splits
 from util import run_command
 
 def read_garmin_file(fname, **options):
@@ -46,7 +46,7 @@ def read_garmin_file(fname, **options):
 
     gpx_filename = convert_gmn_to_gpx(fname)
     if 'do_plot' in options and options['do_plot']:
-        do_plots(gfile,**options)
+        do_plots(gfile, **options)
 
 def compare_with_remote(script_path):
     from urllib2 import urlopen
@@ -123,7 +123,7 @@ if __name__ == '__main__':
         print('need to download files first')
         exit(0)
 
-    options = {'do_plot': False, 'do_year': False, 'do_month': False, 'do_week': False, 'do_day': False, 'do_file': False, 'do_sport': None, 'do_update': False}
+    options = {'do_plot': False, 'do_year': False, 'do_month': False, 'do_week': False, 'do_day': False, 'do_file': False, 'do_sport': None, 'do_update': False, 'do_average': False}
     options['script_path'] = script_path
 
     gdir = []
