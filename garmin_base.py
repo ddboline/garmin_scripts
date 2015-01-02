@@ -87,7 +87,10 @@ def convert_gmn_to_gpx(gmn_filename):
 def convert_fit_to_tcx(fit_filename):
     ''' fit files to tcx files '''
     if '.fit' in fit_filename.lower():
-        run_command('fit2tcx %s > /tmp/temp.tcx' % fit_filename)
+        if os.path.exists( '%s/bin/fit2tcx' % os.getenv('HOME')):
+            run_command('fit2tcx %s > /tmp/temp.tcx' % fit_filename)
+        elif os.path.exists( './bin/fit2tcx'):
+            run_command('./bin/fit2tcx %s > /tmp/temp.tcx' % fit_filename)
     else:
         return False
     return '/tmp/temp.tcx'
@@ -1065,9 +1068,9 @@ class garmin_summary(object):
         elif self.total_calories == 0 and self.sport == 'stairs' and self.total_duration > 0:
             self.total_calories = 325 * (self.total_duration / 1100.89)
         elif self.total_calories == 0:
-            return False
+            return True
         if self.total_calories < 3:
-            return False
+            return True
         if self.sport not in SPORT_TYPES:
             print '%s not supported' % self.sport
             return False
