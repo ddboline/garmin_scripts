@@ -93,7 +93,7 @@ class TestGarminScript(unittest.TestCase):
         self.assertEqual(md5, 'bd68a0bac5267ccac01139e05883aa8f')
         gdf = garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe
         gdf.to_csv('temp.csv', index=False)
-        print gdf.to_html()
+        #print gdf.to_html()
         md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
         self.assertEqual(md5, '90a35d56c4a8a6a99d176407b22a2cad')
 
