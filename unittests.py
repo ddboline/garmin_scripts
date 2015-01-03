@@ -6,6 +6,7 @@
 
 import unittest
 import datetime
+import os
 
 import garmin_base
 from util import run_command
@@ -16,6 +17,8 @@ class TestGarminScript(unittest.TestCase):
         pass
 
     def tearDown(self):
+        if os.path.exists('temp.csv'):
+            os.remove('temp.csv')
         pass
 
     def test_garmin_base(self):
