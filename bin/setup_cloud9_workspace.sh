@@ -13,6 +13,7 @@ sudo rm /etc/localtime
 sudo ln -sf /usr/share/zoneinfo/posixrules /etc/localtime
 
 ./garmin.py get
+./garmin.py sync
 ./garmin.py year run
 python unittests.py
 ./running_pace_plot.py 
