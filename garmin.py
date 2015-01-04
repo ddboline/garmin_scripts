@@ -5,19 +5,19 @@ from __future__ import print_function
 import os, glob
 import datetime
 from garmin_base import garmin_file, do_summary, METERS_PER_MILE, SPORT_TYPES,\
-    convert_gmn_to_gpx, do_plots, print_file_string, print_splits, get_splits
+    convert_gmn_to_gpx, do_plots, print_file_string, print_splits
 from util import run_command
 
 def read_garmin_file(fname, **options):
     gfile = garmin_file(fname)
 
-    print_file_string(gfile)
+    print(print_file_string(gfile))
     if gfile.is_txt:
         return
     print('')
-    print_splits(gfile, METERS_PER_MILE)
+    print(print_splits(gfile, METERS_PER_MILE))
     print('')
-    print_splits(gfile, 5000., 'km')
+    print(print_splits(gfile, 5000., 'km'))
 
     avg_hr = 0
     sum_time = 0
