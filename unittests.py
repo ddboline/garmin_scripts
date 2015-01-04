@@ -109,7 +109,7 @@ class TestGarminScript(unittest.TestCase):
         gdf.to_csv('temp.csv', index=False)
         md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
         self.assertEqual(md5, '5973750ba6ffa5394bbc0a4569a2a922')
-        
+
         gfile = garmin_base.garmin_file(fitfile)
         gdf = garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe
         gdf.to_csv('temp.csv', index=False)
@@ -119,7 +119,7 @@ class TestGarminScript(unittest.TestCase):
         gdf.to_csv('temp.csv', index=False)
         md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
         self.assertEqual(md5, '13fb54df90be4b3da668da4e2048dcee')
-        
+
         #opts = {'do_plot': False, 'do_year': False, 'do_month': False, 'do_week': False, 'do_day': False, 'do_file': False, 'do_sport': None, 'do_update': False}
         #garmin_base.do_summary_dataframe('run/2014/12',**opts)
 
