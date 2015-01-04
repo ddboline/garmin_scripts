@@ -294,17 +294,15 @@ class garmin_lap(object):
 
 def print_lap_string(glap, sport):
     ''' print nice output for a lap '''
-    print '%s lap %i %.2f mi %s %s calories %.2f min' % (sport, glap.lap_number, glap.lap_distance / METERS_PER_MILE, print_h_m_s(glap.lap_duration), glap.lap_calories, glap.lap_duration / 60.),
+    outstr = ['%s lap %i %.2f mi %s %s calories %.2f min' % (sport, glap.lap_number, glap.lap_distance / METERS_PER_MILE, print_h_m_s(glap.lap_duration), glap.lap_calories, glap.lap_duration / 60.)]
     if sport == 'running':
         if glap.lap_distance > 0:
-            print print_h_m_s(glap.lap_duration / (glap.lap_distance / METERS_PER_MILE), False), '/ mi ',
-            print print_h_m_s(glap.lap_duration / (glap.lap_distance / 1000.), False), '/ km',
+            outstr.extend([print_h_m_s(glap.lap_duration / (glap.lap_distance / METERS_PER_MILE), False), '/ mi ',
+                           print_h_m_s(glap.lap_duration / (glap.lap_distance / 1000.), False), '/ km',])
     if glap.lap_avg_hr > 0:
-        print '%i bpm' % glap.lap_avg_hr
-    else:
-        print ''
+        outstr.append('%i bpm' % glap.lap_avg_hr)
 
-    return None
+    return ' '.join(outstr)
 
 def get_lap_html(glap, sport):
     
@@ -617,11 +615,10 @@ class garmin_file(object):
 
 def print_file_string(gfile):
     ''' nice output string for a file '''
-    retval = []
-    print 'Start time', print_date_string(gfile.begin_time)
+    retval = ['Start time %s' % print_date_string(gfile.begin_time)]
 
     for lap in gfile.laps:
-        print_lap_string(lap, gfile.sport)
+        retval.append(print_lap_string(lap, gfile.sport))
 
     min_mile = 0
     mi_per_hr = 0
@@ -630,16 +627,15 @@ def print_file_string(gfile):
     if gfile.total_duration > 0:
         mi_per_hr = (gfile.total_distance / METERS_PER_MILE) / (gfile.total_duration/60./60.)
 
+    tmpstr = []
     if gfile.is_running():
-        print 'total %.2f mi %s calories %s time %s min/mi %s min/km' % (gfile.total_distance / METERS_PER_MILE, gfile.total_calories, print_h_m_s(gfile.total_duration), print_h_m_s(min_mile*60, False), print_h_m_s(min_mile*60 / METERS_PER_MILE * 1000., False)),
+        tmpstr.append('total %.2f mi %s calories %s time %s min/mi %s min/km' % (gfile.total_distance / METERS_PER_MILE, gfile.total_calories, print_h_m_s(gfile.total_duration), print_h_m_s(min_mile*60, False), print_h_m_s(min_mile*60 / METERS_PER_MILE * 1000., False)))
     else:
-        print 'total %.2f mi %s calories %s time %.2f mph' % (gfile.total_distance / METERS_PER_MILE, gfile.total_calories, print_h_m_s(gfile.total_duration), mi_per_hr),
+        tmpstr.append('total %.2f mi %s calories %s time %.2f mph' % (gfile.total_distance / METERS_PER_MILE, gfile.total_calories, print_h_m_s(gfile.total_duration), mi_per_hr))
     if gfile.total_hr_dur > 0:
-        print '%i bpm' % (gfile.total_hr_dur / gfile.total_duration)
-    else:
-        print ''
-
-    return None
+        tmpstr.append('%i bpm' % (gfile.total_hr_dur / gfile.total_duration))
+    retval.append(' '.join(tmpstr))
+    return '\n'.join(retval)
 
 def get_html_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi'):
     ''' print split time for given split distance '''
@@ -783,9 +779,10 @@ def print_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', pr
     ''' print split time for given split distance '''
     if len(gfile.points) == 0: return None
 
+    retval = []
     split_vector = get_splits(gfile, split_distance_in_meters, label)
     for d, t, h in split_vector:
-        print('%i %s \t %s \t %s / mi \t %s / km \t %s \t %i bpm avg' % (d,
+        retval.append('%i %s \t %s \t %s / mi \t %s / km \t %s \t %i bpm avg' % (d,
                                                                       label,
                                                                       print_h_m_s(t),
                                                                       print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE), False),
@@ -793,8 +790,8 @@ def print_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', pr
                                                                       print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE)*MARATHON_DISTANCE_MI),
                                                                       h
                                                                       )
-             )    
-    return split_vector
+             )
+    return '\n'.join(retval)
 
 
 def do_map(gpx_filename):
@@ -1094,128 +1091,126 @@ class garmin_summary(object):
 
     def print_total_summary(self, sport=None, number_days=0, total_days=0):
         ''' print summary of total information '''
-        print '%17s %10s \t %10s \t %10s \t' % (' ', sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories),
+        retval = ['%17s %10s \t %10s \t %10s \t' % (' ', sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories)]
 
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
-            print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
+            retval.append(' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)))
+            retval.append(' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)))
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
+            retval.append(' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))))
         else:
-            print ' %10s \t' % ' ',
-        print ' %10s \t' % (print_h_m_s(self.total_duration)),
+            retval.append(' %10s \t' % ' ')
+        retval.append(' %10s \t' % (print_h_m_s(self.total_duration)))
         if self.total_hr_dur > 0 and sport != 'total':
-            print ' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '),
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
         else:
-            print ' %7s %2s' % (' ', ' '),
+            retval.append(' %7s %2s' % (' ', ' '))
         if number_days > 0 and total_days > 0:
-            print '%16s' % ('%i / %i days' % (number_days, total_days))
-        else:
-            print ''
-        return True
+            retval.append('%16s' % ('%i / %i days' % (number_days, total_days)))
+        return ' '.join(retval)
 
     def print_year_summary(self, sport=None, year=datetime.date.today().year, number_in_year=0):
         ''' print year summary information '''
+        retval = []
         total_days = days_in_year(year)
         if datetime.datetime.today().year == year:
             total_days = (datetime.datetime.today() - datetime.datetime(datetime.datetime.today().year, 1, 1)).days
         if sport == 'total':
-            print '%17s %10s \t %10s \t %10s \t' % (year, sport, ' ', '%i cal' % self.total_calories),
+            retval.append('%17s %10s \t %10s \t %10s \t' % (year, sport, ' ', '%i cal' % self.total_calories))
         else:
-            print '%17s %10s \t %10s \t %10s \t' % (year, sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories),
+            retval.append('%17s %10s \t %10s \t %10s \t' % (year, sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories))
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
-            print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
+            retval.append(' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)))
+            retval.append(' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)))
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
+            retval.append(' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))))
         else:
-            print ' %10s \t' % ' ',
-        print ' %10s \t' % (print_h_m_s(self.total_duration)),
+            retval.append(' %10s \t' % ' ')
+        retval.append(' %10s \t' % (print_h_m_s(self.total_duration)))
         if self.total_hr_dur > 0:
-            print ' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '),
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
         else:
-            print ' %7s %2s' % (' ', ' '),
-        print '%16s' % ('%i / %i days' % (number_in_year, total_days))
-        return True
+            retval.append(' %7s %2s' % (' ', ' '))
+        retval.append('%16s' % ('%i / %i days' % (number_in_year, total_days)))
+        return ' '.join(retval)
 
     def print_month_summary(self, sport=None, year=datetime.date.today().year, month=datetime.date.today().month, number_in_month=0):
         ''' print month summary information '''
         total_days = days_in_month(month=month, year=year)
         if datetime.datetime.today().year == year and datetime.datetime.today().month == month:
             total_days = (datetime.datetime.today() - datetime.datetime(datetime.datetime.today().year, datetime.datetime.today().month, 1)).days
+        retval = []
         if sport == 'total':
-            print '%17s %10s \t %10s \t %10s \t' % ('%i %s' % (year, MONTH_NAMES[month-1]), sport, ' ', '%i cal' % self.total_calories),
+            retval.append('%17s %10s \t %10s \t %10s \t' % ('%i %s' % (year, MONTH_NAMES[month-1]), sport, ' ', '%i cal' % self.total_calories))
         else:
-            print '%17s %10s \t %10s \t %10s \t' % ('%i %s' % (year, MONTH_NAMES[month-1]), sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories),
+            retval.append('%17s %10s \t %10s \t %10s \t' % ('%i %s' % (year, MONTH_NAMES[month-1]), sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories))
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
-            print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
+            retval.append(' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)))
+            retval.append(' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)))
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
+            retval.append(' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))))
         else:
-            print ' %10s \t' % ' ',
-        print ' %10s \t' % (print_h_m_s(self.total_duration)),
+            retval.append(' %10s \t' % ' ')
+        retval.append(' %10s \t' % (print_h_m_s(self.total_duration)))
         if self.total_hr_dur > 0:
-            print ' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '),
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
         else:
-            print ' %7s %2s' % (' ', ' '),
-        print '%16s' % ('%i / %i days' % (number_in_month, total_days))
-        return True
+            retval.append(' %7s %2s' % (' ', ' '))
+        retval.append('%16s' % ('%i / %i days' % (number_in_month, total_days)))
+        return ' '.join(retval)
 
     def print_month_average(self, sport=None, number_of_months=0):
         ''' print month average information '''
         if number_of_months == 0:
             return False
+        retval = []
         if sport == 'total':
-            print '%17s %10s \t %10s \t %10s \t' % ('average / month', sport, ' ', '%i cal' % (self.total_calories / number_of_months)),
+            retval.append('%17s %10s \t %10s \t %10s \t' % ('average / month', sport, ' ', '%i cal' % (self.total_calories / number_of_months)))
         else:
-            print '%17s %10s \t %10s \t %10s \t' % ('average / month', sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE/number_of_months), '%i cal' % (self.total_calories/number_of_months)),
+            retval.append('%17s %10s \t %10s \t %10s \t' % ('average / month', sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE/number_of_months), '%i cal' % (self.total_calories/number_of_months)))
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
-            print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
+            retval.append(' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)))
+            retval.append(' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)))
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
+            retval.append(' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))))
         else:
-            print ' %10s \t' % ' ',
-        print ' %10s \t' % (print_h_m_s(self.total_duration/number_of_months)),
+            retval.append(' %10s \t' % ' ')
+        retval.append(' %10s \t' % (print_h_m_s(self.total_duration/number_of_months)))
         if self.total_hr_dur > 0:
-            print ' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '),
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
         else:
-            print ' %7s %2s' % (' ', ' '),
-        print ''
-        return True
+            retval.append(' %7s %2s' % (' ', ' '))
+        return ' '.join(retval)
 
     def print_day_summary(self, sport=None, cur_date=datetime.date.today()):
         ''' print day summary information '''
+        retval = []
         week = cur_date.isocalendar()[1]
         weekdayname = WEEKDAY_NAMES[cur_date.weekday()]
         if sport == 'running' or sport == 'walking':
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, '%s / mi' % print_h_m_s(self.total_duration / (self.total_distance/METERS_PER_MILE), False), '%s / km' % print_h_m_s(self.total_duration / (self.total_distance/1000.), False), print_h_m_s(self.total_duration)),
+            retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, '%s / mi' % print_h_m_s(self.total_duration / (self.total_distance/METERS_PER_MILE), False), '%s / km' % print_h_m_s(self.total_duration / (self.total_distance/1000.), False), print_h_m_s(self.total_duration)))
         elif sport == 'biking':
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, '%.2f mph' % ((self.total_distance/METERS_PER_MILE) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration)),
+            retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, '%.2f mph' % ((self.total_distance/METERS_PER_MILE) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration)))
         else:
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, ' ', print_h_m_s(self.total_duration)),
+            retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, ' ', print_h_m_s(self.total_duration)))
         if self.total_hr_dur > 0:
-            print '\t %7s' % ('%i bpm' % (self.total_hr_dur / self.total_duration))
-        else:
-            print ''
-        return True
+            retval.append('\t %7s' % ('%i bpm' % (self.total_hr_dur / self.total_duration)))
+        return ' '.join(retval)
 
     def print_day_average(self, sport=None, number_days=0):
         ''' print day average information '''
+        retval = []
         if number_days == 0:
             return False
         if sport == 'running' or sport == 'walking':
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), '%s / mi' % print_h_m_s(self.total_duration / (self.total_distance/METERS_PER_MILE), False), '%s / km' % print_h_m_s(self.total_duration / (self.total_distance/1000.), False), print_h_m_s(self.total_duration/number_days)),
+            retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), '%s / mi' % print_h_m_s(self.total_duration / (self.total_distance/METERS_PER_MILE), False), '%s / km' % print_h_m_s(self.total_duration / (self.total_distance/1000.), False), print_h_m_s(self.total_duration/number_days)))
         elif sport == 'biking':
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), '%.2f mph' % ((self.total_distance/METERS_PER_MILE) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration/number_days)),
+            retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), '%.2f mph' % ((self.total_distance/METERS_PER_MILE) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration/number_days)))
         else:
-            print '%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), ' ', print_h_m_s(self.total_duration/number_days)),
+            retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), ' ', print_h_m_s(self.total_duration/number_days)))
         if self.total_hr_dur > 0:
-            print '\t %7s' % ('%i bpm' % (self.total_hr_dur / self.total_duration))
-        else:
-            print ''
-        return True
+            retval.append('\t %7s' % ('%i bpm' % (self.total_hr_dur / self.total_duration)))
+        return ' '.join(retval)
 
     def print_week_summary(self, sport=None, isoyear=None, isoweek=None, number_in_week=0, date=datetime.datetime.today()):
         ''' print week summary information '''
@@ -1230,49 +1225,51 @@ class garmin_summary(object):
         if datetime.datetime.today().isocalendar()[0] == isoyear and datetime.datetime.today().isocalendar()[1] == isoweek:
             total_days = datetime.datetime.today().isocalendar()[2]
 
+        retval = []
         if sport == 'total':
-            print '%17s %10s \t %10s \t %10s \t' % ('%i week %02i' % (isoyear, isoweek), sport, ' ', '%i cal' % self.total_calories),
+            retval.append('%17s %10s \t %10s \t %10s \t' % ('%i week %02i' % (isoyear, isoweek), sport, ' ', '%i cal' % self.total_calories))
         else:
-            print '%17s %10s \t %10s \t %10s \t' % ('%i week %02i' % (isoyear, isoweek), sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories),
+            retval.append('%17s %10s \t %10s \t %10s \t' % ('%i week %02i' % (isoyear, isoweek), sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories))
 
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
-            print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
+            retval.append(' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)))
+            retval.append(' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)))
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
+            retval.append(' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))))
         else:
-            print ' %10s \t' % ' ',
-        print ' %10s \t' % (print_h_m_s(self.total_duration)),
+            retval.append(' %10s \t' % ' ')
+        retval.append(' %10s \t' % (print_h_m_s(self.total_duration)))
         if self.total_hr_dur > 0 and sport != 'total':
-            print ' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '),
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
         else:
-            print ' %7s %2s' % (' ', ' '),
-        print '%16s' % ('%i / %i days' % (number_in_week, total_days))
-        return True
+            retval.append(' %7s %2s' % (' ', ' '))
+        retval.append('%16s' % ('%i / %i days' % (number_in_week, total_days)))
+        return ' '.join(retval)
 
     def print_week_average(self, sport=None, number_days=0, number_of_weeks=0):
         ''' print week average information '''
         if number_of_weeks == 0:
             return
+        retval = []
         if sport == 'total':
-            print '%17s %10s \t %10s \t %10s \t' % ('avg / %3s weeks' % number_of_weeks, sport, ' ', '%i cal' % (self.total_calories/number_of_weeks)),
+            retval.append('%17s %10s \t %10s \t %10s \t' % ('avg / %3s weeks' % number_of_weeks, sport, ' ', '%i cal' % (self.total_calories/number_of_weeks)))
         else:
-            print '%17s %10s \t %10s \t %10s \t' % ('avg / %3s weeks' % number_of_weeks, sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE/number_of_weeks), '%i cal' % (self.total_calories/number_of_weeks)),
+            retval.append('%17s %10s \t %10s \t %10s \t' % ('avg / %3s weeks' % number_of_weeks, sport, '%4.2f mi' % (self.total_distance/METERS_PER_MILE/number_of_weeks), '%i cal' % (self.total_calories/number_of_weeks)))
 
         if sport == 'running' or sport == 'walking':
-            print ' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)),
-            print ' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)),
+            retval.append(' %10s \t' % ('%s / mi' % print_h_m_s(self.total_duration / (self.total_distance / METERS_PER_MILE), False)))
+            retval.append(' %10s \t' % ('%s / km' % print_h_m_s(self.total_duration / (self.total_distance / 1000.), False)))
         elif sport == 'biking':
-            print ' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))),
+            retval.append(' %10s \t' % ('%.2f mph' % ((self.total_distance / METERS_PER_MILE) / (self.total_duration / 60. / 60.))))
         else:
-            print ' %10s \t' % ' ',
-        print ' %10s \t' % (print_h_m_s(self.total_duration / number_of_weeks)),
+            retval.append(' %10s \t' % ' ')
+        retval.append(' %10s \t' % (print_h_m_s(self.total_duration / number_of_weeks)))
         if self.total_hr_dur > 0 and sport != 'total':
-            print ' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '),
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
         else:
-            print ' %7s %2s' % (' ', ' '),
-        print '%16s' % ('%.1f / %i days' % (float(number_days) / number_of_weeks, 7))
-        return True
+            retval.append(' %7s %2s' % (' ', ' '))
+        retval.append('%16s' % ('%.1f / %i days' % (float(number_days) / number_of_weeks, 7)))
+        return ' '.join(retval)
 
 
 def do_summary(directory, **options):
@@ -1450,7 +1447,7 @@ def do_summary(directory, **options):
         week_day_set[week_index].add(cur_date)
 
     ### If more than one year, default to year-to-year summary
-    print ''
+    retval = []
     if do_file:
         for sport in SPORT_TYPES:
             if sport not in sport_set:
@@ -1459,9 +1456,9 @@ def do_summary(directory, **options):
                 cur_date = gfile.begin_time.date()
                 if gfile.sport != sport:
                     continue
-                gfile.print_day_summary(sport, cur_date)
-            print ''
-        print ''
+                retval.append( gfile.print_day_summary(sport, cur_date) )
+            retval.append( '' )
+        retval.append( '' )
     if do_day:
         for sport in SPORT_TYPES:
             if sport not in sport_set:
@@ -1469,18 +1466,18 @@ def do_summary(directory, **options):
             for cur_date in day_set:
                 if cur_date not in day_sport_set[sport]:
                     continue
-                day_sport_summary[sport][cur_date].print_day_summary(sport, cur_date)
-            print ''
+                retval.append( day_sport_summary[sport][cur_date].print_day_summary(sport, cur_date) )
+            retval.append( '' )
             if not do_sport and do_average:
-                total_sport_summary[sport].print_day_average(sport, len(day_sport_set[sport]))
-                print ''
+                retval.append( total_sport_summary[sport].print_day_average(sport, len(day_sport_set[sport])) )
+                retval.append( '' )
         if not do_sport:
             for cur_date in day_set:
-                day_summary[cur_date].print_day_summary('total', cur_date)
-            print ''
+                retval.append( day_summary[cur_date].print_day_summary('total', cur_date) )
+            retval.append( '' )
         if not do_sport and do_average:
-            total_summary.print_day_average('total', len(day_set))
-            print ''
+            retval.append( total_summary.print_day_average('total', len(day_set)) )
+            retval.append( '' )
     if do_week:
         for sport in SPORT_TYPES:
             if sport not in sport_set:
@@ -1490,20 +1487,20 @@ def do_summary(directory, **options):
                     continue
                 isoyear = int(yearweek/100)
                 isoweek = yearweek % 100
-                week_sport_summary[sport][yearweek].print_week_summary(sport, isoyear, isoweek, len(week_sport_day_set[sport][yearweek]))
-            print ''
+                retval.append( week_sport_summary[sport][yearweek].print_week_summary(sport, isoyear, isoweek, len(week_sport_day_set[sport][yearweek])) )
+            retval.append( '' )
             if not do_sport and do_average:
-                total_sport_summary[sport].print_week_average(sport=sport, number_days=len(total_sport_day_set[sport]), number_of_weeks=len(week_sport_set[sport]))
-                print ''
+                retval.append( total_sport_summary[sport].print_week_average(sport=sport, number_days=len(total_sport_day_set[sport]), number_of_weeks=len(week_sport_set[sport])) )
+                retval.append( '' )
         for yearweek in week_set:
             isoyear = int(yearweek/100)
             isoweek = yearweek % 100
             if not do_sport:
-                week_summary[yearweek].print_week_summary('total', isoyear, isoweek, len(week_day_set[yearweek]))
+                retval.append( week_summary[yearweek].print_week_summary('total', isoyear, isoweek, len(week_day_set[yearweek])) )
         if not do_sport and do_average:
-            print ''
-            total_summary.print_week_average(sport='total', number_days=len(day_set), number_of_weeks=len(week_set))
-            print ''
+            retval.append( '' )
+            retval.append( total_summary.print_week_average(sport='total', number_days=len(day_set), number_of_weeks=len(week_set)) )
+            retval.append( '' )
     if do_month:
         for sport in SPORT_TYPES:
             if sport not in sport_set:
@@ -1513,23 +1510,23 @@ def do_summary(directory, **options):
                 month = yearmonth % 100
                 if len(month_sport_day_set[sport][yearmonth]) == 0:
                     continue
-                month_sport_summary[sport][yearmonth].print_month_summary(sport, year, month, len(month_sport_day_set[sport][yearmonth]))
-            print ''
+                retval.append( month_sport_summary[sport][yearmonth].print_month_summary(sport, year, month, len(month_sport_day_set[sport][yearmonth])) )
+            retval.append( '' )
             if not do_sport and do_average:
-                total_sport_summary[sport].print_month_average(sport, number_of_months=len(month_sport_day_set[sport]))
-                print ''
-        print ''
+                retval.append( total_sport_summary[sport].print_month_average(sport, number_of_months=len(month_sport_day_set[sport])) )
+                retval.append( '' )
+        retval.append( '' )
         for yearmonth in month_set:
             year = int(yearmonth / 100)
             month = yearmonth % 100
             if len(month_day_set[yearmonth]) == 0:
                 continue
             if not do_sport:
-                month_summary[yearmonth].print_month_summary('total', year, month, len(month_day_set[yearmonth]))
-        print ''
+                retval.append( month_summary[yearmonth].print_month_summary('total', year, month, len(month_day_set[yearmonth])) )
+        retval.append( '' )
         if not do_sport and do_average:
-            total_summary.print_month_average(sport='total', number_of_months=len(month_set))
-            print ''
+            retval.append( total_summary.print_month_average(sport='total', number_of_months=len(month_set)) )
+            retval.append( '' )
     if do_year:
         for sport in SPORT_TYPES:
             if sport not in sport_set:
@@ -1537,42 +1534,43 @@ def do_summary(directory, **options):
             for year in year_set:
                 if len(year_sport_day_set[sport][year]) == 0:
                     continue
-                year_sport_summary[sport][year].print_year_summary(sport, year, len(year_sport_day_set[sport][year]))
-            print ''
-        print ''
+                retval.append( year_sport_summary[sport][year].print_year_summary(sport, year, len(year_sport_day_set[sport][year])) )
+            retval.append( '' )
+        retval.append( '' )
         for year in year_set:
             if len(year_day_set[year]) == 0:
                 continue
-            if not do_sport: year_summary[year].print_year_summary('total', year, len(year_day_set[year]))
-        print ''
+            if not do_sport: 
+                retval.append( year_summary[year].print_year_summary('total', year, len(year_day_set[year])) )
+        retval.append( '' )
 
     for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
         if len(total_sport_day_set[sport]) > 1 and not do_day and do_average:
-            total_sport_summary[sport].print_day_average(sport, len(day_sport_set[sport]))
+            print total_sport_summary[sport].print_day_average(sport, len(day_sport_set[sport]))
     if not do_sport and do_average:
-        print ''
-        total_summary.print_day_average('total', len(day_set))
-        print ''
+        retval.append( '' )
+        retval.append( total_summary.print_day_average('total', len(day_set)) )
+        retval.append( '' )
     for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
         if len(week_sport_set[sport]) > 1 and not do_week and do_average:
-            total_sport_summary[sport].print_week_average(sport=sport, number_days=len(total_sport_day_set[sport]), number_of_weeks=len(week_sport_set[sport]))
+            retval.append( total_sport_summary[sport].print_week_average(sport=sport, number_days=len(total_sport_day_set[sport]), number_of_weeks=len(week_sport_set[sport])) )
     if not do_sport and do_average:
-        print ''
-        total_summary.print_week_average('total', number_days=len(day_set), number_of_weeks=len(week_set))
-        print ''
+        retval.append( '' )
+        retval.append( total_summary.print_week_average('total', number_days=len(day_set), number_of_weeks=len(week_set)) )
+        retval.append( '' )
     for sport in SPORT_TYPES:
         if sport not in sport_set:
             continue
         if len(month_sport_day_set[sport]) > 1 and not do_month and do_average:
-            total_sport_summary[sport].print_month_average(sport, number_of_months=len(month_sport_day_set[sport]))
+            retval.append( total_sport_summary[sport].print_month_average(sport, number_of_months=len(month_sport_day_set[sport])) )
     if not do_sport and do_average:
-        print ''
-        total_summary.print_month_average('total', number_of_months=len(month_set))
-        print ''
+        retval.append( '' )
+        retval.append( total_summary.print_month_average('total', number_of_months=len(month_set)) )
+        retval.append( '' )
     begin_date = day_set[0]
     end_date = day_set[-1]
     total_days = (end_date - begin_date).days
@@ -1582,11 +1580,11 @@ def do_summary(directory, **options):
         if len(total_sport_day_set[sport]) == 0:
             continue
         if not do_sport:
-            total_sport_summary[sport].print_total_summary(sport, len(total_sport_day_set[sport]), total_days)
+            retval.append( total_sport_summary[sport].print_total_summary(sport, len(total_sport_day_set[sport]), total_days) )
     if not do_sport:
-        print ''
-        total_summary.print_total_summary('total', len(day_set), total_days)
-        print ''
+        retval.append( '' )
+        retval.append( total_summary.print_total_summary('total', len(day_set), total_days) )
+        retval.append( '' )
 
     if 'occur' in options:
         occur_map = {}
@@ -1599,7 +1597,7 @@ def do_summary(directory, **options):
                 if (day_set[i]-day_set[i-1]).days > 1:
                     occur_map[(day_set[i-1] - last_date).days + 1] += 1
                     if ((day_set[i-1] - last_date).days + 1) > 5:
-                        print day_set[i-1]
+                        retval.append( day_set[i-1] )
                     last_date = day_set[i]
             try:
                 occur_map[(day_set[-1]-last_date).days + 1] += 1
@@ -1614,4 +1612,23 @@ def do_summary(directory, **options):
             if not do_sport:
                 for i in range(0, len(day_set)+1):
                     if occur_map[i] > 0:
-                        print i, occur_map[i]
+                        retval.append( i, occur_map[i] )
+    print '\n'.join(retval)
+    
+    curpath = options['script_path']
+    print curpath
+    if not os.path.exists('%s/html' % curpath):
+        os.makedirs('%s/html' % curpath)
+    os.chdir('%s/html' % curpath)
+    with open('index.html', 'w') as htmlfile:
+        for line in open('%s/GARMIN_TEMPLATE.html' % curpath, 'r'):
+            if 'INSERTTEXTHERE' in line:
+                htmlfile.write('\n'.join(retval))
+            else:
+                htmlfile.write(line)
+
+    os.chdir(curpath)
+    if os.path.exists('%s/html' % curpath) and os.path.exists('%s/public_html/garmin' % os.getenv('HOME')):
+        if os.path.exists('%s/public_html/garmin/html' % os.getenv('HOME')):
+            run_command('rm -rf %s/public_html/garmin/html' % os.getenv('HOME'))
+        run_command('mv %s/html %s/public_html/garmin' % (curpath, os.getenv('HOME')))
