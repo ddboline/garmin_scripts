@@ -108,11 +108,12 @@ if __name__ == '__main__':
         if any(arg == x for x in ['h', 'help', '-h', '--help']):
             print('usage: ./garmin.py <get|build|sync|backup|year|(file)|(directory)|(year(-month(-day)))|(sport)|occur|update>')
             exit(0)
-        elif arg == 'get' and not os.path.exists('%s/run' % script_path):
-            run_command('mkdir -p %s/run/' % script_path)
-            os.chdir('%s/run' % script_path)
-            run_command('wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/backup/garmin_data.tar.gz')
-            run_command('tar zxvf garmin_data.tar.gz ; rm garmin_data.tar.gz')
+        elif arg == 'get':
+            if not os.path.exists('%s/run' % script_path):
+                run_command('mkdir -p %s/run/' % script_path)
+                os.chdir('%s/run' % script_path)
+                run_command('wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/backup/garmin_data.tar.gz')
+                run_command('tar zxvf garmin_data.tar.gz ; rm garmin_data.tar.gz')
             exit(0)
 
         if arg == 'sync':
