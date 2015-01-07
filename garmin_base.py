@@ -686,10 +686,12 @@ def get_file_html(gfile):
     for label in labels:
         retval.append('<th>%s</th>' % label)
     retval.append('</tr></thead>')
-    retval.append('<tbody><tr style="text-align: center;">')
+    retval.append('<tbody>')
     for lap in gfile.laps:
+        retval.append('<tr style="text-align: center;">')
         retval.extend(get_lap_html(lap, gfile.sport))
-    retval.append('</tr></tbody></table><br>')
+        retval.append('</tr>')
+    retval.append('</tbody></table><br>')
 
     min_mile = 0
     mi_per_hr = 0
