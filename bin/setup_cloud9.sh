@@ -4,7 +4,8 @@ sudo echo
 SCRIPTDIR="${HOME}/workspace"
 
 sudo apt-get update
-sudo apt-get install -y gpsbabel garmin-forerunner-tools python-mpltoolkits.basemap xml2
+sudo apt-get install -y gpsbabel garmin-forerunner-tools xml2
+# sudo apt-get install -y python-mpltoolkits.basemap
 sudo apt-get install -y python-pandas python-lockfile
 
 CURDIR=`pwd`
@@ -24,4 +25,4 @@ sudo ln -sf /usr/share/zoneinfo/posixrules /etc/localtime
 ./garmin.py sync
 ./garmin.py year run
 python unittests.py
-./running_pace_plot.py 
+./running_pace_plot.py
