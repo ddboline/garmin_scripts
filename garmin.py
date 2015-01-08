@@ -134,10 +134,10 @@ if __name__ == '__main__':
         elif arg == 'backup':
             fname = '%s/garmin_data_%s.tar.gz' % (script_path, datetime.date.today().strftime('%Y%m%d'))
             run_command('cd %s/run/ ; tar zcvf %s 2* garmin.pkl' % (script_path, fname))
-            if os.path.exists( '%s/public_html/backup' % os.getenv('HOME')):
-                run_command( 'cp %s %s/public_html/backup/garmin_data.tar.gz' % ( fname, os.getenv('HOME')))
-            if os.path.exists( '%s/public_html/garmin/tar' % os.getenv('HOME') ):
-                run_command( 'mv %s %s/public_html/garmin/tar' % ( fname, os.getenv('HOME') ) )
+            if os.path.exists('%s/public_html/backup' % os.getenv('HOME')):
+                run_command('cp %s %s/public_html/backup/garmin_data.tar.gz' % (fname, os.getenv('HOME')))
+            if os.path.exists('%s/public_html/garmin/tar' % os.getenv('HOME')):
+                run_command('mv %s %s/public_html/garmin/tar' % (fname, os.getenv('HOME')))
             exit(0)
         elif arg == 'occur':
             options['occur'] = True
