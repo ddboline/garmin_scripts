@@ -1,8 +1,5 @@
 #!/bin/bash
 
-sudo echo
-SCRIPTDIR="${HOME}/workspace"
-
 sudo apt-get update
 sudo apt-get install -y gpsbabel garmin-forerunner-tools xml2
 # sudo apt-get install -y python-mpltoolkits.basemap
@@ -21,8 +18,4 @@ sudo mv timezone /etc/timezone
 sudo rm /etc/localtime
 sudo ln -sf /usr/share/zoneinfo/posixrules /etc/localtime
 
-./garmin.py get
-./garmin.py sync
-./garmin.py year run
-python unittests.py
-./running_pace_plot.py
+./bin/test_cloud9.sh
