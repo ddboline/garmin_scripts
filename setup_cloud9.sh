@@ -18,4 +18,4 @@ sudo mv timezone /etc/timezone
 sudo rm /etc/localtime
 sudo ln -sf /usr/share/zoneinfo/posixrules /etc/localtime
 
-./bin/test_cloud9.sh
+./test_cloud9.sh
