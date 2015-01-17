@@ -50,6 +50,8 @@ def read_garmin_file(fname, **options):
 
 def compare_with_remote(script_path):
     from urllib2 import urlopen
+    import save_to_s3
+    s3_file_chksum = save_to_s3.save_to_s3()
     remote_file_chksum = {}
     remote_file_path = {}
     for line in urlopen('https://ddbolineathome.mooo.com/~ddboline/garmin/files/garmin.list'):
@@ -89,10 +91,10 @@ def compare_with_remote(script_path):
                 for line in urlout:
                     outfile.write(line)
                 outfile.close()
-            # run_command('wget --quiet --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/garmin/files/%s/%s' % (remote_file_path[fn], fn))
-            # if os.path.exists(fn):
-            #     run_command('mkdir -p %s/run/%s/' % (script_path, remote_file_path[fn]))
-            #     run_command('mv %s %s/run/%s/%s' % (fn, script_path, remote_file_path[fn], fn))
+    
+    local_files_not_in_s3 = [fn for fn in local_file_chksum if fn not in s3_file_chksum]
+    print(local_files_not_in_s3)
+        
     return
 
 if __name__ == '__main__':
