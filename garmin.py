@@ -92,8 +92,12 @@ def compare_with_remote(script_path):
                     outfile.write(line)
                 outfile.close()
     
-    local_files_not_in_s3 = [fn for fn in local_file_chksum if fn not in s3_file_chksum]
-    print(local_files_not_in_s3)
+    local_files_not_in_s3 = ['%s/run/%s/%s' % (script_path, remote_file_path[fn], fn)
+                             for fn in local_file_chksum
+                             if fn not in s3_file_chksum]
+    if local_files_not_in_s3:
+        print('\n'.join(local_files_not_in_s3))
+        s3_file_chksum = save_to_s3.save_to_s3(filelist=local_files_not_in_s3)
         
     return
 
