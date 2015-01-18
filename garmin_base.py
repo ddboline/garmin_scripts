@@ -900,14 +900,14 @@ def do_plots(gfile, use_time=False, **options):
     alt_vals = []
     alt_values = []
     vertical_climb = 0
-    speed_values = filter(lambda x: x[1] < 20, [[d/4., t/60.] for d, t in get_splits(gfile, 400., do_heart_rate=False)])
+    speed_values = filter(lambda x: x[1] < 20, [[d/4., 4*t/60.] for d, t in get_splits(gfile, 400., do_heart_rate=False)])
     mph_speed_values = []
     avg_speed_values = []
     avg_mph_speed_values = []
     lat_vals = []
     lon_vals = []
     graphs = []
-    mile_split_vals = get_splits(gfile, METERS_PER_MILE, do_heart_rate=False)
+    mile_split_vals = [[d, t/60.] for d, t in get_splits(gfile, METERS_PER_MILE, do_heart_rate=False)]
     for point in gfile.points:
         if use_time:
             xval = point.duration_from_begin
