@@ -61,7 +61,7 @@ def compare_with_remote(script_path):
             remote_file_chksum[fn] = md5sum
             remote_file_path[fn] = '/'.join(fname.split('/')[:-1])
         else:
-            print(fname, md5sum, remote_file_chksum[fn])
+            print('duplicate?:', fname, md5sum, remote_file_chksum[fn])
 
     local_file_chksum = {}
 
@@ -79,7 +79,7 @@ def compare_with_remote(script_path):
 
     for fn in remote_file_chksum.keys():
         if fn not in local_file_chksum.keys():
-            print(fn, remote_file_chksum[fn], remote_file_path[fn], script_path)
+            print('download:', fn, remote_file_chksum[fn], remote_file_path[fn], script_path)
             if not os.path.exists('%s/run/%s/' % (script_path, remote_file_path[fn])):
                 os.makedirs('%s/run/%s/' % (script_path, remote_file_path[fn]))
             if not os.path.exists('%s/run/%s/%s' % (script_path, remote_file_path[fn], fn)):
