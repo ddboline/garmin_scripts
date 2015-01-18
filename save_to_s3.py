@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
 
 # Import the SDK
 import boto
@@ -49,9 +50,8 @@ def save_to_s3(bname='garmin_scripts_gps_files_ddboline', filelist=[]):
             k.key = kn
             k.set_contents_from_file(infile)
             list_of_keys[k.key] = k.etag.replace('"','')
-            print kn, fn, list_of_keys[k.key]
+            print('upload to s3:', kn, fn, list_of_keys[k.key])
     return list_of_keys
 
 if __name__ == '__main__':
     save_to_s3('garmin_scripts_gps_files_ddboline', glob.glob('run/*/*/*'))
-    #print save_to_s3()
