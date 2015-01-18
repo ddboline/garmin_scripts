@@ -7,6 +7,10 @@ import datetime
 import cPickle
 import lockfile
 import pandas as pd
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 from util import run_command, datetimefromstring
 from garmin_list_of_corrected_laps import list_of_corrected_laps, \
@@ -802,10 +806,6 @@ def do_map(gpx_filename):
         run_command('gpxviewer %s' % gpx_filename)
 
 def plot_graph(name=None, title=None, data=None, **opts):
-    import numpy as np
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
     popts = {}
     if 'plotopt' in opts:
         popts = opts['plotopt']
@@ -823,11 +823,7 @@ def plot_graph(name=None, title=None, data=None, **opts):
     return '%s.png' % name
 
 def make_mercator_map(name=None, title=None, lats=None, lons=None, latlon_list=None, **opts):
-    import matplotlib
-    matplotlib.use('Agg')
     from mpl_toolkits.basemap import Basemap
-    import numpy as np
-    import matplotlib.pyplot as plt
     plt.clf()
 
     if lats and lons:
@@ -950,41 +946,6 @@ def do_plots(gfile, use_time=False, **options):
     if not os.path.exists('%s/html' % curpath):
         os.makedirs('%s/html' % curpath)
     os.chdir('%s/html' % curpath)
-    htmlfile = open('index.html', 'w')
-    if len(lat_vals) > 0 and len(lon_vals) > 0 and len(lat_vals) == len(lon_vals):
-        minlat, maxlat = min(lat_vals), max(lat_vals)
-        minlon, maxlon = min(lon_vals), max(lon_vals)
-        central_lat = (maxlat + minlat)/2.
-        central_lon = (maxlon + minlon)/2.
-        latlon_min = max((maxlat-minlat), (maxlon-minlon))
-        print 'latlon', latlon_min
-        latlon_thresholds = [[15, 0.015], [14, 0.038], [13, 0.07], [12, 0.12], [11, 0.20], [10, 0.4]]
-        for line in open('%s/MAP_TEMPLATE.html' % curpath, 'r'):
-            if 'SPORTTITLEDATE' in line:
-                newtitle = 'Garmin Event %s on %s' % (gfile.sport.title(), gfile.begin_date)
-                htmlfile.write(line.replace('SPORTTITLEDATE',newtitle))
-            elif 'ZOOMVALUE' in line:
-                for zoom, thresh in latlon_thresholds:
-                    if latlon_min < thresh or zoom == 10:
-                        htmlfile.write(line.replace('ZOOMVALUE','%d' % zoom))
-                        break
-            elif 'INSERTTABLESHERE' in line:
-                htmlfile.write('%s\n' % get_file_html(gfile))
-                htmlfile.write('<br><br>%s\n' % get_html_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi'))
-                htmlfile.write('<br><br>%s\n' % get_html_splits(gfile, split_distance_in_meters=5000., label='km'))
-            elif 'INSERTMAPSEGMENTSHERE' in line:
-                for idx in range(0, len(lat_vals)):
-                    htmlfile.write('new google.maps.LatLng(%f,%f),\n' % (lat_vals[idx], lon_vals[idx]))
-            elif 'MINLAT' in line or 'MAXLAT' in line or 'MINLON' in line or 'MAXLON' in line:
-                htmlfile.write(line.replace('MINLAT', '%s' % minlat).replace('MAXLAT', '%s' % maxlat).replace('MINLON', '%s' % minlon).replace('MAXLON', '%s' % maxlon))
-            elif 'CENTRALLAT' in line or 'CENTRALLON' in line:
-                htmlfile.write(line.replace('CENTRALLAT', '%s' % central_lat).replace('CENTRALLON', '%s' % central_lon))
-            elif 'INSERTOTHERIMAGESHERE' in line:
-                break
-            else:
-                htmlfile.write(line)
-    else:
-        htmlfile.write('<!DOCTYPE HTML>\n<html>\n<body>\n')
 
     #if len(lat_vals) > 0 and len(lon_vals) > 0:
         #graphs.append(make_mercator_map(name='route_map', title='Route Map', lats=lat_vals, lons=lon_vals))
@@ -1010,11 +971,43 @@ def do_plots(gfile, use_time=False, **options):
         avg_mph_speed_value = avg_mph_speed_values[-1][1]
         graphs.append(plot_graph(name='avg_speed_mph', title='Avg Speed %.2f mph' % avg_mph_speed_value, data=avg_mph_speed_values))
 
-    for f in graphs:
-        htmlfile.write('<p>\n<img src="%s">\n</p>' % f)
+    with open('index.html', 'w') as htmlfile:
+        if len(lat_vals) > 0 and len(lon_vals) > 0 and len(lat_vals) == len(lon_vals):
+            minlat, maxlat = min(lat_vals), max(lat_vals)
+            minlon, maxlon = min(lon_vals), max(lon_vals)
+            central_lat = (maxlat + minlat)/2.
+            central_lon = (maxlon + minlon)/2.
+            latlon_min = max((maxlat-minlat), (maxlon-minlon))
+            print 'latlon', latlon_min
+            latlon_thresholds = [[15, 0.015], [14, 0.038], [13, 0.07], [12, 0.12], [11, 0.20], [10, 0.4]]
+            for line in open('%s/MAP_TEMPLATE.html' % curpath, 'r'):
+                if 'SPORTTITLEDATE' in line:
+                    newtitle = 'Garmin Event %s on %s' % (gfile.sport.title(), gfile.begin_date)
+                    htmlfile.write(line.replace('SPORTTITLEDATE',newtitle))
+                elif 'ZOOMVALUE' in line:
+                    for zoom, thresh in latlon_thresholds:
+                        if latlon_min < thresh or zoom == 10:
+                            htmlfile.write(line.replace('ZOOMVALUE','%d' % zoom))
+                            break
+                elif 'INSERTTABLESHERE' in line:
+                    htmlfile.write('%s\n' % get_file_html(gfile))
+                    htmlfile.write('<br><br>%s\n' % get_html_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi'))
+                    htmlfile.write('<br><br>%s\n' % get_html_splits(gfile, split_distance_in_meters=5000., label='km'))
+                elif 'INSERTMAPSEGMENTSHERE' in line:
+                    for idx in range(0, len(lat_vals)):
+                        htmlfile.write('new google.maps.LatLng(%f,%f),\n' % (lat_vals[idx], lon_vals[idx]))
+                elif 'MINLAT' in line or 'MAXLAT' in line or 'MINLON' in line or 'MAXLON' in line:
+                    htmlfile.write(line.replace('MINLAT', '%s' % minlat).replace('MAXLAT', '%s' % maxlat).replace('MINLON', '%s' % minlon).replace('MAXLON', '%s' % maxlon))
+                elif 'CENTRALLAT' in line or 'CENTRALLON' in line:
+                    htmlfile.write(line.replace('CENTRALLAT', '%s' % central_lat).replace('CENTRALLON', '%s' % central_lon))
+                elif 'INSERTOTHERIMAGESHERE' in line:
+                    for f in graphs:
+                        htmlfile.write('<p>\n<img src="%s">\n</p>' % f)
+                else:
+                    htmlfile.write(line)
+        else:
+            htmlfile.write('<!DOCTYPE HTML>\n<html>\n<body>\n')
 
-    htmlfile.write('</body>\n</html>\n')
-    htmlfile.close()
     os.chdir(curpath)
     if os.path.exists('%s/html' % curpath) and os.path.exists('%s/public_html/garmin' % os.getenv('HOME')):
         if os.path.exists('%s/public_html/garmin/html' % os.getenv('HOME')):
