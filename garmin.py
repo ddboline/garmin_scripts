@@ -8,6 +8,9 @@ from garmin_base import garmin_file, do_summary, METERS_PER_MILE, SPORT_TYPES,\
     convert_gmn_to_gpx, do_plots, print_file_string, print_splits
 from util import run_command
 
+#BASEURL = 'https://ddbolineathome.mooo.com/~ddboline'
+BASEURL = 'http://ddbolineinthecloud.mooo.com/~ubuntu'
+
 def read_garmin_file(fname, **options):
     gfile = garmin_file(fname)
 
@@ -54,7 +57,7 @@ def compare_with_remote(script_path):
     s3_file_chksum = save_to_s3.save_to_s3()
     remote_file_chksum = {}
     remote_file_path = {}
-    for line in urlopen('https://ddbolineathome.mooo.com/~ddboline/garmin/files/garmin.list'):
+    for line in urlopen('%s/garmin/files/garmin.list' % BASEURL):
         md5sum, fname = line.split()[0:2]
         fn = fname.split('/')[-1]
         if fn not in remote_file_chksum:
@@ -84,7 +87,7 @@ def compare_with_remote(script_path):
                 os.makedirs('%s/run/%s/' % (script_path, remote_file_path[fn]))
             if not os.path.exists('%s/run/%s/%s' % (script_path, remote_file_path[fn], fn)):
                 outfile = open('%s/run/%s/%s' % (script_path, remote_file_path[fn], fn), 'wb')
-                urlout = urlopen('https://ddbolineathome.mooo.com/~ddboline/garmin/files/%s/%s' % (remote_file_path[fn], fn))
+                urlout = urlopen('%s/garmin/files/%s/%s' % (BASEURL, remote_file_path[fn], fn))
                 if urlout.getcode() != 200:
                     print('something bad happened %d' % urlout.getcode())
                     exit(0)
@@ -118,7 +121,7 @@ if __name__ == '__main__':
             if not os.path.exists('%s/run' % script_path):
                 run_command('mkdir -p %s/run/' % script_path)
                 os.chdir('%s/run' % script_path)
-                run_command('wget --no-check-certificate https://ddbolineathome.mooo.com/~ddboline/backup/garmin_data.tar.gz')
+                run_command('wget --no-check-certificate %s/backup/garmin_data.tar.gz' % BASEURL)
                 run_command('tar zxvf garmin_data.tar.gz ; rm garmin_data.tar.gz')
             exit(0)
 
