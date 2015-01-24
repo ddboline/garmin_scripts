@@ -7,6 +7,7 @@
 import unittest
 import datetime
 import os
+import dateutil
 
 import garmin_base
 from util import run_command
@@ -22,10 +23,10 @@ class TestGarminScript(unittest.TestCase):
         pass
 
     def test_garmin_base(self):
-        gmnfile = 'run/2011/05/20110507T144308.gmn'
-        tcxfile = 'run/2012/11/2012-11-05-065221.TCX'
-        fitfile = 'run/2014/01/2014-01-12_11-30-08-80-7743.fit'
-        txtfile = 'run/2013/01/20130116_ellip.txt'
+        gmnfile = 'test/test.gmn'
+        tcxfile = 'test/test.tcx'
+        fitfile = 'test/test.fit'
+        txtfile = 'test/test.txt'
 
         outfile = garmin_base.convert_gmn_to_gpx(gmnfile)
         self.assertEqual('/tmp/temp.gpx', outfile)
@@ -54,9 +55,11 @@ class TestGarminScript(unittest.TestCase):
 
         for f in tcxfile, fitfile:
             self.assertEqual(f, garmin_base.convert_gmn_to_xml(f))
-        outfile = garmin_base.convert_gmn_to_xml(gmnfile)
-        md5 = run_command('cat %s | md5sum' % outfile, do_popen=True).read().split()[0]
-        self.assertEqual(md5, 'cdad6ffcd76a7d42ed1947cdfbac3c57')
+        ### the xml output of garmin_dump uses the local timezone, don't run the test if localtimezone isn't EST
+        if datetime.datetime.now(dateutil.tz.tzlocal()).tzname() == 'EST':
+            outfile = garmin_base.convert_gmn_to_xml(gmnfile)
+            md5 = run_command('cat %s | md5sum' % outfile, do_popen=True).read().split()[0]
+            self.assertEqual(md5, 'bce90abae060c7dea4b6b6c3b6466b09')
 
         gfile = garmin_base.garmin_file(filename=None)
         gfile.filename = gmnfile
@@ -98,7 +101,7 @@ class TestGarminScript(unittest.TestCase):
         gdf.to_csv('temp.csv', index=False)
         #print gdf.to_html()
         md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
-        self.assertEqual(md5, '90a35d56c4a8a6a99d176407b22a2cad')
+        self.assertEqual(md5, '10088225057791a97454ca8d5b3cc270')
 
         gfile = garmin_base.garmin_file(tcxfile)
         gdf = garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe
