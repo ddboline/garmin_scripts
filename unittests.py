@@ -92,16 +92,17 @@ class TestGarminScript(unittest.TestCase):
         gfile.read_file()
         self.assertEqual(gfile.begin_date, datetime.date(year=2013, month=1, day=16))
 
-        gfile = garmin_base.garmin_file(gmnfile)
-        gdf = garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe
-        gdf.to_csv('temp.csv', index=False)
-        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
-        self.assertEqual(md5, 'bd68a0bac5267ccac01139e05883aa8f')
-        gdf = garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe
-        gdf.to_csv('temp.csv', index=False)
-        #print gdf.to_html()
-        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
-        self.assertEqual(md5, '10088225057791a97454ca8d5b3cc270')
+        if datetime.datetime.now(dateutil.tz.tzlocal()).tzname() == 'EST':
+            gfile = garmin_base.garmin_file(gmnfile)
+            gdf = garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe
+            gdf.to_csv('temp.csv', index=False)
+            md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+            self.assertEqual(md5, 'bd68a0bac5267ccac01139e05883aa8f')
+            gdf = garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe
+            gdf.to_csv('temp.csv', index=False)
+            #print gdf.to_html()
+            md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+            self.assertEqual(md5, '10088225057791a97454ca8d5b3cc270')
 
         gfile = garmin_base.garmin_file(tcxfile)
         gdf = garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe
