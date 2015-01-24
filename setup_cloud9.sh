@@ -13,9 +13,9 @@ sh setup_cloud9.sh
 mkdir garmin
 cd $CURDIR
 
-echo "America/New_York" > timezone
-sudo mv timezone /etc/timezone
-sudo rm /etc/localtime
-sudo ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
+# echo "America/New_York" > timezone
+# sudo mv timezone /etc/timezone
+# sudo rm /etc/localtime
+# sudo ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 
 ./test_cloud9.sh
