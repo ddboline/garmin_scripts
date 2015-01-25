@@ -6,6 +6,8 @@ import tempfile
 import datetime
 import cPickle
 import lockfile
+import copy
+
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -339,7 +341,7 @@ class garmin_file(object):
         self.total_calories = 0
         self.total_distance = 0
         self.total_duration = 0
-        self.total_hr_dur = 0
+        self.total_hr_dur = [0, 0]
         self.laps = []
         self.points = []
         self.is_tcx = is_tcx
@@ -452,7 +454,8 @@ class garmin_file(object):
             self.total_distance += cur_lap.lap_distance
             self.total_duration += cur_lap.lap_duration
             if cur_lap.lap_avg_hr:
-                self.total_hr_dur += cur_lap.lap_avg_hr * cur_lap.lap_duration
+                self.total_hr_dur[0] += cur_lap.lap_avg_hr * cur_lap.lap_duration
+                self.total_hr_dur[1] += cur_lap.lap_duration
             self.laps.append(cur_lap)
             self.points.append(cur_point)
 
@@ -515,7 +518,8 @@ class garmin_file(object):
             self.total_calories += cur_lap.lap_calories
             self.total_duration += cur_lap.lap_duration
             if cur_lap.lap_avg_hr:
-                self.total_hr_dur += cur_lap.lap_avg_hr * cur_lap.lap_duration
+                self.total_hr_dur[0] += cur_lap.lap_avg_hr * cur_lap.lap_duration
+                self.total_hr_dur[1] += cur_lap.lap_duration
 
         time_from_begin = 0
         for point_number, cur_point in enumerate(temp_points):
@@ -577,7 +581,8 @@ class garmin_file(object):
             self.total_calories += cur_lap.lap_calories
             self.total_duration += cur_lap.lap_duration
             if cur_lap.lap_avg_hr:
-                self.total_hr_dur += cur_lap.lap_avg_hr * cur_lap.lap_duration
+                self.total_hr_dur[0] += cur_lap.lap_avg_hr * cur_lap.lap_duration
+                self.total_hr_dur[1] += cur_lap.lap_duration
 
         time_from_begin = 0
         for point_number, cur_point in enumerate(temp_points):
@@ -636,8 +641,8 @@ def print_file_string(gfile):
         tmpstr.append('total %.2f mi %s calories %s time %s min/mi %s min/km' % (gfile.total_distance / METERS_PER_MILE, gfile.total_calories, print_h_m_s(gfile.total_duration), print_h_m_s(min_mile*60, False), print_h_m_s(min_mile*60 / METERS_PER_MILE * 1000., False)))
     else:
         tmpstr.append('total %.2f mi %s calories %s time %.2f mph' % (gfile.total_distance / METERS_PER_MILE, gfile.total_calories, print_h_m_s(gfile.total_duration), mi_per_hr))
-    if gfile.total_hr_dur > 0:
-        tmpstr.append('%i bpm' % (gfile.total_hr_dur / gfile.total_duration))
+    if gfile.total_hr_dur[0] > 0:
+        tmpstr.append('%i bpm' % (gfile.total_hr_dur[0] / gfile.total_hr_dur[1]))
     retval.append(' '.join(tmpstr))
     return '\n'.join(retval)
 
@@ -721,9 +726,9 @@ def get_file_html(gfile):
                   print_h_m_s(gfile.total_duration),
                   mi_per_hr
                ]
-    if gfile.total_hr_dur > 0:
+    if gfile.total_hr_dur[0] > 0:
         labels.append('Heart Rate')
-        values.append('%i bpm' % (gfile.total_hr_dur / gfile.total_duration))
+        values.append('%i bpm' % (gfile.total_hr_dur[0] / gfile.total_hr_dur[1]))
 
     retval.append('<table border="1" class="dataframe">')
     retval.append('<thead><tr style="text-align: center;">')
@@ -1033,7 +1038,7 @@ class garmin_summary(object):
         self.total_calories = 0
         self.total_distance = 0
         self.total_duration = 0
-        self.total_hr_dur = 0
+        self.total_hr_dur = [0, 0]
         self.is_tcx = is_tcx
         self.is_txt = is_txt
         self.number_of_items = 0
@@ -1052,7 +1057,8 @@ class garmin_summary(object):
         self.total_calories = temp_gfile.total_calories
         self.total_distance = temp_gfile.total_distance
         self.total_duration = temp_gfile.total_duration
-        self.total_hr_dur = temp_gfile.total_hr_dur
+        self.total_hr_dur[0] = temp_gfile.total_hr_dur[0]
+        self.total_hr_dur[1] = temp_gfile.total_hr_dur[1]
         self.number_of_items += 1
 
         if self.total_calories == 0 and self.sport == 'running' and self.total_distance > 0.0:
@@ -1074,14 +1080,9 @@ class garmin_summary(object):
         self.total_calories += summary_to_add.total_calories
         self.total_distance += summary_to_add.total_distance
         self.total_duration += summary_to_add.total_duration
-        if self.total_hr_dur > 0 and summary_to_add.total_hr_dur > 0:
-            self.total_hr_dur += summary_to_add.total_hr_dur
-        elif self.total_hr_dur == 0 and summary_to_add.total_hr_dur > 0:
-            self.total_hr_dur = summary_to_add.total_hr_dur * (self.total_duration / summary_to_add.total_duration)
-        elif self.total_hr_dur > 0 and summary_to_add.total_hr_dur == 0:
-            self.total_hr_dur = self.total_hr_dur * self.total_duration / (self.total_duration - summary_to_add.total_duration)
-        else:
-            self.total_hr_dur = 0
+        if summary_to_add.total_hr_dur[0] > 0:
+            self.total_hr_dur[0] += summary_to_add.total_hr_dur[0]
+            self.total_hr_dur[1] += summary_to_add.total_hr_dur[1]
         self.number_of_items += 1
 
     def print_total_summary(self, sport=None, number_days=0, total_days=0):
@@ -1096,8 +1097,8 @@ class garmin_summary(object):
         else:
             retval.append(' %10s \t' % ' ')
         retval.append(' %10s \t' % (print_h_m_s(self.total_duration)))
-        if self.total_hr_dur > 0 and sport != 'total':
-            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
+        if self.total_hr_dur[0] > 0 and sport != 'total':
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur[0] / self.total_hr_dur[1]), ' '))
         else:
             retval.append(' %7s %2s' % (' ', ' '))
         if number_days > 0 and total_days > 0:
@@ -1122,8 +1123,8 @@ class garmin_summary(object):
         else:
             retval.append(' %10s \t' % ' ')
         retval.append(' %10s \t' % (print_h_m_s(self.total_duration)))
-        if self.total_hr_dur > 0:
-            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
+        if self.total_hr_dur[0] > 0:
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur[0] / self.total_hr_dur[1]), ' '))
         else:
             retval.append(' %7s %2s' % (' ', ' '))
         retval.append('%16s' % ('%i / %i days' % (number_in_year, total_days)))
@@ -1147,8 +1148,8 @@ class garmin_summary(object):
         else:
             retval.append(' %10s \t' % ' ')
         retval.append(' %10s \t' % (print_h_m_s(self.total_duration)))
-        if self.total_hr_dur > 0:
-            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
+        if self.total_hr_dur[0] > 0:
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur[0] / self.total_hr_dur[1]), ' '))
         else:
             retval.append(' %7s %2s' % (' ', ' '))
         retval.append('%16s' % ('%i / %i days' % (number_in_month, total_days)))
@@ -1171,8 +1172,8 @@ class garmin_summary(object):
         else:
             retval.append(' %10s \t' % ' ')
         retval.append(' %10s \t' % (print_h_m_s(self.total_duration/number_of_months)))
-        if self.total_hr_dur > 0:
-            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
+        if self.total_hr_dur[0] > 0:
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur[0] / self.total_hr_dur[1]), ' '))
         else:
             retval.append(' %7s %2s' % (' ', ' '))
         return ' '.join(retval)
@@ -1188,8 +1189,8 @@ class garmin_summary(object):
             retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, '%.2f mph' % ((self.total_distance/METERS_PER_MILE) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration)))
         else:
             retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('%10s %02i %3s' % (cur_date, week, weekdayname), sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE), '%i cal' % self.total_calories, ' ', print_h_m_s(self.total_duration)))
-        if self.total_hr_dur > 0:
-            retval.append('\t %7s' % ('%i bpm' % (self.total_hr_dur / self.total_duration)))
+        if self.total_hr_dur[0] > 0:
+            retval.append('\t %7s' % ('%i bpm' % (self.total_hr_dur[0] / self.total_hr_dur[1])))
         return ' '.join(retval)
 
     def print_day_average(self, sport=None, number_days=0):
@@ -1203,8 +1204,8 @@ class garmin_summary(object):
             retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), '%.2f mph' % ((self.total_distance/METERS_PER_MILE) / (self.total_duration/60./60.)), print_h_m_s(self.total_duration/number_days)))
         else:
             retval.append('%17s %10s \t %10s \t %10s \t %10s \t %10s' % ('average / day', sport, '%.2f mi' % (self.total_distance/METERS_PER_MILE/number_days), '%i cal' % (self.total_calories/number_days), ' ', print_h_m_s(self.total_duration/number_days)))
-        if self.total_hr_dur > 0:
-            retval.append('\t %7s' % ('%i bpm' % (self.total_hr_dur / self.total_duration)))
+        if self.total_hr_dur[0] > 0:
+            retval.append('\t %7s' % ('%i bpm' % (self.total_hr_dur[0] / self.total_hr_dur[1])))
         return ' '.join(retval)
 
     def print_week_summary(self, sport=None, isoyear=None, isoweek=None, number_in_week=0, date=datetime.datetime.today()):
@@ -1234,8 +1235,8 @@ class garmin_summary(object):
         else:
             retval.append(' %10s \t' % ' ')
         retval.append(' %10s \t' % (print_h_m_s(self.total_duration)))
-        if self.total_hr_dur > 0 and sport != 'total':
-            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
+        if self.total_hr_dur[0] > 0 and sport != 'total':
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur[0] / self.total_hr_dur[1]), ' '))
         else:
             retval.append(' %7s %2s' % (' ', ' '))
         retval.append('%16s' % ('%i / %i days' % (number_in_week, total_days)))
@@ -1259,8 +1260,8 @@ class garmin_summary(object):
         else:
             retval.append(' %10s \t' % ' ')
         retval.append(' %10s \t' % (print_h_m_s(self.total_duration / number_of_weeks)))
-        if self.total_hr_dur > 0 and sport != 'total':
-            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur / self.total_duration), ' '))
+        if self.total_hr_dur[0] > 0 and sport != 'total':
+            retval.append(' %7s %2s' % ('%i bpm' % (self.total_hr_dur[0] / self.total_hr_dur[1]), ' '))
         else:
             retval.append(' %7s %2s' % (' ', ' '))
         retval.append('%16s' % ('%.1f / %i days' % (float(number_days) / number_of_weeks, 7)))
