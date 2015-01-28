@@ -16,5 +16,3 @@ elif [ $1 == "html" ] ; then
     mkdir garmin
     cd $CURDIR
 fi
-
-./test_cloud9.sh
