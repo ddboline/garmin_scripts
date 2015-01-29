@@ -6,3 +6,4 @@
 ./garmin.py 2014-11-22_18 plot
 ./unittests.py
 ./running_pace_plot.py
+./world_record.py
