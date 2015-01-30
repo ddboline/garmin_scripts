@@ -3,7 +3,7 @@
 sudo apt-get update
 sudo apt-get install -y gpsbabel garmin-forerunner-tools xml2
 # sudo apt-get install -y python-mpltoolkits.basemap
-sudo apt-get install -y python-pandas python-lockfile
+sudo apt-get install -y python-pandas python-lockfile python-dateutil
 
 if [ -z $1 ] ; then
     true
