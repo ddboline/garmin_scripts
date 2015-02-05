@@ -57,7 +57,6 @@ def server_thread(socketfile=GARMIN_SOCKET_FILE, msg_q=None):
                     run_command('cp %s %s/public_html/backup/garmin_data.tar.gz' % (fname, os.getenv('HOME')))
                 if os.path.exists('%s/public_html/garmin/tar' % os.getenv('HOME')):
                     run_command('mv %s %s/public_html/garmin/tar' % (fname, os.getenv('HOME')))
-                exit(0)
             elif arg == 'occur':
                 options['occur'] = True
             elif os.path.isfile(arg):
