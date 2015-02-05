@@ -1616,6 +1616,7 @@ def do_summary(directory, **options):
     print curpath
     if not os.path.exists('%s/html' % curpath):
         os.makedirs('%s/html' % curpath)
+    run_command('cp index.html html/')
     os.chdir('%s/html' % curpath)
     with open('garmin.html', 'w') as htmlfile:
         for line in open('%s/GARMIN_TEMPLATE.html' % curpath, 'r'):
