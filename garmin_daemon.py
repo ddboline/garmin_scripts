@@ -20,8 +20,6 @@ def server_thread(socketfile=GARMIN_SOCKET_FILE, msg_q=None):
         server_thread, listens for commands, sends back responses.
     '''
     script_path = '/'.join(os.path.abspath(os.sys.argv[0]).split('/')[:-1])
-    options = {'do_plot': False, 'do_year': False, 'do_month': False, 'do_week': False, 'do_day': False, 'do_file': False, 'do_sport': None, 'do_update': False, 'do_average': False}
-    options['script_path'] = script_path
     
     if os.path.exists(socketfile):
         os.remove(socketfile)
@@ -32,7 +30,7 @@ def server_thread(socketfile=GARMIN_SOCKET_FILE, msg_q=None):
     except socket.error:
         time.sleep(10)
         print('try again to open socket')
-        return remcom_test(movie_filename, output_dir, begin_time, end_time, socketfile, msg_q)
+        return server_thread(socketfile, msg_q)
     print('socket open')
     s.listen(0)
 
@@ -44,10 +42,10 @@ def server_thread(socketfile=GARMIN_SOCKET_FILE, msg_q=None):
 
         args = d.split()
         
-        print('args ', args)
-        
         gdir = []
-        for arg in os.sys.argv[1:]:
+        options = {'do_plot': False, 'do_year': False, 'do_month': False, 'do_week': False, 'do_day': False, 'do_file': False, 'do_sport': None, 'do_update': False, 'do_average': False}
+        options['script_path'] = script_path
+        for arg in args:
             if arg == 'build':
                 options['build'] = True
             elif arg == 'backup':
@@ -99,6 +97,12 @@ def server_thread(socketfile=GARMIN_SOCKET_FILE, msg_q=None):
             read_garmin_file(gdir[0], **options)
         else:
             do_summary(gdir, **options)
+        c.send('done')
+        c.close()
+    s.shutdown(socket.SHUT_RDWR)
+    s.close()
+    return 0
+
 
 
 def read_garmin_file(fname, **options):
@@ -138,8 +142,7 @@ def read_garmin_file(fname, **options):
     print('')
 
     gpx_filename = convert_gmn_to_gpx(fname)
-    if 'do_plot' in options and options['do_plot']:
-        do_plots(gfile, **options)
+    do_plots(gfile, **options)
 
 
 if __name__ == '__main__':
