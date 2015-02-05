@@ -44,6 +44,8 @@ def server_thread(socketfile=GARMIN_SOCKET_FILE, msg_q=None):
 
         args = d.split()
         
+        print('args ', args)
+        
         gdir = []
         for arg in os.sys.argv[1:]:
             if arg == 'build':
