@@ -976,7 +976,7 @@ def do_plots(gfile, use_time=False, **options):
         avg_mph_speed_value = avg_mph_speed_values[-1][1]
         graphs.append(plot_graph(name='avg_speed_mph', title='Avg Speed %.2f mph' % avg_mph_speed_value, data=avg_mph_speed_values))
 
-    with open('garmin.html', 'w') as htmlfile:
+    with open('index.html', 'w') as htmlfile:
         if len(lat_vals) > 0 and len(lon_vals) > 0 and len(lat_vals) == len(lon_vals):
             minlat, maxlat = min(lat_vals), max(lat_vals)
             minlon, maxlon = min(lon_vals), max(lon_vals)
@@ -1014,7 +1014,6 @@ def do_plots(gfile, use_time=False, **options):
             htmlfile.write('<!DOCTYPE HTML>\n<html>\n<body>\n')
 
     os.chdir(curpath)
-    run_command('cp index.html html/')
     if os.path.exists('%s/html' % curpath) and os.path.exists('%s/public_html/garmin' % os.getenv('HOME')):
         if os.path.exists('%s/public_html/garmin/html' % os.getenv('HOME')):
             run_command('rm -rf %s/public_html/garmin/html' % os.getenv('HOME'))
@@ -1617,7 +1616,7 @@ def do_summary(directory, **options):
     if not os.path.exists('%s/html' % curpath):
         os.makedirs('%s/html' % curpath)
     os.chdir('%s/html' % curpath)
-    with open('garmin.html', 'w') as htmlfile:
+    with open('index.html', 'w') as htmlfile:
         for line in open('%s/GARMIN_TEMPLATE.html' % curpath, 'r'):
             if 'INSERTTEXTHERE' in line:
                 htmlfile.write('\n'.join(retval))
