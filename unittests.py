@@ -8,6 +8,7 @@ import unittest
 import datetime
 import os
 import dateutil
+import glob
 
 import garmin_base
 from util import run_command
@@ -18,8 +19,9 @@ class TestGarminScript(unittest.TestCase):
         pass
 
     def tearDown(self):
-        if os.path.exists('temp.csv'):
-            os.remove('temp.csv')
+        for f in glob.glob('temp.*.*.csv'):
+            if os.path.exists(f):
+                os.remove(f)
         pass
 
     def test_garmin_base(self):
@@ -95,33 +97,32 @@ class TestGarminScript(unittest.TestCase):
         if datetime.datetime.now(dateutil.tz.tzlocal()).tzname() == 'EST':
             gfile = garmin_base.garmin_file(gmnfile)
             gdf = garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe
-            gdf.to_csv('temp.csv', index=False)
-            md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
-            self.assertEqual(md5, 'bd68a0bac5267ccac01139e05883aa8f')
+            gdf.to_csv('temp.xml.point.csv', index=False)
+            md5 = run_command('cat temp.xml.point.csv | md5sum', do_popen=True).read().split()[0]
+            self.assertEqual(md5, '4f574433d75f4c5406babc81997f719c')
             gdf = garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe
-            gdf.to_csv('temp.csv', index=False)
-            #print gdf.to_html()
-            md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+            gdf.to_csv('temp.xml.lap.csv', index=False)
+            md5 = run_command('cat temp.xml.lap.csv | md5sum', do_popen=True).read().split()[0]
             self.assertEqual(md5, '10088225057791a97454ca8d5b3cc270')
 
         gfile = garmin_base.garmin_file(tcxfile)
         gdf = garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe
-        gdf.to_csv('temp.csv', index=False)
-        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
-        self.assertEqual(md5, '157e24fa921aaa169dbd6c09cfdd55d5')
+        gdf.to_csv('temp.tcx.point.csv', index=False)
+        md5 = run_command('cat temp.tcx.point.csv | md5sum', do_popen=True).read().split()[0]
+        self.assertEqual(md5, '3bb1db7d72096006e3cecdb719c55706')
         gdf = garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe
-        gdf.to_csv('temp.csv', index=False)
-        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+        gdf.to_csv('temp.tcx.lap.csv', index=False)
+        md5 = run_command('cat temp.tcx.lap.csv | md5sum', do_popen=True).read().split()[0]
         self.assertEqual(md5, '5973750ba6ffa5394bbc0a4569a2a922')
 
         gfile = garmin_base.garmin_file(fitfile)
         gdf = garmin_base.garmin_dataframe(garmin_base.garmin_point, gfile.points).dataframe
-        gdf.to_csv('temp.csv', index=False)
-        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
-        self.assertEqual(md5, '61efed856cab6799bd0bf83a79052c70')
+        gdf.to_csv('temp.fit.point.csv', index=False)
+        md5 = run_command('cat temp.fit.point.csv | md5sum', do_popen=True).read().split()[0]
+        self.assertEqual(md5, '31a1ec7ed186440c28ff6ff052da13f3')
         gdf = garmin_base.garmin_dataframe(garmin_base.garmin_lap, gfile.laps).dataframe
-        gdf.to_csv('temp.csv', index=False)
-        md5 = run_command('cat temp.csv | md5sum', do_popen=True).read().split()[0]
+        gdf.to_csv('temp.fit.lap.csv', index=False)
+        md5 = run_command('cat temp.fit.lap.csv | md5sum', do_popen=True).read().split()[0]
         self.assertEqual(md5, '13fb54df90be4b3da668da4e2048dcee')
 
         #opts = {'do_plot': False, 'do_year': False, 'do_month': False, 'do_week': False, 'do_day': False, 'do_file': False, 'do_sport': None, 'do_update': False}

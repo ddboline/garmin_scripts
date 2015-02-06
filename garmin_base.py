@@ -174,11 +174,11 @@ class garmin_point(object):
         ### These are set by garmin_file class, left here as placeholders
         self.duration_from_last = 0 ### here last will mean last track point, resets at every new track
         self.duration_from_begin = 0 ### here we add up durations, ignoring time between tracks
-        self.speed_mps = None
-        self.speed_permi = None
-        self.speed_mph = None
-        self.avg_speed_value_permi = None
-        self.avg_speed_value_mph = None
+        self.speed_mps = 0
+        self.speed_permi = -1
+        self.speed_mph = 0
+        self.avg_speed_value_permi = -1
+        self.avg_speed_value_mph = 0
 
     def read_point_xml(self, ent):
         for e in ent:
@@ -1277,7 +1277,7 @@ def do_summary(directory, **options):
     file_vector = []
     filename_md5_dict = {}
 
-    script_path = '/'.join(os.path.abspath(os.sys.argv[0]).split('/')[:-1])
+    script_path = options['script_path']
 
     try:
         pkl_file = open('%s/run/garmin.pkl' % script_path, 'rb')
@@ -1444,6 +1444,7 @@ def do_summary(directory, **options):
 
     ### If more than one year, default to year-to-year summary
     retval = []
+    cmd_args = []
     if do_file:
         for sport in SPORT_TYPES:
             if sport not in sport_set:
@@ -1453,8 +1454,14 @@ def do_summary(directory, **options):
                 if gfile.sport != sport:
                     continue
                 retval.append(gfile.print_day_summary(sport, cur_date))
+                cmd_args.append('%04d-%02d-%02d file %s' % (cur_date.year,
+                                                                         cur_date.month,
+                                                                         cur_date.day,
+                                                                         sport))
             retval.append('')
+            cmd_args.append('')
         retval.append('')
+        cmd_args.append('')
     if do_day:
         for sport in SPORT_TYPES:
             if sport not in sport_set:
@@ -1463,17 +1470,28 @@ def do_summary(directory, **options):
                 if cur_date not in day_sport_set[sport]:
                     continue
                 retval.append(day_sport_summary[sport][cur_date].print_day_summary(sport, cur_date))
+                cmd_args.append('%04d-%02d-%02d file %s' % (cur_date.year,
+                                                                         cur_date.month,
+                                                                         cur_date.day,
+                                                                         sport))
             retval.append('')
+            cmd_args.append('')
             if not do_sport and do_average:
                 retval.append(total_sport_summary[sport].print_day_average(sport, len(day_sport_set[sport])))
+                cmd_args.append('')
                 retval.append('')
+                cmd_args.append('')
         if not do_sport:
             for cur_date in day_set:
                 retval.append(day_summary[cur_date].print_day_summary('total', cur_date))
+                cmd_args.append('')
             retval.append('')
+            cmd_args.append('')
         if not do_sport and do_average:
             retval.append(total_summary.print_day_average('total', len(day_set)))
+            cmd_args.append('')
             retval.append('')
+            cmd_args.append('')
     if do_week:
         for sport in SPORT_TYPES:
             if sport not in sport_set:
@@ -1484,9 +1502,12 @@ def do_summary(directory, **options):
                 isoyear = int(yearweek/100)
                 isoweek = yearweek % 100
                 retval.append(week_sport_summary[sport][yearweek].print_week_summary(sport, isoyear, isoweek, len(week_sport_day_set[sport][yearweek])))
+                cmd_args.append('')
             retval.append('')
+            cmd_args.append('')
             if not do_sport and do_average:
                 retval.append(total_sport_summary[sport].print_week_average(sport=sport, number_days=len(total_sport_day_set[sport]), number_of_weeks=len(week_sport_set[sport])))
+                cmd_args.append('')
                 retval.append('')
         for yearweek in week_set:
             isoyear = int(yearweek/100)
@@ -1609,7 +1630,8 @@ def do_summary(directory, **options):
                 for i in range(0, len(day_set)+1):
                     if occur_map[i] > 0:
                         retval.append(i, occur_map[i])
-    print '\n'.join(retval)
+    outstr = '\n'.join(retval)
+    print(outstr)
 
     curpath = options['script_path']
     print curpath
@@ -1619,7 +1641,7 @@ def do_summary(directory, **options):
     with open('index.html', 'w') as htmlfile:
         for line in open('%s/GARMIN_TEMPLATE.html' % curpath, 'r'):
             if 'INSERTTEXTHERE' in line:
-                htmlfile.write('\n'.join(retval))
+                htmlfile.write(outstr)
             else:
                 htmlfile.write(line)
 
