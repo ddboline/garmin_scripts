@@ -135,7 +135,7 @@ def convert_gmn_to_xml(gmn_filename):
         xml_file.write(line + '\n')
     xml_file.write('</root>\n')
     xml_file.close()
-    os.system('cp %s /tmp/temp.xml' % xml_file.name)
+    os.system('mv %s /tmp/temp.xml' % xml_file.name)
     return xml_filename
 
 
