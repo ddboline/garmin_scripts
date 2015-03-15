@@ -83,6 +83,7 @@
    10.0000       07 14   2015    1       10 Mile Run To The Brewery  NY
     6.2137       07 15   2014    1       Aspire 10k
    13.1094       07 25   2002    1       New Prague Half Marathon    MN
+    9.3206       07 26   2015    1       Kings Park 15k
    13.1094       07 29   2013    1       Suffolk County Half Marathon - Half Marathon    NY
    13.1094       07 33   2012    1       13.1 Marathon NYC
    13.1094       07 36   2014    1       Great South Bay Run - Half Marathon NY
@@ -105,6 +106,7 @@
    26.2188       08 29   2004    1       Twin Cities Marathon 2004 - Run Marathon    MN
    26.2188       08 29   2013    1       Minneapolis Marathon - Marathon MN
    31.0686       08 49   2014    1       Caumsett 50k USATF Championships
+   31.0686       08 52   2015    1       Caumsett 50k USATF Championships
    13.1094       08 54   2014    0       Paine to Pain Half Marathon, New Rochelle NY
     6.2137       08 56   2014    0       Leatherman's Loop 10k Trail Run
    26.2188       09 07   2005    0       Grandma's Marathon 2005 - Marathon  MN
