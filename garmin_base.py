@@ -320,8 +320,7 @@ def get_lap_html(glap, sport):
               '%.2f min' % (glap.lap_duration/60.),
               '%s / mi' % print_h_m_s(glap.lap_duration / (glap.lap_distance / METERS_PER_MILE), False),
               '%s / km' % print_h_m_s(glap.lap_duration / (glap.lap_distance / 1000.), False),
-              '%i bpm' % glap.lap_avg_hr
-            ]
+              '%i bpm' % glap.lap_avg_hr,]
 
     return ['<td>%s</td>' % v for v in values]
 
@@ -661,8 +660,7 @@ def get_html_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi')
                         print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE), False),
                         print_h_m_s(t/(split_distance_in_meters/1000.), False),
                         print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE)*MARATHON_DISTANCE_MI),
-                        '%i bpm' % h
-                  ]
+                        '%i bpm' % h,]
         values.append(tmp_vector)
 
     retval = []
@@ -716,16 +714,14 @@ def get_file_html(gfile):
                   gfile.total_calories,
                   print_h_m_s(gfile.total_duration),
                   print_h_m_s(min_mile*60, False),
-                  print_h_m_s(min_mile*60/METERS_PER_MILE*1000., False)
-               ]
+                  print_h_m_s(min_mile*60/METERS_PER_MILE*1000., False),]
     else:
         labels = ['total', 'Disatnce', 'Calories', 'Time', 'Pace mph']
         values = ['',
                   '%.2f mi' % (gfile.total_distance/METERS_PER_MILE),
                   gfile.total_calories,
                   print_h_m_s(gfile.total_duration),
-                  mi_per_hr
-               ]
+                  mi_per_hr,]
     if gfile.total_hr_dur[0] > 0:
         labels.append('Heart Rate')
         values.append('%i bpm' % (gfile.total_hr_dur[0] / gfile.total_hr_dur[1]))
@@ -799,9 +795,7 @@ def print_splits(gfile, split_distance_in_meters=METERS_PER_MILE, label='mi', pr
                                                                       print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE), False),
                                                                       print_h_m_s(t/(split_distance_in_meters/1000.), False),
                                                                       print_h_m_s(t/(split_distance_in_meters/METERS_PER_MILE)*MARATHON_DISTANCE_MI),
-                                                                      h
-                                                                    )
-           )
+                                                                      h,))
     return '\n'.join(retval)
 
 

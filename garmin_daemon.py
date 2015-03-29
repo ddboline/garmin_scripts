@@ -20,7 +20,7 @@ def server_thread(socketfile=GARMIN_SOCKET_FILE, msg_q=None):
         server_thread, listens for commands, sends back responses.
     '''
     script_path = '/'.join(os.path.abspath(os.sys.argv[0]).split('/')[:-1])
-    
+
     if os.path.exists(socketfile):
         os.remove(socketfile)
     s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -41,7 +41,7 @@ def server_thread(socketfile=GARMIN_SOCKET_FILE, msg_q=None):
         d = c.recv(1024)
 
         args = d.split()
-        
+
         gdir = []
         options = {'do_plot': False, 'do_year': False, 'do_month': False, 'do_week': False, 'do_day': False, 'do_file': False, 'do_sport': None, 'do_update': False, 'do_average': False}
         options['script_path'] = script_path
@@ -147,8 +147,8 @@ def read_garmin_file(fname, **options):
 
 if __name__ == '__main__':
     msg_q = multiprocessing.Queue()
-    
+
     net = multiprocessing.Process(target=server_thread, args=(GARMIN_SOCKET_FILE, msg_q))
     net.start()
-    
+
     net.join()

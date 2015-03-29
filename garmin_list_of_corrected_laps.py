@@ -12,9 +12,8 @@ list_of_stair_files = ['20120208T204305.gmn']
 list_of_snowshoeing_files = ['2013-12-25T19:34:06Z']
 list_of_skiing_files = ['2013-12-26T21:24:38Z']
 list_of_running_files_by_time = ['2014-02-09T14:26:59Z']
-list_of_walking_files_by_time = [
-                                 #'2014-05-18T13:31:55Z'
-                         ]
+list_of_walking_files_by_time = []
+                                 #'2014-05-18T13:31:55Z']
 list_of_biking_files_by_time = ['2011-08-06T13:59:30Z']
 
 def is_biking_file(string):

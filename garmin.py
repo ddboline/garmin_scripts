@@ -94,7 +94,7 @@ def compare_with_remote(script_path):
                 for line in urlout:
                     outfile.write(line)
                 outfile.close()
-    
+
     local_files_not_in_s3 = ['%s/run/%s/%s' % (script_path, remote_file_path[fn], fn)
                              for fn in local_file_chksum
                              if fn not in s3_file_chksum]
