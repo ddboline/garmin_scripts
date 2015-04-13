@@ -17,10 +17,6 @@ METERS_PER_MILE = 1609.344 # meters
 MARATHON_DISTANCE_M = 42195 # meters
 MARATHON_DISTANCE_MI = MARATHON_DISTANCE_M / METERS_PER_MILE # meters
 
-def lin_func(xval, *params):
-    """ self explanatory """
-    return params[0] + params[1] * xval + params[2] * xval**2
-
 def do_fit(data, func, param_default, do_bootstrap=False):
     """ perform fit """
     datax = data[:, 0]
