@@ -108,6 +108,7 @@
    26.2188       08 29   2013    1       Minneapolis Marathon - Marathon MN
    31.0686       08 49   2014    1       Caumsett 50k USATF Championships
    31.0686       08 52   2015    1       Caumsett 50k USATF Championships
+    6.2137       08 52   2015    0       Leatherman's Loop 10k Trail Run
    13.1094       08 54   2014    0       Paine to Pain Half Marathon, New Rochelle NY
     6.2137       08 56   2014    0       Leatherman's Loop 10k Trail Run
    26.2188       09 07   2005    0       Grandma's Marathon 2005 - Marathon  MN
@@ -119,9 +120,11 @@
    31.0686       10 28   2014    1       Tesla Hertz 50k trail run
    32.9000       10 38   2014    1       GLIRC 6 Hour Birthday Run
    13.1094       10 40   2013    0       North Face Endurance Challenge - Half Marathon Trail    NY
+   31.0686       12 27   2015    1       Greenbelt 50k
    50.0000       12 51   2014    1       Ocean to Sound 50 mile
    50.0000       13 07   2014    1       JFK 50 miler
    43.4960       13 35   2014    1       Paumanok Pursuit 70k Trail Run
    31.0686       14 13   2014    0       Greenbelt 50k
    31.0686       14 16   2014    0       Wildcat Ridge 50k
    31.0686       14 17   2014    0       North Face Endurance Challenge NY
+   31.0686       15 52   2015    0       North Face Endurance Challenge NY
