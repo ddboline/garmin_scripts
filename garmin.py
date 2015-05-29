@@ -52,8 +52,18 @@ def read_garmin_file(fname, **options):
         do_plots(gfile, **options)
 
 def compare_with_remote(script_path):
-    from urllib2 import urlopen
     import save_to_s3
+    import requests
+    from requests import HTTPError
+    requests.packages.urllib3.disable_warnings()
+
+    def urlopen(url_):
+        urlout = requests.get(url_)
+        if urlout.status_code != 200:
+            print('something bad happened %d' % urlout.status_code)
+            raise HTTPError
+        return urlout.text.split('\n')
+
     s3_file_chksum = save_to_s3.save_to_s3()
     remote_file_chksum = {}
     remote_file_path = {}
