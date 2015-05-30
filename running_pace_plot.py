@@ -1,4 +1,8 @@
 #!/usr/bin/python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import numpy as np
 import matplotlib
@@ -56,10 +60,10 @@ def plot_paces(fname):
     plt.legend(loc='upper left')
 
     param0 = np.mean(rp_[np.abs(rp_[:, 0]-MARATHON_DISTANCE_MI) < 1][:, 1])
-    print 'average marathon pace', print_m_s(param0*60)
+    print('average marathon pace', print_m_s(param0*60))
     pbest = np.min(rp_[np.abs(rp_[:, 0]-MARATHON_DISTANCE_MI) < 1][:, 1])
-    print 'best marathon pace', print_m_s(pbest*60)
-    print ''
+    print('best marathon pace', print_m_s(pbest*60))
+    print('')
 
     def pow_func(xval, *params):
         """ ... """
@@ -75,8 +79,8 @@ def plot_paces(fname):
     plt.plot(np.log(xval), pow_func(xval, *pp_), 'b--')
     plt.plot(np.log(xval), pow_func(xval, *pm_), 'b--')
 
-    print 'p', params, '+/-', dparams
-    print ''
+    print('p', params, '+/-', dparams)
+    print('')
 
     xval = np.linspace(MARATHON_DISTANCE_MI, 60, 100)
     params, dparams = do_fit(rp_high, pow_func, param_default=[0.5])
@@ -85,8 +89,8 @@ def plot_paces(fname):
     plt.plot(np.log(xval), pow_func(xval, *pp_), 'b--')
     plt.plot(np.log(xval), pow_func(xval, *pm_), 'b--')
 
-    print 'p', params, '+/-', dparams
-    print ''
+    print('p', params, '+/-', dparams)
+    print('')
 
     def pow_func_best(xval, *params):
         """ ... """
@@ -95,10 +99,10 @@ def plot_paces(fname):
 
     p50k = pow_func_best(50e3/METERS_PER_MILE, 0.28938393)*60
     p50m = pow_func_best(50, 0.28938393)*60
-    print 'optimistic 50k estimate', print_m_s(p50k),\
-          print_h_m_s(p50k * 50e3/METERS_PER_MILE)
-    print 'optimistic 50mi estimate', print_m_s(p50m), print_h_m_s(p50m * 50)
-    print ''
+    print('optimistic 50k estimate', print_m_s(p50k),\
+          print_h_m_s(p50k * 50e3/METERS_PER_MILE))
+    print('optimistic 50mi estimate', print_m_s(p50m), print_h_m_s(p50m * 50))
+    print('')
 
     p315 = (3*60 + 15) / (MARATHON_DISTANCE_M/METERS_PER_MILE)
     def pow_func_315(xval, *params):
@@ -108,12 +112,12 @@ def plot_paces(fname):
 
     p50k = pow_func_315(50e3/METERS_PER_MILE, 0.28938393)*60
     p50m = pow_func_315(50, 0.28938393)*60
-    print '3:15 marathon pace', print_m_s(p315*60)
-    print '3:15marathon 50k estimate', print_m_s(p50k),\
-          print_h_m_s(p50k * 50e3/METERS_PER_MILE)
-    print '3:15marathon 50mi estimate', print_m_s(p50m),\
-          print_h_m_s(p50m * 50)
-    print ''
+    print('3:15 marathon pace', print_m_s(p315*60))
+    print('3:15marathon 50k estimate', print_m_s(p50k),\
+          print_h_m_s(p50k * 50e3/METERS_PER_MILE))
+    print('3:15marathon 50mi estimate', print_m_s(p50m),\
+          print_h_m_s(p50m * 50))
+    print('')
 
     p300 = (3*60) / (MARATHON_DISTANCE_M/METERS_PER_MILE)
     def pow_func_300(xval, *params):
@@ -123,11 +127,11 @@ def plot_paces(fname):
 
     p50k = pow_func_300(50e3/METERS_PER_MILE, 0.28938393)*60
     p50m = pow_func_300(50, 0.28938393)*60
-    print '3:00 marathon pace', print_m_s(p300*60)
-    print '3:00marathon 50k estimate', print_m_s(p50k),\
-          print_h_m_s(p50k * 50e3/METERS_PER_MILE)
-    print '3:00marathon 50mi estimate', print_m_s(p50m),\
-          print_h_m_s(p50m * 50)
+    print('3:00 marathon pace', print_m_s(p300*60))
+    print('3:00marathon 50k estimate', print_m_s(p50k),
+          print_h_m_s(p50k * 50e3/METERS_PER_MILE))
+    print('3:00marathon 50mi estimate', print_m_s(p50m),
+          print_h_m_s(p50m * 50))
 
     plt.savefig('running_pace.png')
 

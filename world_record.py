@@ -1,5 +1,9 @@
 #!/usr/bin/python
 """ fit world record paces to simple model """
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
 import numpy as np
@@ -126,8 +130,8 @@ def plot_paces():
     mp0 = np.mean(rpm[np.abs(rpm[:, 0]-MARATHON_DISTANCE_MI) < 1][:, 1])
     wp0 = np.mean(rpw[np.abs(rpw[:, 0]-MARATHON_DISTANCE_MI) < 1][:, 1])
 
-    print 'men\'s world record pace', print_m_s(mp0*60)
-    print 'women\'s world record pace', print_m_s(wp0*60)
+    print('men\'s world record pace', print_m_s(mp0*60))
+    print('women\'s world record pace', print_m_s(wp0*60))
 
     def mfunc(xval, *params):
         """ ... """
@@ -144,8 +148,8 @@ def plot_paces():
 
     params, dparams = do_fit(rpm_low, mfunc, param_default=[1])
     pp_, pm_ = params+dparams, params-dparams
-    print 'men\'s'
-    print 'p', params, '+/-', dparams
+    print('men\'s')
+    print('p', params, '+/-', dparams)
 
     xval = np.linspace(400, MARATHON_DISTANCE_M, 1000)/METERS_PER_MILE
     plt.plot(np.log(xval), mfunc(xval, *params), 'b', linewidth=2.5)
@@ -154,7 +158,7 @@ def plot_paces():
 
     params, dparams = do_fit(rpm_high, mfunc, param_default=[1])
     pp_, pm_ = params+dparams, params-dparams
-    print 'p', params, '+/-', dparams
+    print('p', params, '+/-', dparams)
 
     xval = np.linspace(MARATHON_DISTANCE_M, 600e3, 1000)/METERS_PER_MILE
     plt.plot(np.log(xval), mfunc(xval, *params), 'b', linewidth=2.5)
@@ -166,8 +170,8 @@ def plot_paces():
 
     params, dparams = do_fit(rpw_low, wfunc, param_default=[1])
     pp_, pm_ = params+dparams, params-dparams
-    print 'women\'s'
-    print 'p', params, '+/-', dparams
+    print('women\'s')
+    print('p', params, '+/-', dparams)
 
     xval = np.linspace(400, MARATHON_DISTANCE_M, 1000)/METERS_PER_MILE
     plt.plot(np.log(xval), wfunc(xval, *params), 'r', linewidth=2.5)
@@ -176,7 +180,7 @@ def plot_paces():
 
     params, dparams = do_fit(rpw_high, wfunc, param_default=[1])
     pp_, pm_ = params+dparams, params-dparams
-    print 'p', params, '+/-', dparams
+    print('p', params, '+/-', dparams)
 
     xval = np.linspace(MARATHON_DISTANCE_M, 600e3, 1000)/METERS_PER_MILE
     plt.plot(np.log(xval), wfunc(xval, *params), 'r', linewidth=2.5)

@@ -1,4 +1,8 @@
 #!/usr/bin/python
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import os
 #import scitools.std
@@ -12,16 +16,27 @@ HOMEDIR = os.getenv('HOME')
 paces = []
 
 def print_time(pace, dist):
-    print print_m_s(pace), print_h_m_s(dist * pace)
+    print(print_m_s(pace), print_h_m_s(dist * pace))
 
-def print_time_a_b_c_d_e_f(dist_a, pace_a, dist_b, pace_b, dist_c, pace_c, dist_d, pace_d, dist_e, pace_e, dist_f, pace_f):
-    print '\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % (print_m_s(pace_a), print_h_m_s(dist_a * pace_a), print_m_s(pace_b), print_h_m_s(dist_b * pace_b), print_m_s(pace_c), print_h_m_s(dist_c * pace_c), print_m_s(pace_d), print_h_m_s(dist_d * pace_d), print_m_s(pace_e), print_h_m_s(dist_e * pace_e), print_m_s(pace_f), print_h_m_s(dist_f * pace_f))
+def print_time_a_b_c_d_e_f(dist_a, pace_a, dist_b, pace_b, dist_c, pace_c,
+                           dist_d, pace_d, dist_e, pace_e, dist_f, pace_f):
+    print('\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s'
+          % (print_m_s(pace_a), print_h_m_s(dist_a * pace_a),
+             print_m_s(pace_b), print_h_m_s(dist_b * pace_b),
+             print_m_s(pace_c), print_h_m_s(dist_c * pace_c),
+             print_m_s(pace_d), print_h_m_s(dist_d * pace_d),
+             print_m_s(pace_e), print_h_m_s(dist_e * pace_e),
+             print_m_s(pace_f), print_h_m_s(dist_f * pace_f)))
 
-def running_pace(do_plotting=False):
-    #print 'pace \t\t marathon \t 25K \t\t half_marathon \t 10mi \t\t 10k \t\t 4mi \t\t 5k'
-    #print 'pace \t\t 400m \t 5k \t\t 4mi \t\t 5mi \t\t 10k \t\t 10mi \t\t half_marathon \t marathon'
-    print 'pace \t\t 400m \t 800m \t 1200m \t 4mi \t\t 5mi \t\t 8mi \t\t half_marathon \t marathon \t 50mi'
-    print '----------------------------------------------------------------------------------------------------------'
+def running_pace():
+#    print('pace \t\t marathon \t 25K \t\t half_marathon \t 10mi \t\t 10k ' + 
+#          '\t\t 4mi \t\t 5k')
+#    print('pace \t\t 400m \t 5k \t\t 4mi \t\t 5mi \t\t 10k \t\t 10mi \t\t ' + 
+#          'half_marathon \t marathon')
+    print('pace \t\t 400m \t 800m \t 1200m \t 4mi \t\t 5mi \t\t 8mi \t\t ' + 
+          'half_marathon \t marathon \t 50mi')
+    print('---------------------------------------------------------------' + 
+          '-------------------------------------------')
 
     meters_per_mile = 1609.344 # meters
     km_per_mile = meters_per_mile / 1000
@@ -80,151 +95,63 @@ def running_pace(do_plotting=False):
         eight_mi = print_h_m_s(8 * second)
         five_k = print_h_m_s(5/km_per_mile * second)
         fifty_mi = print_h_m_s(50 * second)
-        print '%s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s' % (pace, four_hundred_meter, eight_hundred_meter, twelve_hundred_meter, four_mi, five_mi, eight_mi, half_marathon, marathon, fifty_mi)
+        print('%s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s'
+              % (pace, four_hundred_meter, eight_hundred_meter,
+                 twelve_hundred_meter, four_mi, five_mi, eight_mi,
+                 half_marathon, marathon, fifty_mi))
 
-    print '\n\n'
+    print('\n\n')
 
-    print 'pace \t\t 10mi \t\t 12mi \t\t 14mi \t\t 16mi \t\t 18mi \t\t 20mi \t\t 22mi \t\t 24mi'
-    print '------------------------------------------------------------------------------------------'
+    print('pace \t\t 10mi \t\t 12mi \t\t 14mi \t\t 16mi \t\t 18mi \t\t 20mi ' +
+          '\t\t 22mi \t\t 24mi')
+    print('-----------------------------------------------------------------' +
+          '-------------------------')
 
+    
     for second in range(4*60+50, 16*60, 10):
         pace = print_h_m_s(second)
-        print '%s \t' % pace,
+        output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_two_miles)):
-            pace_every_two_miles[idx][1] = print_h_m_s(pace_every_two_miles[idx][0]* second)
-            print '%s \t' % pace_every_two_miles[idx][1],
-        print ''
+            pace_every_two_miles[idx][1] = print_h_m_s(
+                                           pace_every_two_miles[idx][0]
+                                           * second)
+            output_.append('%s \t' % pace_every_two_miles[idx][1])
+        print(''.join(output_))
 
-    print '\n\n'
+    print('\n\n')
 
-    print 'pace \t\t 5km \t\t 10km \t\t 15km \t\t 20km \t\t 25km \t\t 30km \t\t 50km \t\t 80km'
-    print '------------------------------------------------------------------------------------------'
+    print('pace \t\t 5km \t\t 10km \t\t 15km \t\t 20km \t\t 25km \t\t 30km ' +
+          '\t\t 50km \t\t 80km')
+    print('----------------------------------------------------------------' +
+          '--------------------------')
     for second in range(4*60+50, 15*60, 10):
         pace = print_h_m_s(second)
-        print '%s \t' % pace,
+        output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_five_k)):
-            pace_every_five_k[idx][1] = print_h_m_s(pace_every_five_k[idx][0]* second)
-            print '%s \t' % pace_every_five_k[idx][1],
-        print ''
+            pace_every_five_k[idx][1] = print_h_m_s(
+                                        pace_every_five_k[idx][0]
+                                        * second)
+            output_.append('%s \t' % pace_every_five_k[idx][1])
+        print(''.join(output_))
 
-    print '\n\n'
+    print('\n\n')
 
-    print 'pace \t\t 35km \t\t 40km \t\t 45km \t\t 50km \t\t 55km \t\t 60km \t\t 65km \t\t 80km'
-    print '------------------------------------------------------------------------------------------'
+    print('pace \t\t 35km \t\t 40km \t\t 45km \t\t 50km \t\t 55km \t\t 60km ' +
+          '\t\t 65km \t\t 80km')
+    print('-----------------------------------------------------------------' +
+          '-------------------------')
     for second in range(4*60+50, 16*60, 10):
         pace = print_h_m_s(second)
-        print '%s \t' % pace,
+        output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_five_k_later)):
-            pace_every_five_k_later[idx][1] = print_h_m_s(pace_every_five_k_later[idx][0]* second)
-            print '%s \t' % pace_every_five_k_later[idx][1],
-        print ''
+            pace_every_five_k_later[idx][1] = print_h_m_s(
+                                              pace_every_five_k_later[idx][0]
+                                              * second)
+            output_.append('%s \t' % pace_every_five_k_later[idx][1])
+        print(''.join(output_))
 
-    print '\n\n'
+    print('\n\n')
 
-    #print 'Paumanok Pursuit Time per leg'
-    #print 'pace \t\t',
-    #for dist in dist_paumanok_pursuit:
-            #print '%0.1fmi \t\t' % dist,
-    #print ''
-    #print '------------------------------------------------------------------------------------------'
-    #for second in range(4*60+50, 17*60, 10):
-        #pace = print_h_m_s(second)
-        #print '%s \t' % pace,
-        #for idx in range(0,len(pace_paumanok_pursuit)):
-            #pace_paumanok_pursuit[idx][1] = print_h_m_s(pace_paumanok_pursuit[idx][0]* second)
-            #print '%s \t' % pace_paumanok_pursuit[idx][1],
-        #print ''
-
-    #print '\n\n'
-
-    #print 'Paumanok Pursuit Cumulative Time'
-    #print 'pace \t\t',
-    #for dist in dist_paumanok_pursuit_cum:
-            #print '%0.1fmi \t\t' % dist,
-    #print ''
-    #print '------------------------------------------------------------------------------------------'
-    #for second in range(4*60+50, 17*60, 10):
-        #pace = print_h_m_s(second)
-        #print '%s \t' % pace,
-        #for idx in range(0,len(pace_paumanok_pursuit_cum)):
-            #pace_paumanok_pursuit_cum[idx][1] = print_h_m_s(pace_paumanok_pursuit_cum[idx][0]* second)
-            #print '%s \t' % pace_paumanok_pursuit_cum[idx][1],
-        #print ''
-
-    #print '\n\n'
-
-    #print 'NF Endurance Challenge 50k Cumulative Time'
-    #print '     \t\t',
-    #for dist in dist_bear_mountain:
-            #print '%0.1fmi \t\t' % dist,
-    #print ''
-    #print 'pace \t\t',
-    #for dist in dist_bear_mountain_cum:
-            #print '%0.1fmi \t\t' % dist,
-    #print ''
-    #print '------------------------------------------------------------------------------------------'
-    #for second in range(4*60+50, 17*60, 10):
-        #pace = print_h_m_s(second)
-        #print '%s \t' % pace,
-        #for idx in range(0,len(pace_bear_mountain_cum)):
-            #pace_bear_mountain_cum[idx][1] = print_h_m_s(pace_bear_mountain_cum[idx][0]* second)
-            #print '%s \t' % pace_bear_mountain_cum[idx][1],
-        #print ''
-
-    #print '\n\n'
-
-    # print 'Ocean2Sound 50mi Cumulative Time'
-    # print '%10s' % '',
-    # for dist in dist_o2s50:
-    #     print '%6s%4s' % ('%0.1fmi' % dist, ''),
-    # print ''
-    # print 'pace%6s' % '',
-    # for dist in dist_o2s50_cum:
-    #     print '%6s%4s' % ('%0.1fmi' % dist, ''),
-    # print ''
-    # for a in range(0, 120):
-    #     os.sys.stdout.write('-')
-    #     os.sys.stdout.flush()
-    # print ''
-    # for second in range(4*60+50, 17*60, 10):
-    #     pace = print_h_m_s(second)
-    #     print '%8s%2s' % (pace, ''),
-    #     for idx in range(0, len(pace_o2s50_cum)):
-    #         pace_o2s50_cum[idx][1] = print_h_m_s(pace_o2s50_cum[idx][0]* second)
-    #         #print '%s ' % pace_o2s50_cum[idx][1],
-    #         print '%8s%2s' % (pace_o2s50_cum[idx][1], ''),
-    #     print ''
-
-    # print '\n\n'
-
-    # print 'JFK 50mi Cumulative Time'
-    # print '%10s' % '',
-    # for dist in dist_jfk50:
-    #     print '%6s%4s' % ('%0.1fmi' % dist, ''),
-    # print ''
-    # print 'pace%6s' % '',
-    # for dist in dist_jfk50_cum:
-    #     print '%6s%4s' % ('%0.1fmi' % dist, ''),
-    # print ''
-    # for a in range(0, 120):
-    #     os.sys.stdout.write('-')
-    #     os.sys.stdout.flush()
-    # print ''
-    # for second in range(4*60+50, 17*60, 10):
-    #     pace = print_h_m_s(second)
-    #     print '%8s%2s' % (pace, ''),
-    #     for idx in range(0, len(pace_jfk50_cum)):
-    #         pace_jfk50_cum[idx][1] = print_h_m_s(pace_jfk50_cum[idx][0]* second)
-    #         #print '%s ' % pace_jfk50_cum[idx][1],
-    #         print '%8s%2s' % (pace_jfk50_cum[idx][1], ''),
-    #     print ''
-
-    # print '\n\n'
 
 if __name__ == '__main__':
-    do_plot = False
-
-    for arg in os.sys.argv:
-        if arg[0:4] == 'plot':
-            do_plot = True
-    running_pace(do_plot)
+    running_pace()
