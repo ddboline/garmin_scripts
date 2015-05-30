@@ -4,7 +4,6 @@ import os
 #import scitools.std
 #from scipy.optimize import leastsq
 #from scipy.optimize import curve_fit
-from math import sqrt
 #import scipy
 from util import print_h_m_s, print_m_s
 
