@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """ fit world record paces to simple model """
 from __future__ import absolute_import
 from __future__ import division
@@ -75,7 +75,7 @@ def read_result_file(fname):
                 continue
             dist_meters = float(ent[0]) * 1000.
             time_string = ent[1]
-            __t__ = map(float, time_string.split(':'))
+            __t__ = [float(x) for x in time_string.split(':')]
             time_sec = __t__[0]*3600 + __t__[1]*60 + __t__[2]
             pace_per_mi = (time_sec / 60.) / (dist_meters / METERS_PER_MILE)
             running_paces.append([dist_meters/METERS_PER_MILE, pace_per_mi])

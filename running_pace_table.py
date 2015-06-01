@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -46,7 +46,7 @@ def running_pace():
     pace_every_five_k = []
     for mi in range(10, 26, 2):
         pace_every_two_miles.append([mi, ''])
-    for km in range(5, 35, 5) + [50]+ [80]:
+    for km in [x for x in range(5, 35, 5)] + [50] + [80]:
         mi = km / km_per_mile
         pace_every_five_k.append([mi, ''])
 
