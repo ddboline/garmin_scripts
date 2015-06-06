@@ -18,8 +18,10 @@ def read_result_file(fname):
     running_paces = []
     with open(fname, 'r') as result_file:
         for line in result_file:
-            print(dir(line))
-            ent = line.split()
+            try:
+                ent = line.split()
+            except UnicodeDecodeError:
+                ent = line.encode().split()
             dist_meters = float(ent[0])
             pace_minute = int(ent[1])
             pace_second = int(ent[2])
