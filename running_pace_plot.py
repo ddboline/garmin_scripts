@@ -18,7 +18,6 @@ def read_result_file(fname):
     running_paces = []
     with open(fname, 'rb') as result_file:
         for line in result_file:
-            print(type(line))
             ent = line.split()
             dist_meters = float(ent[0])
             pace_minute = int(ent[1])
