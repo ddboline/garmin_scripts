@@ -16,7 +16,7 @@ from world_record import do_fit, METERS_PER_MILE, MARATHON_DISTANCE_M,\
 def read_result_file(fname):
     """ read results """
     running_paces = []
-    with open(fname, 'r') as result_file:
+    with open(fname, 'rb') as result_file:
         for line in result_file:
             print(type(line))
             ent = line.split()
