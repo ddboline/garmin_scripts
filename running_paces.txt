@@ -3,6 +3,7 @@
     5.0000       05 48   1999    0       Easy Does It 5 miler
     3.1069       05 54   2011    1       Firecracker 5K 2011 IL
     3.1069       05 59   1999    0       Hennepin Lake Classic
+    1.1500       06 00   2015    1       Northport Nautical Mile
     3.1069       06 12   2011    1       Ho Ho Ho Holiday 5k Run 2011    NY
     3.1069       06 13   2012    1       NYS Parks Winter Run Series 2012    NY
     3.1069       06 14   2012    1       NYS Parks Winter Run Series 2012 - Caumsett 5k  NY
