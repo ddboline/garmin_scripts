@@ -41,7 +41,7 @@ def running_pace():
     meters_per_mile = 1609.344 # meters
     km_per_mile = meters_per_mile / 1000
     marathon_distance_m = 42195 # meters
-    marathon_distance_mi = 42195 / meters_per_mile # meters
+    marathon_distance_mi = marathon_distance_m / meters_per_mile # meters
     pace_every_two_miles = []
     pace_every_five_k = []
     for mi in range(10, 26, 2):
@@ -55,9 +55,9 @@ def running_pace():
         mi = km / km_per_mile
         pace_every_five_k_later.append([mi, ''])
 
-    paumanok_pursuit_legs = [10.75, 8.5, 10.0, 7.5, 6.75]
-    bear_mountain_legs = [3.9, 4.7, 5.0, 4.3, 2.7, 4.4, 2.5, 2.8]
-    greenbelt_legs = [3.3, 2.9, 2.8, 2.8, 2.9, 2.9, 2.9, 2.8, 2.8, 2.9, 2.9]
+#    paumanok_pursuit_legs = [10.75, 8.5, 10.0, 7.5, 6.75]
+#    bear_mountain_legs = [3.9, 4.7, 5.0, 4.3, 2.7, 4.4, 2.5, 2.8]
+#    greenbelt_legs = [3.3, 2.9, 2.8, 2.8, 2.9, 2.9, 2.9, 2.8, 2.8, 2.9, 2.9]
     o2s50_legs = [6.0, 6.0, 6.3, 5.8, 6.2, 5.4, 7, 6.4]
     jfk50_legs = [2.5, 6.8, 6.2, 11.6, 7.3, 4, 3.4, 4.2, 4.2]
 
@@ -88,12 +88,12 @@ def running_pace():
         twelve_hundred_meter = print_m_s(second * 1200 / meters_per_mile)
         marathon = print_h_m_s(marathon_distance_mi * second)
         half_marathon = print_h_m_s(marathon_distance_mi/2. * second)
-        ten_mile = print_h_m_s(10 * second)
-        ten_k = print_h_m_s(10/km_per_mile * second)
+#        ten_mile = print_h_m_s(10 * second)
+#        ten_k = print_h_m_s(10/km_per_mile * second)
         four_mi = print_h_m_s(4 * second)
         five_mi = print_h_m_s(5 * second)
         eight_mi = print_h_m_s(8 * second)
-        five_k = print_h_m_s(5/km_per_mile * second)
+#        five_k = print_h_m_s(5/km_per_mile * second)
         fifty_mi = print_h_m_s(50 * second)
         print('%s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s'
               % (pace, four_hundred_meter, eight_hundred_meter,

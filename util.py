@@ -35,10 +35,11 @@ def run_command(command, do_popen=False, turn_on_commands=True,
         print(command)
         return command
     elif do_popen:
-        return PopenWrapperClass(command)
-    elif single_line:
-        with PopenWrapperClass(command) as pop_:
-            return pop_.stdout.read()
+        if single_line:
+            with PopenWrapperClass(command) as pop_:
+                return pop_.stdout.read()
+        else:
+            return PopenWrapperClass(command)
     else:
         return call(command, shell=True)
 
@@ -69,3 +70,16 @@ def print_m_s(second):
 def datetimefromstring(tstr, ignore_tz=False):
     from dateutil.parser import parse
     return parse(tstr, ignoretz=ignore_tz)
+
+def test_run_command():
+    cmd = 'echo "HELLO"'
+    out = run_command(cmd, do_popen=True, single_line=True).strip()
+    print(out, cmd)
+    assert out == b'HELLO'
+
+def test_datetimefromstring():
+    import datetime
+    from pytz import UTC
+    dt0 = '1980-11-17T05:12:13Z'
+    dt1 = datetime.datetime(year=1980, month=11, day=17, hour=5, minute=12, second=13, tzinfo=UTC)
+    assert datetimefromstring(dt0) == dt1
