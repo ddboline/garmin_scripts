@@ -113,9 +113,9 @@ def plot_paces(fname):
     p50k = pow_func_315(50e3/METERS_PER_MILE, 0.28938393)*60
     p50m = pow_func_315(50, 0.28938393)*60
     print('3:15 marathon pace', print_m_s(p315*60))
-    print('3:15marathon 50k estimate', print_m_s(p50k),\
+    print('3:15 marathon 50k estimate', print_m_s(p50k),\
           print_h_m_s(p50k * 50e3/METERS_PER_MILE))
-    print('3:15marathon 50mi estimate', print_m_s(p50m),\
+    print('3:15 marathon 50mi estimate', print_m_s(p50m),\
           print_h_m_s(p50m * 50))
     print('')
 
@@ -128,9 +128,9 @@ def plot_paces(fname):
     p50k = pow_func_300(50e3/METERS_PER_MILE, 0.28938393)*60
     p50m = pow_func_300(50, 0.28938393)*60
     print('3:00 marathon pace', print_m_s(p300*60))
-    print('3:00marathon 50k estimate', print_m_s(p50k),
+    print('3:00 marathon 50k estimate', print_m_s(p50k),
           print_h_m_s(p50k * 50e3/METERS_PER_MILE))
-    print('3:00marathon 50mi estimate', print_m_s(p50m),
+    print('3:00 marathon 50mi estimate', print_m_s(p50m),
           print_h_m_s(p50m * 50))
 
     plt.savefig('running_pace.png')
