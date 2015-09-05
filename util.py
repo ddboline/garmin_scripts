@@ -11,22 +11,30 @@ from subprocess import call, Popen, PIPE
 HOMEDIR = os.getenv('HOME')
 
 class PopenWrapperClass(object):
+    """ context wrapper around subprocess.Popen """
     def __init__(self, command):
+        """ init fn """
         self.command = command
+        self.pop_ = Popen(self.command, shell=True, stdout=PIPE)
+
+    def __iter__(self):
+        return self.pop_.stdout
 
     def __enter__(self):
-        self.pop_ = Popen(self.command, shell=True, stdout=PIPE,
-                          close_fds=True)
-        return self.pop_
+        """ enter fn """
+        return self.pop_.stdout
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """ exit fn """
         if hasattr(self.pop_, '__exit__'):
-            return self.pop_.__exit__(exc_type, exc_value, traceback)
-        self.pop_.wait()
-        if exc_type or exc_value or traceback:
-            return False
+            efunc = getattr(self.pop_, '__exit__')
+            return efunc(exc_type, exc_value, traceback)
         else:
-            return True
+            self.pop_.wait()
+            if exc_type or exc_value or traceback:
+                return False
+            else:
+                return True
 
 def run_command(command, do_popen=False, turn_on_commands=True,
                 single_line=False):
@@ -37,7 +45,7 @@ def run_command(command, do_popen=False, turn_on_commands=True,
     elif do_popen:
         if single_line:
             with PopenWrapperClass(command) as pop_:
-                return pop_.stdout.read()
+                return pop_.read()
         else:
             return PopenWrapperClass(command)
     else:
