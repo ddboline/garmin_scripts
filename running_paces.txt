@@ -63,6 +63,7 @@
     3.1069       06 54   2011    1       Stony Brook Turkey Trot 5K Run/Walk 2011    NY
     3.1069       06 54   2014    1       Thunder Run 5k
     3.1069       06 55   2014    1       NYS Parks Winter Run Series - Jones Beach State Park NY
+    6.2137       06 56   2015    1       The Great Cow Harbor 10k Run - 10K Run  NY
    13.1094       06 57   2001    1       Whistlestop Marathon 2001 - Run -Half Marathon  WI
     4.0000       06 57   2012    1       Nickerson 4 Mile Run 2012 Open 2012 NY
     6.2137       06 57   2014    1       Sunken Meadow 10k
@@ -132,3 +133,4 @@
    31.0686       14 16   2014    0       Wildcat Ridge 50k
    31.0686       14 17   2014    0       North Face Endurance Challenge NY
    31.0686       15 52   2015    0       North Face Endurance Challenge NY
+   31.0686       15 53   2015    0       Mountain Madness 50k
