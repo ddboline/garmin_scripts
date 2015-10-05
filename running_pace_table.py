@@ -5,21 +5,21 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
-#import scitools.std
-#from scipy.optimize import leastsq
-#from scipy.optimize import curve_fit
-#import scipy
 from util import print_h_m_s, print_m_s
 
 HOMEDIR = os.getenv('HOME')
 
 paces = []
 
+
 def print_time(pace, dist):
+    """ format time """
     print(print_m_s(pace), print_h_m_s(dist * pace))
+
 
 def print_time_a_b_c_d_e_f(dist_a, pace_a, dist_b, pace_b, dist_c, pace_c,
                            dist_d, pace_d, dist_e, pace_e, dist_f, pace_f):
+    """ format table """
     print('\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s'
           % (print_m_s(pace_a), print_h_m_s(dist_a * pace_a),
              print_m_s(pace_b), print_h_m_s(dist_b * pace_b),
@@ -28,20 +28,17 @@ def print_time_a_b_c_d_e_f(dist_a, pace_a, dist_b, pace_b, dist_c, pace_c,
              print_m_s(pace_e), print_h_m_s(dist_e * pace_e),
              print_m_s(pace_f), print_h_m_s(dist_f * pace_f)))
 
+
 def running_pace():
-#    print('pace \t\t marathon \t 25K \t\t half_marathon \t 10mi \t\t 10k ' + 
-#          '\t\t 4mi \t\t 5k')
-#    print('pace \t\t 400m \t 5k \t\t 4mi \t\t 5mi \t\t 10k \t\t 10mi \t\t ' + 
-#          'half_marathon \t marathon')
-    print('pace \t\t 400m \t 800m \t 1200m \t 4mi \t\t 5mi \t\t 8mi \t\t ' + 
+    print('pace \t\t 400m \t 800m \t 1200m \t 4mi \t\t 5mi \t\t 8mi \t\t ' +
           'half_marathon \t marathon \t 50mi')
-    print('---------------------------------------------------------------' + 
+    print('---------------------------------------------------------------' +
           '-------------------------------------------')
 
-    meters_per_mile = 1609.344 # meters
+    meters_per_mile = 1609.344  # meters
     km_per_mile = meters_per_mile / 1000
-    marathon_distance_m = 42195 # meters
-    marathon_distance_mi = marathon_distance_m / meters_per_mile # meters
+    marathon_distance_m = 42195  # meters
+    marathon_distance_mi = marathon_distance_m / meters_per_mile  # meters
     pace_every_two_miles = []
     pace_every_five_k = []
     for mi in range(10, 26, 2):
@@ -107,14 +104,12 @@ def running_pace():
     print('-----------------------------------------------------------------' +
           '-------------------------')
 
-    
     for second in range(4*60+50, 16*60, 10):
         pace = print_h_m_s(second)
         output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_two_miles)):
             pace_every_two_miles[idx][1] = print_h_m_s(
-                                           pace_every_two_miles[idx][0]
-                                           * second)
+                pace_every_two_miles[idx][0] * second)
             output_.append('%s \t' % pace_every_two_miles[idx][1])
         print(''.join(output_))
 
@@ -129,8 +124,7 @@ def running_pace():
         output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_five_k)):
             pace_every_five_k[idx][1] = print_h_m_s(
-                                        pace_every_five_k[idx][0]
-                                        * second)
+                pace_every_five_k[idx][0] * second)
             output_.append('%s \t' % pace_every_five_k[idx][1])
         print(''.join(output_))
 
@@ -145,8 +139,7 @@ def running_pace():
         output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_five_k_later)):
             pace_every_five_k_later[idx][1] = print_h_m_s(
-                                              pace_every_five_k_later[idx][0]
-                                              * second)
+                pace_every_five_k_later[idx][0] * second)
             output_.append('%s \t' % pace_every_five_k_later[idx][1])
         print(''.join(output_))
 

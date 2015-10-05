@@ -17,9 +17,10 @@ except ImportError:
     os.sys.path.append('%s' % os.getenv('HOME'))
     from scripts.util import print_m_s
 
-METERS_PER_MILE = 1609.344 # meters
-MARATHON_DISTANCE_M = 42195 # meters
-MARATHON_DISTANCE_MI = MARATHON_DISTANCE_M / METERS_PER_MILE # meters
+METERS_PER_MILE = 1609.344  # meters
+MARATHON_DISTANCE_M = 42195  # meters
+MARATHON_DISTANCE_MI = MARATHON_DISTANCE_M / METERS_PER_MILE  # meters
+
 
 def do_fit(data, func, param_default, do_bootstrap=False):
     """ perform fit """
@@ -46,15 +47,15 @@ def do_fit(data, func, param_default, do_bootstrap=False):
                                     for derr in datayerrors])
             random_data_y = datay + random_delta
         randomfit, _ = optimize.leastsq(errfunc, param_default,
-                                                args=(datax, random_data_y),
-                                                full_output=0)
+                                        args=(datax, random_data_y),
+                                        full_output=0)
         params.append(randomfit)
 
     params = np.array(params)
     mean_pfit = np.mean(params, 0)
-    n_sigma = 1. # 1sigma gets approximately the same as methods above
-                # 1sigma corresponds to 68.3% confidence interval
-                # 2sigma corresponds to 95.44% confidence interval
+    n_sigma = 1.  # 1sigma gets approximately the same as methods above
+                  # 1sigma corresponds to 68.3% confidence interval
+                  # 2sigma corresponds to 95.44% confidence interval
     err_pfit = n_sigma * np.std(params, 0)
 
     pfit_bootstrap = mean_pfit
@@ -64,6 +65,7 @@ def do_fit(data, func, param_default, do_bootstrap=False):
         return popt, dpopt
     else:
         return pfit_bootstrap, perr_bootstrap
+
 
 def read_result_file(fname):
     """ read file with world record distances/paces """
@@ -80,6 +82,7 @@ def read_result_file(fname):
             pace_per_mi = (time_sec / 60.) / (dist_meters / METERS_PER_MILE)
             running_paces.append([dist_meters/METERS_PER_MILE, pace_per_mi])
     return running_paces
+
 
 def plot_paces():
     """ plot paces with fit """
@@ -122,7 +125,7 @@ def plot_paces():
 
     for yt_ in ytickarray:
         plt.plot([np.log(60/METERS_PER_MILE), np.log(600e3/METERS_PER_MILE)],
-                  [yt_, yt_], color='black', linewidth=0.5, linestyle=':')
+                 [yt_, yt_], color='black', linewidth=0.5, linestyle=':')
 
     plt.title('Running Race (minutes per mile) for World Records from 100m '
               'to 48hours')

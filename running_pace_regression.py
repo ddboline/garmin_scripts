@@ -16,10 +16,10 @@ import math
 
 HOMEDIR = os.getenv('HOME')
 
-METERS_PER_MILE = 1609.344 # meters
+METERS_PER_MILE = 1609.344  # meters
 KM_PER_MILE = METERS_PER_MILE / 1000
-MARATHON_DISTANCE_M = 42195 # meters
-MARATHON_DISTANCE_MI = 42195 / METERS_PER_MILE # meters
+MARATHON_DISTANCE_M = 42195  # meters
+MARATHON_DISTANCE_MI = 42195 / METERS_PER_MILE  # meters
 
 
 class RunningPace(object):
@@ -54,6 +54,7 @@ def read_pace_file(fname='%s/scripts/running_paces.txt' % HOMEDIR):
 
     return running_paces
 
+
 def running_pace_regression():
     """ run regression """
     running_paces = read_pace_file()
@@ -73,7 +74,6 @@ def running_pace_regression():
     d_train = dists[0:50, np.newaxis]
     p_test = paces[-50:]
     d_test = dists[-50:, np.newaxis]
-
 
     p_train = paces
     d_train = dists[:, np.newaxis]

@@ -10,6 +10,7 @@ from subprocess import call, Popen, PIPE
 
 HOMEDIR = os.getenv('HOME')
 
+
 class PopenWrapperClass(object):
     """ context wrapper around subprocess.Popen """
     def __init__(self, command):
@@ -36,6 +37,7 @@ class PopenWrapperClass(object):
             else:
                 return True
 
+
 def run_command(command, do_popen=False, turn_on_commands=True,
                 single_line=False):
     """ wrapper around os.system """
@@ -51,6 +53,7 @@ def run_command(command, do_popen=False, turn_on_commands=True,
     else:
         return call(command, shell=True)
 
+
 def convert_date(input_date):
     import datetime
     _month = int(input_date[0:2])
@@ -58,12 +61,14 @@ def convert_date(input_date):
     _year = 2000 + int(input_date[4:6])
     return datetime.date(_year, _month, _day)
 
+
 def print_h_m_s(second):
     ''' convert time from seconds to hh:mm:ss format '''
     hours = int(second / 3600)
     minutes = int(second / 60) - hours * 60
     seconds = int(second) - minutes * 60 - hours * 3600
     return '%02i:%02i:%02i' % (hours, minutes, seconds)
+
 
 def print_m_s(second):
     ''' convert time from seconds to mm:ss format '''
@@ -75,9 +80,11 @@ def print_m_s(second):
     else:
         return '%02i:%02i:%02i' % (hours, minutes, seconds)
 
+
 def datetimefromstring(tstr, ignore_tz=False):
     from dateutil.parser import parse
     return parse(tstr, ignoretz=ignore_tz)
+
 
 def test_run_command():
     cmd = 'echo "HELLO"'
@@ -85,9 +92,11 @@ def test_run_command():
     print(out, cmd)
     assert out == b'HELLO'
 
+
 def test_datetimefromstring():
     import datetime
     from pytz import UTC
     dt0 = '1980-11-17T05:12:13Z'
-    dt1 = datetime.datetime(year=1980, month=11, day=17, hour=5, minute=12, second=13, tzinfo=UTC)
+    dt1 = datetime.datetime(year=1980, month=11, day=17, hour=5, minute=12,
+                            second=13, tzinfo=UTC)
     assert datetimefromstring(dt0) == dt1
