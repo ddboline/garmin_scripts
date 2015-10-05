@@ -103,6 +103,7 @@
    15.5343       08 02   2013    1       GLIRC 25K/50K Caumsett Park Run - 25k Run   NY
    26.2188       08 07   2002    1       Grandma's Marathon 2002 MN
     5.0000       08 08   2014    1       Run the Farm 5miler
+   13.1094       08 12   2015    1       Paine to Pain Half Marathon, New Rochelle NY
    26.2188       08 13   2003    1       Cerrone Ocean State Marathon RI
    26.2188       08 14   2001    1       Grandma's Marathon 2001 MN
    26.2188       08 19   2003    1       Grandma's Marathon 2003 - Run - 26.22Mi MN
