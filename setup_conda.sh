@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sudo /opt/conda/bin/conda install --yes numpy matplotlib scipy nose sklearn
+sudo /opt/conda/bin/conda install --yes numpy matplotlib scipy nose scikit-learn
