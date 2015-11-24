@@ -145,6 +145,29 @@ def running_pace():
 
     print('\n\n')
 
+    print('JFK 50mi Cumulative Time')
+    output = '%10s' % ''
+    for dist in dist_jfk50:
+        output += '%6s%4s' % ('%0.1fmi' % dist, '')
+    print(output)
+    output = 'pace%6s' % ''
+    for dist in dist_jfk50_cum:
+        output += '%6s%4s' % ('%0.1fmi' % dist, '')
+    print(output)
+    for a in range(0, 120):
+        os.sys.stdout.write('-')
+        os.sys.stdout.flush()
+    print('')
+    for second in range(4*60+50, 17*60, 10):
+        pace = print_h_m_s(second)
+        output = '%8s%2s' % (pace, '')
+        for idx in range(0, len(pace_jfk50_cum)):
+            pace_jfk50_cum[idx][1] = print_h_m_s(pace_jfk50_cum[idx][0]* second)
+            output += '%8s%2s' % (pace_jfk50_cum[idx][1], '')
+        print(output)
+
+    print('\n\n')
+
 
 if __name__ == '__main__':
     running_pace()
