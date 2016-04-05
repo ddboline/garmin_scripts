@@ -136,6 +136,7 @@
    31.0686       11 11   2015    1       Tesla Hertz 50k trail run
    10.0000       11 20   2015    0       Wildcat Ridge 10mi (DNF'd 50k)
    31.4000       11 27   2015    1       GLIRC 6 Hour Birthday Run
+   43.4960       12 26   2016    1       Paumanok Pursuit 70k Trail Run
    31.0686       12 27   2015    1       Greenbelt 50k
    50.0000       12 41   2015    1       JFK 50 miler
    50.0000       12 51   2014    1       Ocean to Sound 50 mile
