@@ -53,7 +53,7 @@ def running_pace():
         pace_every_five_k_later.append([mi, ''])
 
 #    paumanok_pursuit_legs = [10.75, 8.5, 10.0, 7.5, 6.75]
-#    bear_mountain_legs = [3.9, 4.7, 5.0, 4.3, 2.7, 4.4, 2.5, 2.8]
+    bear_mountain_legs = [4.0, 4.7, 5.5, 5.6, 3.4, 5.8, 6.2, 3.4, 2.7, 4.4, 2.5, 2.8]
 #    greenbelt_legs = [3.3, 2.9, 2.8, 2.8, 2.9, 2.9, 2.9, 2.8, 2.8, 2.9, 2.9]
     o2s50_legs = [6.0, 6.0, 6.3, 5.8, 6.2, 5.4, 7, 6.4]
     jfk50_legs = [2.5, 6.8, 6.2, 11.6, 7.3, 4, 3.4, 4.2, 4.2]
@@ -77,6 +77,16 @@ def running_pace():
         dist_jfk50.append(leg)
         dist_jfk50_cum.append(mi)
         pace_jfk50_cum.append([mi, ''])
+
+    dist_bear_mountain = []
+    dist_bear_mountain_cum = []
+    pace_bear_mountain_cum = []
+    mi = 0
+    for leg in bear_mountain_legs:
+        mi += leg
+        dist_bear_mountain.append(leg)
+        dist_bear_mountain_cum.append(mi)
+        pace_bear_mountain_cum.append([mi, ''])
 
     for second in range(4*60+50, 15*60, 10):
         pace = print_h_m_s(second)
@@ -145,13 +155,13 @@ def running_pace():
 
     print('\n\n')
 
-    print('JFK 50mi Cumulative Time')
+    print('Bear Mountain 50mi Cumulative Time')
     output = '%10s' % ''
-    for dist in dist_jfk50:
+    for dist in dist_bear_mountain:
         output += '%6s%4s' % ('%0.1fmi' % dist, '')
     print(output)
     output = 'pace%6s' % ''
-    for dist in dist_jfk50_cum:
+    for dist in dist_bear_mountain_cum:
         output += '%6s%4s' % ('%0.1fmi' % dist, '')
     print(output)
     for a in range(0, 120):
@@ -161,9 +171,9 @@ def running_pace():
     for second in range(4*60+50, 17*60, 10):
         pace = print_h_m_s(second)
         output = '%8s%2s' % (pace, '')
-        for idx in range(0, len(pace_jfk50_cum)):
-            pace_jfk50_cum[idx][1] = print_h_m_s(pace_jfk50_cum[idx][0]* second)
-            output += '%8s%2s' % (pace_jfk50_cum[idx][1], '')
+        for idx in range(0, len(pace_bear_mountain_cum)):
+            pace_bear_mountain_cum[idx][1] = print_h_m_s(pace_bear_mountain_cum[idx][0]* second)
+            output += '%8s%2s' % (pace_bear_mountain_cum[idx][1], '')
         print(output)
 
     print('\n\n')
