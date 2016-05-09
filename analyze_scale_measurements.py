@@ -10,6 +10,7 @@ import matplotlib.pyplot as pl
 import pandas as pd
 import scipy.optimize as optimize
 from world_record import do_fit
+from itertools import chain, imap
 try:
     from util import print_m_s
 except ImportError:
@@ -30,7 +31,7 @@ def analyze_scale_measurements():
                               'Fat %': 'fat', 'Muscle': 'muscle',
                               'Bone': 'bone', 'Water %': 'water'})
     rows = {}
-    for idx, row in df.iterrows():
+    for idx, row in chain(*[x.iterrows() for x in df, df1]):
         dt = row['datetime']
         if dt not in rows:
             rows[dt] = row.to_dict()
@@ -38,6 +39,7 @@ def analyze_scale_measurements():
                       columns=['datetime', 'mass', 'fat', 'water', 'muscle',
                                'bone']).sort_values(by=['datetime'])
     df.index = np.arange(df.shape[0])
+    print(df)
     df['days'] = (df.datetime - df.datetime[0]).apply(lambda x: x.days)
     xval = np.linspace(0, max(df['days']))
 
