@@ -43,7 +43,7 @@ class RunningPace(object):
         self.name = ents[5]
 
 
-def read_pace_file(fname='%s/scripts/running_paces.txt' % HOMEDIR):
+def read_pace_file(fname='running_paces.txt'):
     """ read running paces file """
     running_paces = []
 
