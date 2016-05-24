@@ -92,6 +92,7 @@
     9.3206       07 26   2015    1       Kings Park 15k
     3.1069       07 27   2015    1       Doug Woods 5k
    13.1094       07 29   2013    1       Suffolk County Half Marathon - Half Marathon    NY
+   13.1094       07 32   2016    1       Brooklyn Half Marathon
    13.1094       07 33   2012    1       13.1 Marathon NYC
    13.1094       07 36   2014    1       Great South Bay Run - Half Marathon NY
     3.1069       07 37   2014    1       NYS State Parks Winter Run Series Robert Moses 5K   NY
