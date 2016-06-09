@@ -63,6 +63,7 @@ def running_pace_regression():
 
     paces = []
     dists = []
+
     for rp_ in running_paces:
         paces.append(math.log(rp_.pace))
         dists.append(math.log(rp_.distance))
@@ -90,8 +91,18 @@ def running_pace_regression():
     plt.scatter(d_test, p_test, color='black')
     plt.plot(d_test, regr.predict(d_test), color='blue', linewidth=3)
 
-    plt.xticks(())
-    plt.yticks(())
+    xtickarray = np.log(np.array([METERS_PER_MILE, 5e3, 10e3,
+                                  MARATHON_DISTANCE_M / 2.,
+                                  MARATHON_DISTANCE_M, 50 * METERS_PER_MILE])
+                        / METERS_PER_MILE)
+    ytickarray = np.log(np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]))
+
+    plt.xticks(xtickarray, ['1mi', '5k', '10k', '', 'Marathon', '50mi'])
+
+    # Set y ticks
+    plt.yticks(ytickarray, ['5:00/mi', '6:00/mi', '7:00/mi', '8:00/mi',
+                            '9:00/mi', '10:00/mi', '11:00/mi', '12:00/mi',
+                            '13:00/mi', '14:00/mi', '15:00/mi'])
 
     plt.savefig('temp.png')
 
