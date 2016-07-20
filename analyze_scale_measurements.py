@@ -54,7 +54,14 @@ def analyze_scale_measurements():
         pl.clf()
         pl.plot(df['days'], df[var])
         pl.plot(xval, lin_func(xval, *params), 'b')
+        pl.title(var)
+        pl.xlabel('days')
+        if var == 'mass':
+            pl.ylabel('lbs')
+        else:
+            pl.ylabel('%')
         pl.savefig('scale_%s.png' % var)
+        os.system('mv scale_%s.png /home/ddboline/public_html/' % var)
         print(var, df[var].mean(), params[0], params[1]*7)
     return
 

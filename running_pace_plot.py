@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import os
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -35,25 +36,24 @@ def plot_paces(fname):
     running_paces = read_result_file(fname)
     rp_ = np.array(running_paces)
     plt.scatter(np.log(rp_[:, 0]), rp_[:, 1], label='race results')
+    plt.title('Running Race (minutes per mile) for me')
     plt.xlim(np.log([0.9, 60]))
-    plt.ylim([5, 16])
+    plt.ylim([2, 16])
 
     # Set x ticks
     xtickarray = np.log(np.array([METERS_PER_MILE, 5e3, 10e3,
                                   MARATHON_DISTANCE_M / 2.,
                                   MARATHON_DISTANCE_M, 50 * METERS_PER_MILE])
                         / METERS_PER_MILE)
-    ytickarray = np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+    ytickarray = np.array(range(2,16))
 
     plt.xticks(xtickarray, ['1mi', '5k', '10k', '', 'Marathon', '50mi'])
 
     # Set y ticks
-    plt.yticks(ytickarray, ['5:00/mi', '6:00/mi', '7:00/mi', '8:00/mi',
-                            '9:00/mi', '10:00/mi', '11:00/mi', '12:00/mi',
-                            '13:00/mi', '14:00/mi', '15:00/mi'])
+    plt.yticks(ytickarray, ['%d:00/mi' % x for x in range(2,16)])
 
     for xt_ in xtickarray:
-        plt.plot([xt_, xt_], [5, 16], color='black', linewidth=0.5,
+        plt.plot([xt_, xt_], [2, 16], color='black', linewidth=0.5,
                  linestyle=':')
 
     for yt_ in ytickarray:
@@ -139,6 +139,7 @@ def plot_paces(fname):
           print_h_m_s(p50m * 50))
 
     plt.savefig('running_pace.png')
+    os.system('mv running_pace.png /home/ddboline/public_html/')
 
 if __name__ == '__main__':
     read_result_file('running_paces.txt')

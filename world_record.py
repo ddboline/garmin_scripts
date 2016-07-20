@@ -95,7 +95,7 @@ def plot_paces():
                 label='Women\'s World Records')
 
     plt.xlim(np.log(60/METERS_PER_MILE), np.log(600e3/METERS_PER_MILE))
-    plt.ylim(2, 12)
+    plt.ylim(2, 16)
 
     # Set x ticks
     xtickarray = np.log(np.array([100, 200, 800, 5e3, 10e3,
@@ -103,21 +103,19 @@ def plot_paces():
                                   MARATHON_DISTANCE_M,
                                   160e3,
                                   300*METERS_PER_MILE])/METERS_PER_MILE)
-    ytickarray = np.array([3, 4, 5, 6, 7, 8, 9, 10, 11])
+    ytickarray = np.array(range(3, 16))
 
     plt.xticks(xtickarray,
                ['100m', '200m', '800m', '5k', '10k', '', 'Marathon', '100mi',
                 '300mi'])
 
     # Set y ticks
-    plt.yticks(ytickarray, ['3:00/mi', '4:00/mi', '5:00/mi', '6:00/mi',
-                            '7:00/mi', '8:00/mi', '9:00/mi', '10:00/mi',
-                            '11:00/mi'])
+    plt.yticks(ytickarray, ['%d:00/mi' % x for x in range(3, 16)])
 
     plt.legend(loc='upper left')
 
     for xt_ in xtickarray:
-        plt.plot([xt_, xt_], [2, 12], color='black', linewidth=0.5,
+        plt.plot([xt_, xt_], [2, 16], color='black', linewidth=0.5,
                  linestyle=':')
 
     for yt_ in ytickarray:
@@ -189,6 +187,7 @@ def plot_paces():
 
     plt.show()
     plt.savefig('world_record.png')
+    os.system('mv world_record.png /home/ddboline/public_html/')
 
 if __name__ == '__main__':
     plot_paces()
