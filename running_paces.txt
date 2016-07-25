@@ -28,6 +28,7 @@
     4.0000       06 33   2014    1       Cystic Fibrosis 4mi
    10.0000       06 34   2012    1       Sayville Running Company 10 Mile Run to the Brewery 2012    NY
    13.1094       06 34   1999    0       Mora Half Marathon
+    3.1069       06 34   2015    1       Fire Island 5k, Run for Rose
     4.0000       06 34   2014    1       Bellmore 4mi
     3.1069       06 35   2013    1       NYS Parks Winter Series - Heckscher State Park  NY
     3.1069       06 35   2014    1       Ho Ho Ho Holiday run    NY
@@ -137,6 +138,8 @@
    31.0686       11 11   2015    1       Tesla Hertz 50k trail run
    10.0000       11 20   2015    0       Wildcat Ridge 10mi (DNF'd 50k)
    31.4000       11 27   2015    1       GLIRC 6 Hour Birthday Run
+   30.8300       11 40   2016    1       Pajama 6hr Run
+   32.0000       11 47   2016    1       Finger Lakes 50k (more like 32mi on the dot...)
    43.4960       12 26   2016    1       Paumanok Pursuit 70k Trail Run
    31.0686       12 27   2015    1       Greenbelt 50k
    31.0686       12 27   2016    1       Greenbelt 50k
