@@ -98,16 +98,18 @@ def plot_paces():
     plt.ylim(2, 16)
 
     # Set x ticks
-    xtickarray = np.log(np.array([100, 200, 800, 5e3, 10e3,
-                                  MARATHON_DISTANCE_M/2.,
+    xtickarray = np.log(np.array([100, 200, 400, 800, METERS_PER_MILE,
+                                  5e3, 10e3,
+                                  MARATHON_DISTANCE_M / 2.,
                                   MARATHON_DISTANCE_M,
-                                  160e3,
-                                  300*METERS_PER_MILE])/METERS_PER_MILE)
-    ytickarray = np.array(range(3, 16))
+                                  50 * METERS_PER_MILE,
+                                  100 * METERS_PER_MILE,
+                                  300 * METERS_PER_MILE]) / METERS_PER_MILE)
+    ytickarray = np.array(range(2, 16))
 
     plt.xticks(xtickarray,
-               ['100m', '200m', '800m', '5k', '10k', '', 'Marathon', '100mi',
-                '300mi'])
+               ['100m', '', '', '800m', '1mi', '5k', '10k', '', 'Marathon',
+                '', '100mi', '300mi'])
 
     # Set y ticks
     plt.yticks(ytickarray, ['%d:00/mi' % x for x in range(3, 16)])
@@ -119,7 +121,7 @@ def plot_paces():
                  linestyle=':')
 
     for yt_ in ytickarray:
-        plt.plot([np.log(60/METERS_PER_MILE), np.log(600e3/METERS_PER_MILE)],
+        plt.plot(np.log([60/METERS_PER_MILE, 600e3/METERS_PER_MILE]),
                  [yt_, yt_], color='black', linewidth=0.5, linestyle=':')
 
     plt.title('Running Race (minutes per mile) for World Records from 100m '

@@ -41,24 +41,29 @@ def plot_paces(fname):
     plt.ylim([2, 16])
 
     # Set x ticks
-    xtickarray = np.log(np.array([METERS_PER_MILE, 5e3, 10e3,
+    xtickarray = np.log(np.array([100, 200, 400, 800, METERS_PER_MILE,
+                                  5e3, 10e3,
                                   MARATHON_DISTANCE_M / 2.,
-                                  MARATHON_DISTANCE_M, 50 * METERS_PER_MILE])
-                        / METERS_PER_MILE)
-    ytickarray = np.array(range(2,16))
+                                  MARATHON_DISTANCE_M,
+                                  50 * METERS_PER_MILE,
+                                  100 * METERS_PER_MILE,
+                                  300 * METERS_PER_MILE]) / METERS_PER_MILE)
+    ytickarray = np.array(range(2, 16))
 
-    plt.xticks(xtickarray, ['1mi', '5k', '10k', '', 'Marathon', '50mi'])
+    plt.xticks(xtickarray,
+               ['100m', '', '', '800m', '1mi', '5k', '10k', '', 'Marathon',
+                '', '100mi', '300mi'])
 
     # Set y ticks
-    plt.yticks(ytickarray, ['%d:00/mi' % x for x in range(2,16)])
+    plt.yticks(ytickarray, ['%d:00/mi' % x for x in range(2, 16)])
 
     for xt_ in xtickarray:
         plt.plot([xt_, xt_], [2, 16], color='black', linewidth=0.5,
                  linestyle=':')
 
     for yt_ in ytickarray:
-        plt.plot(np.log([0.9, 60]), [yt_, yt_], color='black', linewidth=0.5,
-                 linestyle=':')
+        plt.plot(np.log([60/METERS_PER_MILE, 600e3/METERS_PER_MILE]),
+                 [yt_, yt_], color='black', linewidth=0.5, linestyle=':')
 
     plt.legend(loc='upper left')
 
