@@ -8,14 +8,13 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as pl
 import pandas as pd
-import scipy.optimize as optimize
-from world_record import do_fit
-from itertools import chain, imap
+#import scipy.optimize as optimize
+from itertools import chain
 try:
-    from util import print_m_s
+    from world_record import do_fit
 except ImportError:
     os.sys.path.append('%s' % os.getenv('HOME'))
-    from scripts.util import print_m_s
+    from scripts.world_record import do_fit
 
 
 def analyze_scale_measurements():
@@ -44,13 +43,13 @@ def analyze_scale_measurements():
     xval = np.linspace(0, max(df['days']))
 
     def lin_func(xval, *params):
-        return params[0] + xval * params[1]
+        return params[0] + xval * params[1] + xval**2 * params[2]
 
     for var in ('mass', 'fat', 'water', 'muscle', 'bone'):
         data = df[['days', var]].values
 #        import pdb
 #        pdb.set_trace()
-        params, dparams = do_fit(data, lin_func, param_default=[75, 0])
+        params, dparams = do_fit(data, lin_func, param_default=[75, 1, 1])
         pl.clf()
         pl.plot(df['days'], df[var])
         pl.plot(xval, lin_func(xval, *params), 'b')
