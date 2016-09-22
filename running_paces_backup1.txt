@@ -1,3 +1,6 @@
+   31.2600       15 30   2016    0       SRT 30 mile Run Hike
+   31.0686       11 31   2016    1       Dirty Dozen 50k
+   31.0686       14 28   2016    0       Wildcat Ridge 50k
    30.8300       11 40   2016    1       Pajama 6hr Run
    32.0000       11 47   2016    1       Finger Lakes 50k (more like 32mi on the dot...)
    13.1094       07 32   2016    1       Brooklyn Half Marathon
