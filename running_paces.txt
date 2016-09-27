@@ -153,6 +153,6 @@
    31.0686       14 17   2014    0       North Face Endurance Challenge NY
    31.0686       14 28   2016    0       Wildcat Ridge 50k
    31.2600       15 30   2016    0       SRT 30 mile Run Hike
-   51.0000       15 47   2016    1       North Face Endurance Challenge NY
+   51.0000       15 47   2016    0       North Face Endurance Challenge NY
    31.0686       15 52   2015    0       North Face Endurance Challenge NY
    31.0686       15 53   2015    0       Mountain Madness 50k
