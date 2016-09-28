@@ -114,7 +114,7 @@ def running_pace():
     print('-----------------------------------------------------------------' +
           '-------------------------')
 
-    for second in range(4*60+50, 16*60, 10):
+    for second in range(4*60+50, 19*60, 10):
         pace = print_h_m_s(second)
         output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_two_miles)):
