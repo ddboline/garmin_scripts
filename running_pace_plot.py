@@ -38,7 +38,7 @@ def plot_paces(fname):
     plt.scatter(np.log(rp_[:, 0]), rp_[:, 1], label='race results')
     plt.title('Running Race (minutes per mile) for me')
     plt.xlim(np.log([0.9, 60]))
-    plt.ylim([2, 16])
+    plt.ylim([2, 20])
 
     # Set x ticks
     xtickarray = np.log(np.array([100, 200, 400, 800, METERS_PER_MILE,
@@ -48,17 +48,17 @@ def plot_paces(fname):
                                   50 * METERS_PER_MILE,
                                   100 * METERS_PER_MILE,
                                   300 * METERS_PER_MILE]) / METERS_PER_MILE)
-    ytickarray = np.array(range(2, 16))
+    ytickarray = np.array(range(2, 20))
 
     plt.xticks(xtickarray,
                ['100m', '', '', '800m', '1mi', '5k', '10k', '', 'Marathon',
                 '', '100mi', '300mi'])
 
     # Set y ticks
-    plt.yticks(ytickarray, ['%d:00/mi' % x for x in range(2, 16)])
+    plt.yticks(ytickarray, ['%d:00/mi' % x for x in range(2, 20)])
 
     for xt_ in xtickarray:
-        plt.plot([xt_, xt_], [2, 16], color='black', linewidth=0.5,
+        plt.plot([xt_, xt_], [2, 20], color='black', linewidth=0.5,
                  linestyle=':')
 
     for yt_ in ytickarray:
@@ -90,7 +90,7 @@ def plot_paces(fname):
     print('p', params, '+/-', dparams)
     print('')
 
-    xval = np.linspace(MARATHON_DISTANCE_MI, 60, 100)
+    xval = np.linspace(MARATHON_DISTANCE_MI, 100, 100)
     params, dparams = do_fit(rp_high, pow_func, param_default=[0.5])
     pp_, pm_ = params+dparams, params-dparams
     plt.plot(np.log(xval), pow_func(xval, *params), 'b', linewidth=2.5)
