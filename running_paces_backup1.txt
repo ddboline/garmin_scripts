@@ -1,15 +1,15 @@
   104.0000       16 12   2016    1       Tesla Hertz 104 mile trail run
    13.1094       08 01   2016    1       Paine to Pain Half Marathon, New Rochelle NY
    31.2600       15 30   2016    0       SRT 30 mile Run Hike
-   31.0686       11 31   2016    1       Dirty Dozen 50k
+   31.0686       11 31   2016    0       Dirty Dozen 50k
    31.0686       14 28   2016    0       Wildcat Ridge 50k
-   30.8300       11 40   2016    1       Pajama 6hr Run
+   30.8300       11 40   2016    0       Pajama 6hr Run
     6.2137       13 49   2016    0       Lime Kiln Weekend 10k
    14.7000       10 16   2016    0       Lime Kiln Weekend "Half Marathon"
-   32.0000       11 47   2016    1       Finger Lakes 50k (more like 32mi on the dot...)
-   31.0686       12 50   2016    1       NJTrailSeries Spring Watchung 50k
+   32.0000       11 47   2016    0       Finger Lakes 50k (more like 32mi on the dot...)
+   31.0686       12 50   2016    0       NJTrailSeries Spring Watchung 50k
    13.1094       07 32   2016    1       Brooklyn Half Marathon
-   31.0686       12 27   2016    1       Greenbelt 50k
+   31.0686       12 27   2016    0       Greenbelt 50k
    51.0000       15 47   2016    0       North Face Endurance Challenge NY
    43.4960       12 26   2016    1       Paumanok Pursuit 70k Trail Run
    13.1094       07 38   2016    1       Sleepy Hollow Half Marathon
@@ -19,11 +19,11 @@
    26.2188       09 04   2015    1       NYCRUNS Central Park Marathon
    31.0686       10 22   2016    1       Febapple 50k
    10.0000       07 01   2016    1       NYCRuns Hot Cocoa Central Park 10 miler
-   31.0686       10 51   2015    1       BUS Fat Ass 50k
-   50.0000       12 41   2015    1       JFK 50 miler
+   31.0686       10 51   2015    0       BUS Fat Ass 50k
+   50.0000       12 41   2015    0       JFK 50 miler
     9.3206       08 50   2015    1       Manorville Hills 15k Trail Race
-   31.4000       11 27   2015    1       GLIRC 6 Hour Birthday Run
-   31.0686       11 11   2015    1       Tesla Hertz 50k trail run
+   31.4000       11 27   2015    0       GLIRC 6 Hour Birthday Run
+   31.0686       11 11   2015    0       Tesla Hertz 50k trail run
    13.1094       08 12   2015    1       Paine to Pain Half Marathon, New Rochelle NY
    31.0686       15 53   2015    0       Mountain Madness 50k
     6.2137       06 56   2015    1       The Great Cow Harbor 10k Run - 10K Run  NY
@@ -32,7 +32,7 @@
     3.1069       06 34   2015    1       Fire Island 5k, Run for Rose
     6.2137       07 18   2015    0       Shelter Island 10k
     1.1500       06 00   2015    1       Northport Nautical Mile
-   31.0686       12 27   2015    1       Greenbelt 50k
+   31.0686       12 27   2015    0       Greenbelt 50k
    31.0686       15 52   2015    0       North Face Endurance Challenge NY
     6.2137       08 52   2015    0       Leatherman's Loop 10k Trail Run
     3.1069       07 27   2015    1       Doug Woods 5k
@@ -45,15 +45,15 @@
     5.3500       07 59   2014    1       Tough Cookie "8k"
     9.3206       07 11   2014    1       Indian Island 15k
     3.1069       07 03   2014    1       Rob's Run 5k
-   50.0000       13 07   2014    1       JFK 50 miler
+   50.0000       13 07   2014    0       JFK 50 miler
     4.0000       06 38   2014    1       Fly with the Owls 4mi
     9.3206       08 22   2014    1       Manorville Hills 15k Trail Race
     2.4855       06 22   2014    1       VA 4k Race
     5.0000       08 08   2014    1       Run the Farm 5miler
-   32.9000       10 38   2014    1       GLIRC 6 Hour Birthday Run
-   31.0686       10 28   2014    1       Tesla Hertz 50k trail run
+   32.9000       10 38   2014    0       GLIRC 6 Hour Birthday Run
+   31.0686       10 28   2014    0       Tesla Hertz 50k trail run
    13.1094       07 36   2014    1       Great South Bay Run - Half Marathon NY
-   50.0000       12 51   2014    1       Ocean to Sound 50 mile
+   50.0000       12 51   2014    0       Ocean to Sound 50 mile
    13.1094       08 54   2014    0       Paine to Pain Half Marathon, New Rochelle NY
     6.2137       06 45   2014    1       The Great Cow Harbor 10k Run - 10K Run  NY
     6.2137       06 37   2014    1       Angel's on the Bay 10k
@@ -86,8 +86,8 @@
     6.2137       08 56   2014    0       Leatherman's Loop 10k Trail Run
     3.1069       07 08   2014    1       Doug Wood 5k XC Trail Run
     6.2137       07 15   2014    1       Aspire 10k
-   43.4960       13 35   2014    1       Paumanok Pursuit 70k Trail Run
-   31.0686       08 49   2014    1       Caumsett 50k USATF Championships
+   43.4960       13 35   2014    0       Paumanok Pursuit 70k Trail Run
+   31.0686       08 49   2014    0       Caumsett 50k USATF Championships
     3.1069       06 55   2014    1       NYS Parks Winter Run Series - Jones Beach State Park NY
     3.1069       07 07   2014    1       NYS Parks Winter Run Series - Caumsett State Park   NY
     3.1069       07 37   2014    1       NYS State Parks Winter Run Series Robert Moses 5K   NY
