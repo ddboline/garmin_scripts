@@ -31,7 +31,7 @@ def analyze_scale_measurements():
                               'Fat %': 'fat', 'Muscle': 'muscle',
                               'Bone': 'bone', 'Water %': 'water'})
     rows = {}
-    for idx, row in chain(*[x.iterrows() for x in df, df1]):
+    for idx, row in chain(*[x.iterrows() for x in (df, df1)]):
         dt = row['datetime']
         if dt not in rows:
             rows[dt] = row.to_dict()
