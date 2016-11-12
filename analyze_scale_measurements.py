@@ -30,26 +30,31 @@ def analyze_scale_measurements():
     df1 = df1.rename(columns={'Weight (lbs)': 'mass', 'Timestamp': 'datetime',
                               'Fat %': 'fat', 'Muscle': 'muscle',
                               'Bone': 'bone', 'Water %': 'water'})
-    rows = {}
-    for idx, row in chain(*[x.iterrows() for x in (df, df1)]):
-        dt = row['datetime']
-        if dt not in rows:
-            rows[dt] = row.to_dict()
-    df = pd.DataFrame(rows.values(),
-                      columns=['datetime', 'mass', 'fat', 'water', 'muscle',
-                               'bone']).sort_values(by=['datetime'])
-    df.index = np.arange(df.shape[0])
+    df1 = df1[df1.datetime > df.datetime.max()]
+    df = pd.concat([df, df1], axis=0)
+    df.index = df.datetime
+    df = df.sort_index()
     print(df)
     df['days'] = (df.datetime - df.datetime[0]).apply(lambda x: x.days)
     today = (datetime.datetime.now() - df.datetime[0]).days
-    xval = np.linspace(0, max(df['days']))
+    xval = np.linspace(0, df['days'].max())
+
+    tmp = pd.Series(np.arange(0, df['days'].max()))
+    tmp = tmp.apply(lambda x: df.datetime[0] + datetime.timedelta(days=x))
+    xtickarray = tmp[tmp.dt.day == 1].index
+    xticklabels = range(len(xtickarray))
 
     def lin_func(xval, *params):
-        return params[0] + xval * params[1] + xval**2 * params[2]
+        return sum(params[i] * xval**i for i in range(4))
 
     for var in ('mass', 'fat', 'water', 'muscle', 'bone'):
+        min_, max_ = df[var].min(), df[var].max()
+        margin = (max_ - min_) * 0.05
+        ytickarray = np.linspace(min_ - margin, max_ + margin, 10)
+        yticklabels = ['%3.1f' % x for x in ytickarray]
+
         data = df[['days', var]].values
-        params, dparams = do_fit(data, lin_func, param_default=[75, 1, 1])
+        params, dparams = do_fit(data, lin_func, param_default=[75, 1, 1, 1])
         pp_, pm_ = params+dparams, params-dparams
 
         v0 = lin_func(today, *params)
@@ -61,11 +66,13 @@ def analyze_scale_measurements():
         pl.plot(xval, lin_func(xval, *params), 'b')
 
         pl.plot(xval, lin_func(xval, *params), 'b', linewidth=2.5)
-        pl.plot(xval, lin_func(xval, *pp_), 'b--')
-        pl.plot(xval, lin_func(xval, *pm_), 'b--')
+#        pl.plot(xval, lin_func(xval, *pp_), 'b--')
+#        pl.plot(xval, lin_func(xval, *pm_), 'b--')
 
+        pl.xticks(xtickarray, xticklabels)
+        pl.yticks(ytickarray, yticklabels)
         pl.title(var)
-        pl.xlabel('days')
+        pl.xlabel('months')
         if var == 'mass':
             pl.ylabel('lbs')
         else:
