@@ -100,6 +100,7 @@
    13.1094       07 38   2016    1       Sleepy Hollow Half Marathon
    13.1094       07 42   2016    1       Celebrate Life Half Marathon
    10.3600       07 44   2013    1       Tesla Hertz 10 mile trail run
+   12.9000       07 47   2016    1       After the Leaves Have Fallen
     3.1069       07 47   2014    1       NYS Parks Winter Series - Heckscher NY
     4.9710       07 50   2013    1       Tough Cookie 8k Trail Race  NY
    26.2188       07 51   2002    1       Twin Cities Marathon - Run - 26.2Miles  MN
@@ -133,6 +134,7 @@
    26.2188       09 49   2012    0       Long Island Marathon - Half Marathon 2012 - Run-Marathon    NY
    26.2188       10 01   2010    0       Grandma's Marathon 2010 - Grandma's Marathon    MN
    14.7000       10 16   2016    0       Lime Kiln Weekend "Half Marathon"
+   34.8000       10 20   2016    1       GLIRC 6 Hour Birthday Run
    31.0686       10 22   2016    1       Febapple 50k
    31.0686       10 28   2014    0       Tesla Hertz 50k trail run
    32.9000       10 38   2014    0       GLIRC 6 Hour Birthday Run
@@ -157,8 +159,10 @@
    31.0686       14 16   2014    0       Wildcat Ridge 50k
    31.0686       14 17   2014    0       North Face Endurance Challenge NY
    31.0686       14 28   2016    0       Wildcat Ridge 50k
+   13.9000       14 57   2016    0       Black Rock 25k
    31.2600       15 30   2016    0       SRT 30 mile Run Hike
    51.0000       15 47   2016    0       North Face Endurance Challenge NY
    31.0686       15 52   2015    0       North Face Endurance Challenge NY
    31.0686       15 53   2015    0       Mountain Madness 50k
   104.0000       16 12   2016    1       Tesla Hertz 104 mile trail run
+   20.3000       16 48   2016    0       Great Schunemunk Traverse
