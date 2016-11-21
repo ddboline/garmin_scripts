@@ -1,4 +1,6 @@
-   12.9000       07 47   2016    1       After the Leaves Have Fallen
+   26.2188       09 40   2016    1       Brooklyn Marathon
+   37.2823       09 45   2016    1       NYC 60k
+   13.1094       07 39   2016    1       After the Leaves Have Fallen
    13.9000       14 57   2016    1       Black Rock 25k
    20.3000       16 48   2016    1       Great Schunemunk Traverse
    34.8000       10 20   2016    1       GLIRC 6 Hour Birthday Run
@@ -20,7 +22,7 @@
    13.1094       07 42   2016    1       Celebrate Life Half Marathon
     9.3206       06 55   2016    1       Kings Park 15k
    31.0686       08 48   2016    1       Caumsett 50k USATF Championships
-   26.2188       09 04   2015    1       NYCRUNS Central Park Marathon
+   26.2188       09 04   2016    1       NYCRUNS Central Park Marathon
    31.0686       10 22   2016    1       Febapple 50k
    10.0000       07 01   2016    1       NYCRuns Hot Cocoa Central Park 10 miler
    31.0686       10 51   2015    1       BUS Fat Ass 50k
