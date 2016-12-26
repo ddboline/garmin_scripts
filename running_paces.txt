@@ -134,6 +134,7 @@
    26.2188       09 41   2015    0       Lincoln's Birthday Marathon, East Meadow, NY
    37.2823       09 45   2016    1       NYC 60k
    26.2188       09 49   2012    0       Long Island Marathon - Half Marathon 2012 - Run-Marathon    NY
+   31.0686       09 51   2016    1       BUS Dumb Ass 50k
    26.2188       10 01   2010    0       Grandma's Marathon 2010 - Grandma's Marathon    MN
    14.7000       10 16   2016    0       Lime Kiln Weekend "Half Marathon"
    34.8000       10 20   2016    1       GLIRC 6 Hour Birthday Run

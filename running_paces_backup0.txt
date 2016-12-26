@@ -1,3 +1,4 @@
+   31.0686       09 51   2016    1       BUS Dumb Ass 50k
    26.2188       09 40   2016    1       Brooklyn Marathon
    37.2823       09 45   2016    1       NYC 60k
    13.1094       07 39   2016    1       After the Leaves Have Fallen
@@ -121,7 +122,7 @@
     3.1069       06 53   2013    1       NYS Parks Winter Run Series 2013    NY
    10.0000       07 03   2013    1       Sayville Running Company 10 Mile Run to the Brewery NY
     3.1069       06 35   2013    1       NYS Parks Winter Series - Heckscher State Park  NY
-   14.1000       09 26   2012    1       Rodeo Valley Trail Run – Winter - Trail-Half-Marathon   CA
+   14.1000       09 26   2012    1       Rodeo Valley Trail Run ??? Winter - Trail-Half-Marathon   CA
     3.1069       06 30   2012    1       Ho Ho Ho 5k Race 2012   NY
     5.0000       06 48   2012    1       Wantagh Snowball 5 Mile Run 2012    NY
     3.1069       06 42   2012    1       Santa's 5k Toy Trot 2012    NY
