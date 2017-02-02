@@ -1,11 +1,9 @@
 #!/usr/bin/python
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import os
 from util import print_h_m_s, print_m_s
+
 
 HOMEDIR = os.getenv('HOME')
 
@@ -51,42 +49,6 @@ def running_pace():
     for km in range(35, 75, 5):
         mi = km / km_per_mile
         pace_every_five_k_later.append([mi, ''])
-
-#    paumanok_pursuit_legs = [10.75, 8.5, 10.0, 7.5, 6.75]
-    bear_mountain_legs = [4.0, 4.7, 5.5, 5.6, 3.4, 5.8, 6.2, 3.4, 2.7, 4.4, 2.5, 2.8]
-#    greenbelt_legs = [3.3, 2.9, 2.8, 2.8, 2.9, 2.9, 2.9, 2.8, 2.8, 2.9, 2.9]
-    o2s50_legs = [6.0, 6.0, 6.3, 5.8, 6.2, 5.4, 7, 6.4]
-    jfk50_legs = [2.5, 6.8, 6.2, 11.6, 7.3, 4, 3.4, 4.2, 4.2]
-
-    dist_o2s50 = []
-    dist_o2s50_cum = []
-    pace_o2s50_cum = []
-    mi = 0
-    for leg in o2s50_legs:
-        mi += leg
-        dist_o2s50.append(leg)
-        dist_o2s50_cum.append(mi)
-        pace_o2s50_cum.append([mi, ''])
-
-    dist_jfk50 = []
-    dist_jfk50_cum = []
-    pace_jfk50_cum = []
-    mi = 0
-    for leg in jfk50_legs:
-        mi += leg
-        dist_jfk50.append(leg)
-        dist_jfk50_cum.append(mi)
-        pace_jfk50_cum.append([mi, ''])
-
-    dist_bear_mountain = []
-    dist_bear_mountain_cum = []
-    pace_bear_mountain_cum = []
-    mi = 0
-    for leg in bear_mountain_legs:
-        mi += leg
-        dist_bear_mountain.append(leg)
-        dist_bear_mountain_cum.append(mi)
-        pace_bear_mountain_cum.append([mi, ''])
 
     for second in range(4*60+50, 15*60, 10):
         pace = print_h_m_s(second)
@@ -155,29 +117,48 @@ def running_pace():
 
     print('\n\n')
 
-    print('Bear Mountain 50mi Cumulative Time')
-    output = '%10s' % ''
-    for dist in dist_bear_mountain:
-        output += '%6s%4s' % ('%0.1fmi' % dist, '')
-    print(output)
-    output = 'pace%6s' % ''
-    for dist in dist_bear_mountain_cum:
-        output += '%6s%4s' % ('%0.1fmi' % dist, '')
-    print(output)
-    for a in range(0, 120):
-        os.sys.stdout.write('-')
-        os.sys.stdout.flush()
-    print('')
-    for second in range(4*60+50, 17*60, 10):
-        pace = print_h_m_s(second)
-        output = '%8s%2s' % (pace, '')
-        for idx in range(0, len(pace_bear_mountain_cum)):
-            pace_bear_mountain_cum[idx][1] = print_h_m_s(pace_bear_mountain_cum[idx][0]* second)
-            output += '%8s%2s' % (pace_bear_mountain_cum[idx][1], '')
+    paumanok_pursuit_legs = (10.75, 8.5, 10.0, 7.5, 6.75)
+    bear_mountain_legs = (4.0, 4.7, 5.5, 5.6, 3.4, 5.8, 6.2, 3.4, 2.7, 4.4,
+                          2.5, 2.8)
+    greenbelt_legs = (3.3, 2.9, 2.8, 2.8, 2.9, 2.9, 2.9, 2.8, 2.8, 2.9, 2.9)
+    o2s50_legs = (6.0, 6.0, 6.3, 5.8, 6.2, 5.4, 7, 6.4)
+    jfk50_legs = (2.5, 6.8, 6.2, 11.6, 7.3, 4, 3.4, 4.2, 4.2)
+    rocky_100_legs = (3.10, 2.64, 6.95, 2.96, 4.36)
+#    rocky_100_legs = tuple(sum(rocky_100_legs) for _ in range(5))
+    tesla_100_legs = tuple(10.4 for _ in range(10))
+    superior_100_legs = (9.7, 10.4, 4.9, 9.9, 8.6, 7.7, 7.5, 4.2, 9.4, 5.6, 7.1, 5.7, 5.5, 7.1)
+
+    def cumulative_table(label, leg_distances):
+        cumulative_distances = tuple(
+            sum(leg_distances[:i+1]) for i in range(len(leg_distances)))
+        print('%s Cumulative Time' % label)
+        output = '%10s' % ''
+        for dist in leg_distances:
+            output += '%6s%4s' % ('%0.1fmi' % dist, '')
         print(output)
+        output = 'pace%6s' % ''
+        for dist in cumulative_distances:
+            output += '%6s%4s' % ('%0.1fmi' % dist, '')
+        print(output)
+        for a in range(0, 120):
+            os.sys.stdout.write('-')
+            os.sys.stdout.flush()
+        print('')
+        for second in range(4*60+50, 17*60, 10):
+            pace = print_h_m_s(second)
+            output = '%8s%2s' % (pace, '')
+            for cum_dist in cumulative_distances:
+                outstr = print_h_m_s(cum_dist * second)
+                output += '%8s  ' % outstr
+            print(output)
+    
+        print('\n\n')
 
-    print('\n\n')
-
+    #cumulative_table('Bear Mountain 50mi', bear_mountain_legs)
+    #cumulative_table('Paumanok Pursuit', paumanok_pursuit_legs)
+    #cumulative_table('Rocky Raccoon 100 mi', rocky_100_legs)
+    #cumulative_table('Tesla 100 mi', tesla_100_legs)
+    cumulative_table('Superior 100mi', superior_100_legs)
 
 if __name__ == '__main__':
     running_pace()
