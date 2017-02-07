@@ -171,4 +171,5 @@
    31.0686       15 52   2015    0       North Face Endurance Challenge NY
    31.0686       15 53   2015    0       Mountain Madness 50k
   104.0000       16 12   2016    1       Tesla Hertz 104 mile trail run
+  100.0000       16 34   2017    1       Rocky Racoon 100 mile
    20.3000       16 48   2016    0       Great Schunemunk Traverse
