@@ -1,10 +1,6 @@
 #!/usr/bin/python
 """ Fit my race results to linear model """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
+from __future__ import (absolute_import, division, print_function, unicode_literals)
 import os
 import random
 import matplotlib
@@ -24,6 +20,7 @@ MARATHON_DISTANCE_MI = 42195 / METERS_PER_MILE  # meters
 
 class RunningPace(object):
     """ Class to contain running pace entry """
+
     def __init__(self, dist=0.0, pmpm=0.0, year=2014, flag=True, name=''):
         self.distance = dist
         self.pace = pmpm
@@ -91,20 +88,23 @@ def running_pace_regression():
     plt.scatter(d_test, p_test, color='black')
     plt.plot(d_test, regr.predict(d_test), color='blue', linewidth=3)
 
-    xtickarray = np.log(np.array([METERS_PER_MILE, 5e3, 10e3,
-                                  MARATHON_DISTANCE_M / 2.,
-                                  MARATHON_DISTANCE_M, 50 * METERS_PER_MILE])
-                        / METERS_PER_MILE)
+    xtickarray = np.log(
+        np.array([
+            METERS_PER_MILE, 5e3, 10e3, MARATHON_DISTANCE_M / 2., MARATHON_DISTANCE_M, 50 *
+            METERS_PER_MILE
+        ]) / METERS_PER_MILE)
     ytickarray = np.log(np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]))
 
     plt.xticks(xtickarray, ['1mi', '5k', '10k', '', 'Marathon', '50mi'])
 
     # Set y ticks
-    plt.yticks(ytickarray, ['5:00/mi', '6:00/mi', '7:00/mi', '8:00/mi',
-                            '9:00/mi', '10:00/mi', '11:00/mi', '12:00/mi',
-                            '13:00/mi', '14:00/mi', '15:00/mi', '16:00/mi', '17:00/mi'])
+    plt.yticks(ytickarray, [
+        '5:00/mi', '6:00/mi', '7:00/mi', '8:00/mi', '9:00/mi', '10:00/mi', '11:00/mi', '12:00/mi',
+        '13:00/mi', '14:00/mi', '15:00/mi', '16:00/mi', '17:00/mi'
+    ])
 
     plt.savefig('temp.png')
+
 
 if __name__ == '__main__':
     running_pace_regression()
