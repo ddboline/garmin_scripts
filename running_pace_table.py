@@ -109,13 +109,15 @@ def running_pace():
 
     print('\n\n')
 
-    paumanok_pursuit_legs = (10.75, 8.5, 10.0, 7.5, 6.75)
-    bear_mountain_legs = (4.0, 4.7, 5.5, 5.6, 3.4, 5.8, 6.2, 3.4, 2.7, 4.4, 2.5, 2.8)
     greenbelt_legs = (3.3, 2.9, 2.8, 2.8, 2.9, 2.9, 2.9, 2.8, 2.8, 2.9, 2.9)
     o2s50_legs = (6.0, 6.0, 6.3, 5.8, 6.2, 5.4, 7, 6.4)
     jfk50_legs = (2.5, 6.8, 6.2, 11.6, 7.3, 4, 3.4, 4.2, 4.2)
     rocky_100_legs = (3.10, 2.64, 6.95, 2.96, 4.36)
     # rocky_100_legs = tuple(sum(rocky_100_legs) for _ in range(5))
+
+    paumanok_pursuit_legs = (10.75, 8.5, 10.0, 7.5, 6.75)
+    nfecdc_legs = (2.1, 3.5, 2.7, 4.8, 4.1, 1.8, 4.8, 2.7, 3.5, 1.7)
+    bear_mountain_legs = (4.0, 4.7, 5.5, 5.6, 3.4, 5.8, 6.2, 3.4, 2.7, 4.4, 2.5, 2.8)
     tesla_100_legs = tuple(10.4 for _ in range(10))
     superior_100_legs = (9.7, 10.4, 4.9, 9.9, 8.6, 7.7, 7.5, 4.2, 9.4, 5.6, 7.1, 5.7, 5.5, 7.1)
 
@@ -147,7 +149,8 @@ def running_pace():
     # cumulative_table('Paumanok Pursuit', paumanok_pursuit_legs)
     # cumulative_table('Rocky Raccoon 100 mi', rocky_100_legs)
     # cumulative_table('Tesla 100 mi', tesla_100_legs)
-    cumulative_table('Superior 100mi', superior_100_legs)
+    cumulative_table('North Face DC', nfecdc_legs)
+    #cumulative_table('Superior 100mi', superior_100_legs)
 
 
 if __name__ == '__main__':
