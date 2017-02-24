@@ -144,6 +144,7 @@
    32.9000       10 38   2014    0       GLIRC 6 Hour Birthday Run
    13.1094       10 40   2013    0       North Face Endurance Challenge - Half Marathon Trail    NY
    31.0686       10 51   2015    0       BUS Fat Ass 50k
+   31.0686       11 08   2017    1       Febapple 50k
    31.0686       11 11   2015    0       Tesla Hertz 50k trail run
    10.0000       11 20   2015    0       Wildcat Ridge 10mi (DNF'd 50k)
    31.4000       11 27   2015    0       GLIRC 6 Hour Birthday Run
