@@ -33,6 +33,8 @@ def analyze_scale_measurements():
         s = gc.open(title)
         w = s.sheet1
         o = w.export()
+        if hasattr(o, 'decode'):
+            o = o.decode()
         return pd.read_csv(StringIO(o), parse_dates=[0])
 
     df = get_spreadsheet_by_title('Scale Measurements')

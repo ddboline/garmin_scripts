@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+""" fit world record paces to simple model """
+
 """Example of using hangups.build_user_conversation_list to data."""
 import os
 import sys
