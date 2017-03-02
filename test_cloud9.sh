@@ -1,5 +1,5 @@
 #!/bin/bash
 
-py.test *.py
+py.test util.py
 ./running_pace_plot.py
 ./world_record.py

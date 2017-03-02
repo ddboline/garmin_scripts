@@ -109,10 +109,10 @@ def running_pace():
 
     print('\n\n')
 
-    greenbelt_legs = (3.3, 2.9, 2.8, 2.8, 2.9, 2.9, 2.9, 2.8, 2.8, 2.9, 2.9)
-    o2s50_legs = (6.0, 6.0, 6.3, 5.8, 6.2, 5.4, 7, 6.4)
-    jfk50_legs = (2.5, 6.8, 6.2, 11.6, 7.3, 4, 3.4, 4.2, 4.2)
-    rocky_100_legs = (3.10, 2.64, 6.95, 2.96, 4.36)
+    # greenbelt_legs = (3.3, 2.9, 2.8, 2.8, 2.9, 2.9, 2.9, 2.8, 2.8, 2.9, 2.9)
+    # o2s50_legs = (6.0, 6.0, 6.3, 5.8, 6.2, 5.4, 7, 6.4)
+    # jfk50_legs = (2.5, 6.8, 6.2, 11.6, 7.3, 4, 3.4, 4.2, 4.2)
+    # rocky_100_legs = (3.10, 2.64, 6.95, 2.96, 4.36)
     # rocky_100_legs = tuple(sum(rocky_100_legs) for _ in range(5))
 
     paumanok_pursuit_legs = (10.75, 8.5, 10.0, 7.5, 6.75)
@@ -122,7 +122,7 @@ def running_pace():
     tesla_100_legs = tuple(10.4 for _ in range(10))
     superior_100_legs = (9.7, 10.4, 4.9, 9.9, 8.6, 7.7, 7.5, 4.2, 9.4, 5.6, 7.1, 5.7, 5.5, 7.1)
 
-    def cumulative_table(label, leg_distances):
+    def cumulative_table(label, leg_distances, min_pace=6, max_pace=17):
         cumulative_distances = tuple(sum(leg_distances[:i + 1]) for i in range(len(leg_distances)))
         print('%s Cumulative Time' % label)
         output = '%10s' % ''
@@ -137,7 +137,7 @@ def running_pace():
             os.sys.stdout.write('-')
             os.sys.stdout.flush()
         print('')
-        for second in range(4 * 60 + 50, 20 * 60, 10):
+        for second in range(min_pace * 60, max_pace * 60, 10):
             pace = print_h_m_s(second)
             output = '%8s%2s' % (pace, '')
             for cum_dist in cumulative_distances:
@@ -146,8 +146,8 @@ def running_pace():
             print(output)
         print('\n\n')
 
-    cumulative_table('Bear Mountain 50mi', bear_mountain_legs)
-    # cumulative_table('Paumanok Pursuit', paumanok_pursuit_legs)
+    #cumulative_table('Bear Mountain 50mi', bear_mountain_legs)
+    cumulative_table('Paumanok Pursuit', paumanok_pursuit_legs, min_pace=9, max_pace=14)
     # cumulative_table('Rocky Raccoon 100 mi', rocky_100_legs)
     # cumulative_table('Tesla 100 mi', tesla_100_legs)
     #cumulative_table('North Face DC', nfecdc_legs)
