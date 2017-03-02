@@ -9,6 +9,14 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as pl
 import pandas as pd
 from itertools import chain
+from oauth2client.service_account import ServiceAccountCredentials
+import gspread
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 try:
     from world_record import do_fit
 except ImportError:
@@ -17,10 +25,18 @@ except ImportError:
 
 
 def analyze_scale_measurements():
-    fname = '/home/ddboline/gDrive/Scale Measurements'
-    fname1 = '/home/ddboline/gDrive/Scale Measurement (Responses)'
-    df = pd.read_excel(fname, index=None)
-    df1 = pd.read_excel(fname1, index=None)
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        '/home/ddboline/setup_files/build/gapi_scripts/gspread.json', ['https://spreadsheets.google.com/feeds'])
+    gc = gspread.authorize(credentials)
+
+    def get_spreadsheet_by_title(title):
+        s = gc.open(title)
+        w = s.sheet1
+        o = w.export()
+        return pd.read_csv(StringIO(o), parse_dates=[0])
+
+    df = get_spreadsheet_by_title('Scale Measurements')
+    df1 = get_spreadsheet_by_title('Scale Measurement (Responses)')
 
     df = df.rename(columns={
         'Mass': 'mass',
