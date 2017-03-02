@@ -53,7 +53,7 @@ def analyze_scale_measurements():
     xticklabels = range(len(xtickarray))
 
     def lin_func(xval, *params):
-        return sum(params[i] * xval**i for i in range(4))
+        return sum(params[i] * xval**i for i in range(5))
 
     for var in ('mass', 'fat', 'water', 'muscle', 'bone'):
         min_, max_ = df[var].min(), df[var].max()
@@ -62,7 +62,7 @@ def analyze_scale_measurements():
         yticklabels = ['%3.1f' % x for x in ytickarray]
 
         data = df[['days', var]].values
-        params, dparams = do_fit(data, lin_func, param_default=[75, 1, 1, 1])
+        params, dparams = do_fit(data, lin_func, param_default=[75, 1, 1, 1, 1])
         pp_, pm_ = params + dparams, params - dparams
 
         v0 = lin_func(today, *params)
