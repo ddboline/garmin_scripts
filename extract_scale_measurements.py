@@ -41,7 +41,7 @@ def insert_entries_into_spreadsheet(new_entries):
 
     for day in sorted(new_days):
         new_entry = new_entries[day]
-        wsheet.insert_row([getattr(new_entry, x) for x in new_entry._fields], index=last_row)
+        wsheet.insert_row([getattr(new_entry, x) for x in new_entry._fields], index=last_row+1)
         print(new_entries[day])
         current_entries[day] = new_entry
     return current_entries
@@ -49,7 +49,8 @@ def insert_entries_into_spreadsheet(new_entries):
 
 @asyncio.coroutine
 def extract_scale_inputs(client, _):
-    user_list, conversation_list = (yield from hangups.build_user_conversation_list(client))
+    user_list, conversation_list = (yield from hangups.build_user_conversation_list(
+        client, max_converations=10, max_events=100))
     all_conversations = conversation_list.get_all(include_archived=True)
 
     print('{} known conversations'.format(len(all_conversations)))
