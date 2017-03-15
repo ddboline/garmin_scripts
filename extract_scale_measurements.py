@@ -8,10 +8,13 @@ import logging
 from dateutil.parser import parse
 from oauth2client.service_account import ServiceAccountCredentials
 from collections import namedtuple
+from pytz import timezone
+from time import strftime
 
 import hangups
 import appdirs
 
+est = timezone(strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
 ScaleEntry = namedtuple('ScaleEntry', ['timestamp', 'weight', 'fat', 'water', 'muscle', 'bone'])
 
 
@@ -21,7 +24,7 @@ def insert_entries_into_spreadsheet(new_entries):
         ['https://spreadsheets.google.com/feeds'])
     gc = gspread.authorize(credentials)
 
-    spreadsheet = gc.open('Scale Measurement (Responses)')
+    spreadsheet = gc.open('Scale Measurements')
     wsheet = spreadsheet.sheet1
 
     current_entries = {}
@@ -30,7 +33,7 @@ def insert_entries_into_spreadsheet(new_entries):
     for irow, vals in enumerate(csv):
         if irow == 0:
             continue
-        tstamp = parse(vals[0])
+        tstamp = parse(vals[0]).replace(tzinfo=est)
         weight, fat, water, muscle, bone = [float(x) for x in vals[1:]]
         entry = ScaleEntry(tstamp, weight, fat, water, muscle, bone)
         current_entries[tstamp.date().isoformat()] = entry
@@ -39,10 +42,12 @@ def insert_entries_into_spreadsheet(new_entries):
     current_days = set(current_entries.keys())
     new_days = set(new_entries.keys()) - current_days
 
+    current_row = last_row+2
     for day in sorted(new_days):
         new_entry = new_entries[day]
-        wsheet.insert_row([getattr(new_entry, x) for x in new_entry._fields], index=last_row+1)
         print(new_entries[day])
+        wsheet.insert_row([getattr(new_entry, x) for x in new_entry._fields], index=current_row)
+        current_row += 1
         current_entries[day] = new_entry
     return current_entries
 
@@ -73,7 +78,7 @@ def extract_scale_inputs(client, _):
                         entries.add((event.text.strip(), event.timestamp.isoformat()))
     new_entries = {}
     for txt, tstmp in entries:
-        tstmp = parse(tstmp)
+        tstmp = parse(tstmp).astimezone(est)
         weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split(':')]
         new_entry = ScaleEntry(tstmp, weight, fat, water, muscle, bone)
         new_entries[tstmp.date().isoformat()] = new_entry

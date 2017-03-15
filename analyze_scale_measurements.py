@@ -3,6 +3,7 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 import os
 import datetime
+from dateutil.parser import parse
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -11,6 +12,8 @@ import pandas as pd
 from itertools import chain
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
+
+from extract_heartrate_data import get_client
 
 try:
     from StringIO import StringIO
@@ -60,7 +63,30 @@ def analyze_scale_measurements():
     df = pd.concat([df, df1], axis=0)
     df.index = df.datetime
     df = df.sort_index()
-    print(df)
+
+    client = get_client()
+    body_weight = {x['date']: x['weight']
+                   for x in client.get_bodyweight(
+                       base_date=parse('2017-03-01').date(),
+                       end_date=datetime.date.today())['weight']}
+    body_fat = {x['date']: x['fat']
+                for x in client.get_bodyfat(
+                    base_date=parse('2017-03-01').date(),
+                    end_date=datetime.date.today())['fat']}
+    cond = df.datetime.dt.date >= parse('2017-03-01').date()
+    for idx, row in df[cond].iterrows():
+        date = row['datetime'].date().isoformat()
+        time = row['datetime'].time().strftime('%H:%M:%S')
+        mass = row['mass']
+        fat = row['fat']
+        if date not in body_weight:
+            url = 'https://api.fitbit.com/1/user/-/body/log/weight.json'
+            data = {'date': date, 'time': time, 'weight': mass}
+            client.make_request(url, data=data, method='POST')
+        if date not in body_fat:
+            url = 'https://api.fitbit.com/1/user/-/body/log/fat.json'
+            data = {'date': date, 'time': time, 'fat': fat}
+            client.make_request(url, data=data, method='POST')
     df['days'] = (df.datetime - df.datetime[0]).apply(lambda x: x.days)
     today = (datetime.datetime.now() - df.datetime[0]).days
     xval = np.linspace(0, df['days'].max())
