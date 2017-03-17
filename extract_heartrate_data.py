@@ -10,20 +10,22 @@ import pandas as pd
 from dateutil.parser import parse
 
 from base64 import b64encode
+import fitbit
 from fitbit.api import Fitbit
 from oauthlib.oauth2.rfc6749.errors import MismatchingStateError, MissingTokenError
 
 import pylab as pl
 
-from garmin_app import garmin_utils, garmin_parse
+from garmin_app import garmin_utils, garmin_parse, garmin_report
 from garmin_app.util import utc, est
 
 client_id = '228D9P'
 client_secret = '9d7aa34320fac07106dca853dab8603d'
 
+
 class OAuth2Server:
-    def __init__(self, client_id, client_secret,
-                 redirect_uri='http://127.0.0.1:8080/'):
+
+    def __init__(self, client_id, client_secret, redirect_uri='http://127.0.0.1:8080/'):
         """ Initialize the FitbitOauth2Client """
         self.success_html = """
             <h1>You are now authorized to access the Fitbit API!</h1>
@@ -31,12 +33,11 @@ class OAuth2Server:
         self.failure_html = """
             <h1>ERROR: %s</h1><br/><h3>You can close this window</h3>%s"""
 
-        self.fitbit = Fitbit(
+        self.fitbit = fitbit.Fitbit(
             client_id,
             client_secret,
             redirect_uri=redirect_uri,
-            timeout=10,
-        )
+            timeout=10, )
 
     def browser_authorize(self):
         """
@@ -45,7 +46,7 @@ class OAuth2Server:
         """
         url, _ = self.fitbit.client.authorize_token_url()
         # Open the web browser in a new thread for command-line browser support
-        threading.Timer(1, webbrowser.open, args=(url,)).start()
+        threading.Timer(1, webbrowser.open, args=(url, )).start()
         cherrypy.quickstart(self)
 
     @cherrypy.expose
@@ -59,9 +60,8 @@ class OAuth2Server:
             try:
                 self.fitbit.client.fetch_access_token(code)
             except MissingTokenError:
-                error = self._fmt_failure(
-                    'Missing access token parameter.</br>Please check that '
-                    'you are using the correct client_secret')
+                error = self._fmt_failure('Missing access token parameter.</br>Please check that '
+                                          'you are using the correct client_secret')
             except MismatchingStateError:
                 error = self._fmt_failure('CSRF Warning! Mismatching state')
         else:
@@ -102,42 +102,65 @@ def get_client(refresh=False):
                     access_token = val
                 elif key == 'refresh_token':
                     refresh_token = val
-    return Fitbit(client_id, client_secret, access_token=access_token, refresh_token=refresh_token)
+    client = fitbit.Fitbit(
+        client_id, client_secret, access_token=access_token, refresh_token=refresh_token)
+    try:
+        client.user_profile_get()
+        return client
+    except fitbit.exceptions.HTTPUnauthorized:
+        return get_client(refresh=True)
+    return client
 
 
 def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().isoformat()):
-    client = get_client()
     begin_date = parse(begin_date).date()
     end_date = parse(end_date).date()
     assert end_date >= begin_date
     days = (end_date - begin_date).days
-    dates = [begin_date + datetime.timedelta(days=x) for x in range(days+1)]
+    dates = [begin_date + datetime.timedelta(days=x) for x in range(days + 1)]
     dates = map(lambda x: x.isoformat(), dates)
-    
+
     data = []
-    
+    heart_rate_pace_data = []
+
+    client = get_client()
     for date in dates:
         fitbit_hr_data = client.intraday_time_series('activities/heart', base_date=date)
         tmp = fitbit_hr_data['activities-heart-intraday']['dataset']
         tmp = [{'time': parse('%sT%s' % (date, x['time'])), 'value': x['value']} for x in tmp]
         data.extend(tmp)
-    
+
     files = []
     for date in dates:
         files.extend(garmin_utils.find_gps_tracks(date, garmin_utils.CACHEDIR))
     for fname in files:
         gf = garmin_parse.GarminParse(fname)
         gf.read_file()
-        tmp = [{'time': x.time.replace(tzinfo=utc).astimezone(est), 'value': x.heart_rate} for x in gf.points]
+        tmp = [{
+            'time': x.time.replace(tzinfo=utc).astimezone(est),
+            'value': x.heart_rate
+        } for x in gf.points]
         tmp = [{'time': parse(x['time'].isoformat()[:19]), 'value': x['value']} for x in tmp]
         data.extend(tmp)
+
+        tmp = garmin_report.get_splits(gf, 400., do_heart_rate=True)
+        tmp = [{'hrt': h, 'pace': 4 * s / 60.} for d, s, h in tmp]
+        tmp = filter(lambda x: x['pace'] < 20, tmp)
+        heart_rate_pace_data.extend(tmp)
     df = pd.DataFrame(data)
     df.index = df.time
     ts = df.sort_index().value
     pl.clf()
-    ts.resample('1Min').mean().dropna().plot()
+    ts.resample('5Min').mean().dropna().plot()
     pl.savefig('heartrate_data.png')
     os.system('mv heartrate_data.png /home/ddboline/public_html/')
+
+    df = pd.DataFrame(heart_rate_pace_data)
+    pl.clf()
+    #df.plot.scatter('hrt', 'pace')
+    df.plot.hexbin('hrt', 'pace', gridsize=30)
+    pl.savefig('hrt_vs_pace.png')
+    os.system('mv hrt_vs_pace.png /home/ddboline/public_html/')
     return df
 
 
