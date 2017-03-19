@@ -166,5 +166,5 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
 
 if __name__ == '__main__':
     today = datetime.date.today()
-    last_week = today - datetime.timedelta(days=7)
+    last_week = today - datetime.timedelta(days=3)
     x = get_heartrate_data(last_week.isoformat(), today.isoformat())
