@@ -54,8 +54,7 @@ def insert_entries_into_spreadsheet(new_entries):
 
 @asyncio.coroutine
 def extract_scale_inputs(client, _):
-    user_list, conversation_list = (yield from hangups.build_user_conversation_list(
-        client, max_converations=10, max_events=100))
+    user_list, conversation_list = (yield from hangups.build_user_conversation_list(client))
     all_conversations = conversation_list.get_all(include_archived=True)
 
     print('{} known conversations'.format(len(all_conversations)))
