@@ -99,6 +99,7 @@
     3.1069       07 37   2014    1       NYS State Parks Winter Run Series Robert Moses 5K   NY
    13.1094       07 38   2016    1       Sleepy Hollow Half Marathon
    13.1094       07 39   2016    1       After the Leaves Have Fallen
+   13.1094       07 39   2017    1       NYC Half Marathon
    13.1094       07 41   2017    1       Fred Lebow Manhattan Half Marathon
    13.1094       07 42   2016    1       Celebrate Life Half Marathon
    10.3600       07 44   2013    1       Tesla Hertz 10 mile trail run
