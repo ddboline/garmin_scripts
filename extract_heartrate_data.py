@@ -145,22 +145,24 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
 
         tmp = garmin_report.get_splits(gf, 400., do_heart_rate=True)
         tmp = [{'hrt': h, 'pace': 4 * s / 60.} for d, s, h in tmp]
-        tmp = filter(lambda x: x['pace'] < 20, tmp)
+        tmp = filter(lambda x: 5.5 < x['pace'] < 20, tmp)
         heart_rate_pace_data.extend(tmp)
     df = pd.DataFrame(data)
-    df.index = df.time
-    ts = df.sort_index().value
-    pl.clf()
-    ts.resample('5Min').mean().dropna().plot()
-    pl.savefig('heartrate_data.png')
-    os.system('mv heartrate_data.png /home/ddboline/public_html/')
+    if df.shape[0] > 0:
+        df.index = df.time
+        ts = df.sort_index().value
+        pl.clf()
+        ts.resample('5Min').mean().dropna().plot()
+        pl.savefig('heartrate_data.png')
+        os.system('mv heartrate_data.png /home/ddboline/public_html/')
 
     df = pd.DataFrame(heart_rate_pace_data)
-    pl.clf()
-    #df.plot.scatter('hrt', 'pace')
-    df.plot.hexbin('hrt', 'pace', gridsize=30)
-    pl.savefig('hrt_vs_pace.png')
-    os.system('mv hrt_vs_pace.png /home/ddboline/public_html/')
+    if df.shape[0] > 0:
+        pl.clf()
+        #df.plot.scatter('hrt', 'pace')
+        df.plot.hexbin('hrt', 'pace', gridsize=30)
+        pl.savefig('hrt_vs_pace.png')
+        os.system('mv hrt_vs_pace.png /home/ddboline/public_html/')
     return df
 
 
