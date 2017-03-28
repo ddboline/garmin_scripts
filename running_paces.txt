@@ -106,6 +106,7 @@
     3.1069       07 47   2014    1       NYS Parks Winter Series - Heckscher NY
     4.9710       07 50   2013    1       Tough Cookie 8k Trail Race  NY
    26.2188       07 51   2002    1       Twin Cities Marathon - Run - 26.2Miles  MN
+   13.1094       07 53   2017    1       Sleepy Hollow Half Marathon
    26.2188       07 56   2004    1       Grandma's Marathon 2004 MN
    26.2188       07 57   2013    1       Philadelphia Marathon & Half Marathon, 8k - Marathon    PA
     5.3500       07 59   2014    1       Tough Cookie "8k"
