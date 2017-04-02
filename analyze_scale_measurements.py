@@ -66,14 +66,11 @@ def analyze_scale_measurements():
 
     client = get_client()
     body_weight = {x['date']: x['weight']
-                   for x in client.get_bodyweight(
-                       base_date=parse('2017-03-01').date(),
-                       end_date=datetime.date.today())['weight']}
+                   for x in client.get_bodyweight(period='30d')['weight']}
     body_fat = {x['date']: x['fat']
-                for x in client.get_bodyfat(
-                    base_date=parse('2017-03-01').date(),
-                    end_date=datetime.date.today())['fat']}
-    cond = df.datetime.dt.date >= parse('2017-03-01').date()
+                for x in client.get_bodyfat(period='30d')['fat']}
+    min_date = min(chain(body_weight.keys(), body_fat.keys()))
+    cond = df.datetime.dt.date >= parse(min_date).date()
     for idx, row in df[cond].iterrows():
         date = row['datetime'].date().isoformat()
         time = row['datetime'].time().strftime('%H:%M:%S')
@@ -82,10 +79,12 @@ def analyze_scale_measurements():
         if date not in body_weight:
             url = 'https://api.fitbit.com/1/user/-/body/log/weight.json'
             data = {'date': date, 'time': time, 'weight': mass}
+            print(url)
             client.make_request(url, data=data, method='POST')
         if date not in body_fat:
             url = 'https://api.fitbit.com/1/user/-/body/log/fat.json'
             data = {'date': date, 'time': time, 'fat': fat}
+            print(url)
             client.make_request(url, data=data, method='POST')
     df['days'] = (df.datetime - df.datetime[0]).apply(lambda x: x.days)
     today = (datetime.datetime.now() - df.datetime[0]).days
