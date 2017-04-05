@@ -134,6 +134,8 @@ def analyze_scale_measurements():
               (var, df[var].mean(), params[0], params[1], params[2]))
         print('\t%s +%s -%s' % (v0, vp - v0, v0 - vm))
 
+    df.to_csv('scale_measurements.csv', index=False)
+
     return
 
 
