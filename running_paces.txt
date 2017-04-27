@@ -132,6 +132,7 @@
    26.2188       09 04   2016    0       NYCRUNS Central Park Marathon
    31.0686       09 06   2017    1       Caumsett 50k
    26.2188       09 07   2005    0       Grandma's Marathon 2005 - Marathon  MN
+    6.2137       09 10   2017    0       Leatherman's Loop 10k Trail Run
    26.2188       09 19   2011    0       Towpath Marathon - Run-Marathon OH
    14.1000       09 26   2012    0       Rodeo Valley Trail Run – Winter - Trail-Half-Marathon   CA
    26.2188       09 40   2016    0       Brooklyn Marathon
