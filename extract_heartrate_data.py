@@ -14,6 +14,8 @@ import fitbit
 from fitbit.api import Fitbit
 from oauthlib.oauth2.rfc6749.errors import MismatchingStateError, MissingTokenError
 
+import matplotlib
+matplotlib.use('Agg')
 import pylab as pl
 
 from garmin_app import garmin_utils, garmin_parse, garmin_report
