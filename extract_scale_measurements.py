@@ -107,6 +107,8 @@ def run_example(example_coroutine, *extra_args):
     except KeyboardInterrupt:
         task.cancel()
         loop.run_forever()
+    except hangups.exceptions.NetworkError:
+        print('Network problem.  Try again later?')
     finally:
         loop.close()
 
