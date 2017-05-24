@@ -148,7 +148,7 @@
    32.9000       10 38   2014    0       GLIRC 6 Hour Birthday Run
    13.1094       10 40   2013    0       North Face Endurance Challenge - Half Marathon Trail    NY
    31.0686       10 51   2015    0       BUS Fat Ass 50k
-   31.0686       11 08   2017    1       Febapple 50k
+   31.0686       11 08   2017    0       Febapple 50k
    31.0686       11 11   2015    0       Tesla Hertz 50k trail run
    10.0000       11 20   2015    0       Wildcat Ridge 10mi (DNF'd 50k)
    31.4000       11 27   2015    0       GLIRC 6 Hour Birthday Run
@@ -159,13 +159,15 @@
    43.4960       12 26   2016    1       Paumanok Pursuit 70k Trail Run
    31.0686       12 27   2015    0       Greenbelt 50k
    31.0686       12 27   2016    0       Greenbelt 50k
-   50.0000       12 41   2015    0       JFK 50 miler
+   50.0000       12 41   2015    1       JFK 50 miler
    31.0686       12 43   2017    0       Fat Ass 50(k)
+   31.0686       12 45   2017    0       North Face Endurance Challenge DC 50k
    31.0686       12 50   2016    0       NJTrailSeries Spring Watchung 50k
    50.0000       12 51   2014    0       Ocean to Sound 50 mile
    50.0000       13 07   2014    0       JFK 50 miler
    43.4960       13 35   2014    0       Paumanok Pursuit 70k Trail Run
     6.2137       13 49   2016    0       Lime Kiln Weekend 10k
+   31.0686       14 04   2017    0       Mayapple 50k
    31.0686       14 13   2014    0       Greenbelt 50k
    43.4960       14 13   2017    0       Paumanok Pursuit 70k Trail Run
    31.0686       14 16   2014    0       Wildcat Ridge 50k
@@ -177,6 +179,7 @@
    31.0686       15 52   2015    0       North Face Endurance Challenge NY
    31.0686       15 53   2015    0       Mountain Madness 50k
   104.0000       16 12   2016    1       Tesla Hertz 104 mile trail run
+   50.0000       16 19   2017    0       North Face Endurance Challenge NY 50mi
   100.0000       16 34   2017    1       Rocky Racoon 100 mile
    20.3000       16 48   2016    0       Great Schunemunk Traverse
    28.0000       20 22   2017    0       Breakneck Trail "Marathon"
