@@ -78,7 +78,10 @@ def extract_scale_inputs(client, _):
     new_entries = {}
     for txt, tstmp in entries:
         tstmp = parse(tstmp).astimezone(est)
-        weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split(':')]
+        try:
+            weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split(':')]
+        except ValueError:
+            continue
         new_entry = ScaleEntry(tstmp, weight, fat, water, muscle, bone)
         new_entries[tstmp.date().isoformat()] = new_entry
     insert_entries_into_spreadsheet(new_entries)
