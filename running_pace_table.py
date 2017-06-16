@@ -120,6 +120,7 @@ def running_pace():
     bear_mountain_legs = (4.0, 4.7, 5.5, 4.3, 2.7, 4.4, 2.5, 2.8)
     #bear_mountain_legs = (4.0, 4.7, 5.5, 5.6, 3.4, 5.8, 6.2, 3.4, 2.7, 4.4, 2.5, 2.8)
     tesla_100_legs = tuple(10.4 for _ in range(10))
+    manitous_legs = (3.0, 10.3, 17.5, 21.5, 31.5, 38.5, 43.5, 48.5, 53, 54.3)
     superior_100_legs = (9.7, 10.4, 4.9, 9.9, 8.6, 7.7, 7.5, 4.2, 9.4, 5.6, 7.1, 5.7, 5.5, 7.1)
 
     def cumulative_table(label, leg_distances, min_pace=6, max_pace=17):
