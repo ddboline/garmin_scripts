@@ -123,7 +123,7 @@ def running_pace():
     manitous_legs = (3.0, 10.3, 17.5, 21.5, 31.5, 38.5, 43.5, 48.5, 53, 54.3)
     superior_100_legs = (9.7, 10.4, 4.9, 9.9, 8.6, 7.7, 7.5, 4.2, 9.4, 5.6, 7.1, 5.7, 5.5, 7.1)
 
-    def cumulative_table(label, leg_distances, min_pace=6, max_pace=17):
+    def cumulative_table(label, leg_distances, min_pace=6, max_pace=22.2):
         cumulative_distances = tuple(sum(leg_distances[:i + 1]) for i in range(len(leg_distances)))
         print('%s Cumulative Time' % label)
         output = '%10s' % ''
@@ -138,7 +138,7 @@ def running_pace():
             os.sys.stdout.write('-')
             os.sys.stdout.flush()
         print('')
-        for second in range(min_pace * 60, max_pace * 60, 10):
+        for second in range(min_pace * 60, int(max_pace * 60), 10):
             pace = print_h_m_s(second)
             output = '%8s%2s' % (pace, '')
             for cum_dist in cumulative_distances:
@@ -148,11 +148,11 @@ def running_pace():
         print('\n\n')
 
     #cumulative_table('Bear Mountain 50mi', bear_mountain_legs)
-    cumulative_table('Paumanok Pursuit', paumanok_pursuit_legs, min_pace=9, max_pace=14)
+    #cumulative_table('Paumanok Pursuit', paumanok_pursuit_legs, min_pace=9, max_pace=14)
     # cumulative_table('Rocky Raccoon 100 mi', rocky_100_legs)
     # cumulative_table('Tesla 100 mi', tesla_100_legs)
     #cumulative_table('North Face DC', nfecdc_legs)
-    #cumulative_table('Superior 100mi', superior_100_legs)
+    cumulative_table('Superior 100mi', superior_100_legs)
 
 
 if __name__ == '__main__':
