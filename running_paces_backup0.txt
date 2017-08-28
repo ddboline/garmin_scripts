@@ -1,3 +1,8 @@
+   31.0686       13 04   2017    1       Wildcat Ridge 50k
+   54.0000       17 11   2017    1       Lost Turkey 50 mi
+   32.0000       13 31   2017    1       Finger Lakes 50k (more like 32mi on the dot...)
+   13.1094       13 00   2017    1       Palisades Cliffhanger Half Marathon
+   50.0000       16 35   2017    1       Cayuga Trail 50 mile
    31.0686       14 04   2017    1       Mayapple 50k
    50.0000       16 19   2017    1       North Face Endurance Challenge NY 50mi
    31.0686       12 45   2017    1       North Face Endurance Challenge DC 50k

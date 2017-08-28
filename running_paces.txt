@@ -164,7 +164,10 @@
    31.0686       12 45   2017    0       North Face Endurance Challenge DC 50k
    31.0686       12 50   2016    0       NJTrailSeries Spring Watchung 50k
    50.0000       12 51   2014    0       Ocean to Sound 50 mile
+   13.1094       13 00   2017    0       Palisades Cliffhanger Half Marathon
+   31.0686       13 04   2017    0       Wildcat Ridge 50k
    50.0000       13 07   2014    0       JFK 50 miler
+   32.0000       13 31   2017    0       Finger Lakes 50k (more like 32mi on the dot...)
    43.4960       13 35   2014    0       Paumanok Pursuit 70k Trail Run
     6.2137       13 49   2016    0       Lime Kiln Weekend 10k
    31.0686       14 04   2017    0       Mayapple 50k
@@ -181,5 +184,7 @@
   104.0000       16 12   2016    1       Tesla Hertz 104 mile trail run
    50.0000       16 19   2017    0       North Face Endurance Challenge NY 50mi
   100.0000       16 34   2017    1       Rocky Racoon 100 mile
+   50.0000       16 35   2017    0       Cayuga Trail 50 mile
    20.3000       16 48   2016    0       Great Schunemunk Traverse
+   54.0000       17 11   2017    0       Lost Turkey 50 mi
    28.0000       20 22   2017    0       Breakneck Trail "Marathon"
