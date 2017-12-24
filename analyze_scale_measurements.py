@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """ fit world record paces to simple model """
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 import os
