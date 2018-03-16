@@ -69,9 +69,11 @@ def analyze_scale_measurements():
                    for x in client.get_bodyweight(period='30d')['weight']}
     body_fat = {x['date']: x['fat']
                 for x in client.get_bodyfat(period='30d')['fat']}
+    
     if len(body_weight) == 0 or len(body_fat) == 0:
-        return
-    min_date = min(chain(body_weight.keys(), body_fat.keys()))
+        min_date = (datetime.date.today() - datetime.timedelta(days=30)).isoformat()
+    else:
+        min_date = min(chain(body_weight.keys(), body_fat.keys()))
     cond = df.datetime.dt.date >= parse(min_date).date()
     for idx, row in df[cond].iterrows():
         date = row['datetime'].date().isoformat()
@@ -131,7 +133,9 @@ def analyze_scale_measurements():
         else:
             pl.ylabel('%')
         pl.savefig('scale_%s.png' % var)
-        os.system('mv scale_%s.png /home/ddboline/public_html/' % var)
+        cmd = 'mv scale_%s.png /home/ddboline/public_html/' % var
+        print(cmd)
+        os.system(cmd)
         print('%s\tmean=%s parameters=[%s, %s, %s]' %
               (var, df[var].mean(), params[0], params[1], params[2]))
         print('\t%s +%s -%s' % (v0, vp - v0, v0 - vm))
