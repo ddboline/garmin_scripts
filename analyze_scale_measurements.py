@@ -29,47 +29,54 @@ except ImportError:
 
 def analyze_scale_measurements():
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        '/home/ddboline/setup_files/build/gapi_scripts/gspread.json', ['https://spreadsheets.google.com/feeds'])
+        '/home/ddboline/setup_files/build/gapi_scripts/gspread.json',
+        ['https://spreadsheets.google.com/feeds'])
     gc = gspread.authorize(credentials)
 
-    def get_spreadsheet_by_title(title):
-        s = gc.open(title)
+    def get_spreadsheet_by_title(title, key=None):
+        if key:
+            s = gc.open_by_key(key)
+        else:
+            s = gc.open(title)
         w = s.sheet1
-        o = w.export()
-        if hasattr(o, 'decode'):
-            o = o.decode()
-        return pd.read_csv(StringIO(o), parse_dates=[0])
+        df = pd.DataFrame(w.get_all_records())
+        for col in ('Datetime', 'Timestamp'):
+            if col in df:
+                df[col] = df[col].apply(lambda x: parse(x, ignoretz=True))
+        return df
 
-    df = get_spreadsheet_by_title('Scale Measurements')
-    df1 = get_spreadsheet_by_title('Scale Measurement (Responses)')
+    df = get_spreadsheet_by_title(
+        'Scale Measurements', key='1MG8so2pFKoOIpt0Vo9pUAtoNk-Y1SnHq9DiEFi-m5Uw')
+    df1 = get_spreadsheet_by_title(
+        'Scale Measurement (Responses)', key='1_m-D8U-jHNur6TkpoDufGPn1S9fl_v-_oX_lCnS9LNk')
 
-    df = df.rename(columns={
-        'Mass': 'mass',
-        'Datetime': 'datetime',
-        'Fat': 'fat',
-        'Water': 'water',
-        'Muscle': 'muscle',
-        'Bone': 'bone'
-    })
-    df1 = df1.rename(columns={
-        'Weight (lbs)': 'mass',
-        'Timestamp': 'datetime',
-        'Fat %': 'fat',
-        'Muscle': 'muscle',
-        'Bone': 'bone',
-        'Water %': 'water'
-    })
+    df = df.rename(
+        columns={
+            'Mass': 'mass',
+            'Datetime': 'datetime',
+            'Fat': 'fat',
+            'Water': 'water',
+            'Muscle': 'muscle',
+            'Bone': 'bone'
+        })
+    df1 = df1.rename(
+        columns={
+            'Weight (lbs)': 'mass',
+            'Timestamp': 'datetime',
+            'Fat %': 'fat',
+            'Muscle': 'muscle',
+            'Bone': 'bone',
+            'Water %': 'water'
+        })
     df1 = df1[df1.datetime > df.datetime.max()]
     df = pd.concat([df, df1], axis=0)
     df.index = df.datetime
     df = df.sort_index()
 
     client = get_client()
-    body_weight = {x['date']: x['weight']
-                   for x in client.get_bodyweight(period='30d')['weight']}
-    body_fat = {x['date']: x['fat']
-                for x in client.get_bodyfat(period='30d')['fat']}
-    
+    body_weight = {x['date']: x['weight'] for x in client.get_bodyweight(period='30d')['weight']}
+    body_fat = {x['date']: x['fat'] for x in client.get_bodyfat(period='30d')['fat']}
+
     if len(body_weight) == 0 or len(body_fat) == 0:
         min_date = (datetime.date.today() - datetime.timedelta(days=30)).isoformat()
     else:
@@ -136,8 +143,8 @@ def analyze_scale_measurements():
         cmd = 'mv scale_%s.png /home/ddboline/public_html/' % var
         print(cmd)
         os.system(cmd)
-        print('%s\tmean=%s parameters=[%s, %s, %s]' %
-              (var, df[var].mean(), params[0], params[1], params[2]))
+        print('%s\tmean=%s parameters=[%s, %s, %s]' % (var, df[var].mean(), params[0], params[1],
+                                                       params[2]))
         print('\t%s +%s -%s' % (v0, vp - v0, v0 - vm))
 
     df.to_csv('scale_measurements.csv', index=False)
