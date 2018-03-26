@@ -24,13 +24,12 @@ def insert_entries_into_spreadsheet(new_entries):
         ['https://spreadsheets.google.com/feeds'])
     gc = gspread.authorize(credentials)
 
-    spreadsheet = gc.open('Scale Measurements')
+    spreadsheet = gc.open_by_key('1MG8so2pFKoOIpt0Vo9pUAtoNk-Y1SnHq9DiEFi-m5Uw')
     wsheet = spreadsheet.sheet1
 
     current_entries = {}
-    csv = map(lambda x: x.split(','), wsheet.export().decode().split('\r\n'))
 
-    for irow, vals in enumerate(csv):
+    for irow, vals in enumerate(wsheet.get_all_values()):
         if irow == 0:
             continue
         tstamp = parse(vals[0]).replace(tzinfo=est)
