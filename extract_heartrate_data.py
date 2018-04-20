@@ -141,7 +141,7 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
         tmp = [{
             'time': x.time.replace(tzinfo=utc).astimezone(est),
             'value': x.heart_rate
-        } for x in gf.points]
+        } for x in gf.points if x.heart_rate is not None]
         tmp = [{'time': parse(x['time'].isoformat()[:19]), 'value': x['value']} for x in tmp]
         data.extend(tmp)
 
