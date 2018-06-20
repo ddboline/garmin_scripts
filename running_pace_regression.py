@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """ Fit my race results to linear model """
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 import os
@@ -44,7 +44,7 @@ def read_pace_file(fname='running_paces.txt'):
     """ read running paces file """
     running_paces = []
 
-    for line in open(fname, 'r').xreadlines():
+    for line in open(fname, 'r').readlines():
         rp_ = RunningPace()
         rp_.read_line(line)
         running_paces.append(rp_)
