@@ -111,8 +111,8 @@ def run_example(example_coroutine, *extra_args):
         loop.run_forever()
     except hangups.exceptions.NetworkError:
         print('Network problem.  Try again later?')
-    finally:
-        loop.close()
+    #finally:
+        #loop.close()
 
 
 def _get_parser(extra_args):
