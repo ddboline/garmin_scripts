@@ -186,6 +186,7 @@
    31.0686       14 28   2016    0       Wildcat Ridge 50k
    13.9000       14 57   2016    0       Black Rock 25k
    50.0000       15 25   2017    1       NFEC CA 50 mi
+   31.0686       15 29   2018    0       North Face Endurance Challenge MA 50k
    31.2600       15 30   2016    0       SRT 30 mile Run Hike
    51.0000       15 47   2016    0       North Face Endurance Challenge NY
    31.0686       15 52   2015    0       North Face Endurance Challenge NY
@@ -197,3 +198,4 @@
    20.3000       16 48   2016    0       Great Schunemunk Traverse
    54.0000       17 11   2017    0       Lost Turkey 50 mi
    28.0000       20 22   2017    0       Breakneck Trail "Marathon"
+   54.0000       24 36   2018    0       Manitou's Revenge
