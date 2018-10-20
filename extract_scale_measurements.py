@@ -34,7 +34,7 @@ def insert_entries_into_spreadsheet(new_entries):
             continue
         tstamp = parse(vals[0]).replace(tzinfo=est)
         weight, fat, water, muscle, bone = [float(x) for x in vals[1:]]
-        entry = ScaleEntry(tstamp, weight, fat, water, muscle, bone)
+        entry = ScaleEntry(tstamp.isoformat(), weight, fat, water, muscle, bone)
         current_entries[tstamp.date().isoformat()] = entry
         last_row = irow
 
@@ -81,7 +81,7 @@ def extract_scale_inputs(client, _):
             weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split(':')]
         except ValueError:
             continue
-        new_entry = ScaleEntry(tstmp, weight, fat, water, muscle, bone)
+        new_entry = ScaleEntry(tstmp.isoformat(), weight, fat, water, muscle, bone)
         new_entries[tstmp.date().isoformat()] = new_entry
     insert_entries_into_spreadsheet(new_entries)
 
