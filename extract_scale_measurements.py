@@ -72,13 +72,16 @@ def extract_scale_inputs(client, _):
                     if event.timestamp < oldest_time:
                         oldest_event = event.id_
                         oldest_time = event.timestamp
-                    if event.text[0].isnumeric():
+                    if event.text[0].isnumeric() and event.text[-1].isnumeric():
                         entries.add((event.text.strip(), event.timestamp.isoformat()))
     new_entries = {}
     for txt, tstmp in entries:
         tstmp = parse(tstmp).astimezone(est)
         try:
-            weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split(':')]
+            if ':' in txt:
+                weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split(':')]
+            elif '=' in txt:
+                weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split('=')]
         except ValueError:
             continue
         new_entry = ScaleEntry(tstmp.isoformat(), weight, fat, water, muscle, bone)
