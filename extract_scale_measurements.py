@@ -82,6 +82,8 @@ def extract_scale_inputs(client, _):
                 weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split(':')]
             elif '=' in txt:
                 weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split('=')]
+                if muscle > 300.0:
+                    muscle = muscle / 10.
         except ValueError:
             continue
         new_entry = ScaleEntry(tstmp.isoformat(), weight, fat, water, muscle, bone)
