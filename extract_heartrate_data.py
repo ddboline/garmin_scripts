@@ -6,8 +6,12 @@ import threading
 import traceback
 import webbrowser
 import datetime
+import requests
 import pandas as pd
 from dateutil.parser import parse
+
+from pytz import timezone
+from time import strftime
 
 from base64 import b64encode
 import fitbit
@@ -18,8 +22,11 @@ import matplotlib
 matplotlib.use('Agg')
 import pylab as pl
 
-from garmin_app import garmin_utils, garmin_parse, garmin_report
-from garmin_app.util import utc, est
+#from garmin_app import garmin_utils, garmin_parse, garmin_report
+#from garmin_app.util import utc, est
+
+utc = timezone('UTC')
+est = timezone(strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
 
 client_id = '228D9P'
 client_secret = '9d7aa34320fac07106dca853dab8603d'
@@ -39,7 +46,8 @@ class OAuth2Server:
             client_id,
             client_secret,
             redirect_uri=redirect_uri,
-            timeout=10, )
+            timeout=10,
+        )
 
     def browser_authorize(self):
         """
@@ -120,7 +128,7 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
     assert end_date >= begin_date
     days = (end_date - begin_date).days
     dates = [begin_date + datetime.timedelta(days=x) for x in range(days + 1)]
-    dates = map(lambda x: x.isoformat(), dates)
+    dates = list(map(lambda x: x.isoformat(), dates))
 
     data = []
     heart_rate_pace_data = []
@@ -134,20 +142,18 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
 
     files = []
     for date in dates:
-        files.extend(garmin_utils.find_gps_tracks(date, garmin_utils.CACHEDIR))
+        js = requests.get(f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}').json()
+        files.extend(js['gps_list'])
     for fname in files:
-        gf = garmin_parse.GarminParse(fname)
-        gf.read_file()
+        js = requests.get(f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}').json()
         tmp = [{
-            'time': x.time.replace(tzinfo=utc).astimezone(est),
-            'value': x.heart_rate
-        } for x in gf.points if x.heart_rate is not None]
-        tmp = [{'time': parse(x['time'].isoformat()[:19]), 'value': x['value']} for x in tmp]
+            'time': parse(x['time']).astimezone(est).isoformat()[:19],
+            'value': x['value']
+        } for x in js['hr_data']]
         data.extend(tmp)
 
-        tmp = garmin_report.get_splits(gf, 400., do_heart_rate=True)
-        tmp = [{'hrt': h, 'pace': 4 * s / 60.} for d, s, h in tmp]
-        tmp = filter(lambda x: 5.5 < x['pace'] < 20, tmp)
+        js = requests.get(f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}').json()
+        tmp = [{'hrt': int(x['hr']), 'pace': x['pace']} for x in js['hr_pace']]
         heart_rate_pace_data.extend(tmp)
     df = pd.DataFrame(data)
     if df.shape[0] > 0:
