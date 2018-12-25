@@ -68,6 +68,8 @@ def analyze_scale_measurements():
             'Bone': 'bone',
             'Water %': 'water'
         })
+    df = df.sort_values(by='datetime')
+    df1 = df.sort_values(by='datetime')
     df1 = df1[df1.datetime > df.datetime.max()]
     df = pd.concat([df, df1], axis=0)
     df.index = df.datetime
