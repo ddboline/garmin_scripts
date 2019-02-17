@@ -26,6 +26,8 @@ except ImportError:
     os.sys.path.append('%s' % os.getenv('HOME'))
     from scripts.world_record import do_fit
 
+os.set_blocking(0, True)
+
 
 def analyze_scale_measurements():
     credentials = ServiceAccountCredentials.from_json_keyfile_name(

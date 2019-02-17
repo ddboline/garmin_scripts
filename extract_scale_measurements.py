@@ -14,6 +14,8 @@ from time import strftime
 import hangups
 import appdirs
 
+os.set_blocking(0, True)
+
 est = timezone(strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
 ScaleEntry = namedtuple('ScaleEntry', ['timestamp', 'weight', 'fat', 'water', 'muscle', 'bone'])
 
@@ -41,7 +43,7 @@ def insert_entries_into_spreadsheet(new_entries):
     current_days = set(current_entries.keys())
     new_days = set(new_entries.keys()) - current_days
 
-    current_row = last_row+2
+    current_row = last_row + 2
     for day in sorted(new_days):
         new_entry = new_entries[day]
         print(new_entries[day])
@@ -117,13 +119,12 @@ def run_example(example_coroutine, *extra_args):
     except hangups.exceptions.NetworkError:
         print('Network problem.  Try again later?')
     #finally:
-        #loop.close()
+    #loop.close()
 
 
 def _get_parser(extra_args):
     """Return ArgumentParser with any extra arguments."""
-    parser = argparse.ArgumentParser(
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter, )
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, )
     dirs = appdirs.AppDirs('hangups', 'hangups')
     default_token_path = os.path.join(dirs.user_cache_dir, 'refresh_token.txt')
     parser.add_argument(

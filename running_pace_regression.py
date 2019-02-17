@@ -90,8 +90,8 @@ def running_pace_regression():
 
     xtickarray = np.log(
         np.array([
-            METERS_PER_MILE, 5e3, 10e3, MARATHON_DISTANCE_M / 2., MARATHON_DISTANCE_M, 50 *
-            METERS_PER_MILE
+            METERS_PER_MILE, 5e3, 10e3, MARATHON_DISTANCE_M / 2., MARATHON_DISTANCE_M,
+            50 * METERS_PER_MILE
         ]) / METERS_PER_MILE)
     ytickarray = np.log(np.array([5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]))
 

@@ -26,13 +26,13 @@ import pylab as pl
 #from garmin_app import garmin_utils, garmin_parse, garmin_report
 #from garmin_app.util import utc, est
 
+os.set_blocking(0, True)
+
 utc = timezone('UTC')
 est = timezone(strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
 
 client_id = '228D9P'
 client_secret = '9d7aa34320fac07106dca853dab8603d'
-
-current_token = {}
 
 
 def get_client(refresh=False):
@@ -44,6 +44,8 @@ def get_client(refresh=False):
         webbrowser.open(requests.get(url).text)
         sleep(5)
 
+    user_id, access_token, refresh_token = '', '', ''
+
     with open('%s/.fitbit_tokens' % os.getenv('HOME'), 'r') as fd:
         for line in fd:
             key, val = line.strip().split('=')
@@ -53,15 +55,6 @@ def get_client(refresh=False):
                 access_token = val
             elif key == 'refresh_token':
                 refresh_token = val
-
-    if (user_id == current_token.get('user_id', '') and
-            access_token == current_token.get('access_token', '') and
-            refresh_token == current_token.get('refresh_token', '')):
-        input('Something didnt work')
-    else:
-        current_token['user_id'] = user_id
-        current_token['access_token'] = access_token
-        current_token['refresh_token'] = refresh_token
 
     client = fitbit.Fitbit(
         client_id, client_secret, access_token=access_token, refresh_token=refresh_token)
