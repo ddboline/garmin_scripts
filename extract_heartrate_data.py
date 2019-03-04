@@ -31,8 +31,18 @@ os.set_blocking(0, True)
 utc = timezone('UTC')
 est = timezone(strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
 
-client_id = '228D9P'
-client_secret = '9d7aa34320fac07106dca853dab8603d'
+def read_config_env():
+    with open('config.env', 'r') as f:
+        for l in f:
+            (key, val) = l.strip().split('=')[:2]
+            os.environ[key] = val
+
+read_config_env()
+
+client_id = os.environ['FITBIT_CLIENTID']
+client_secret = os.environ['FITBIT_CLIENTSECRET']
+garmin_username = os.environ['GARMIN_USERNAME']
+garmin_password = os.environ['GARMIN_PASSWORD']
 
 
 def get_client(refresh=False):
@@ -82,27 +92,29 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
         fitbit_hr_data = client.intraday_time_series('activities/heart', base_date=date)
         tmp = fitbit_hr_data['activities-heart-intraday']['dataset']
         tmp = [{'time': parse('%sT%s' % (date, x['time'])), 'value': x['value']} for x in tmp]
+        print(date, len(tmp))
         data.extend(tmp)
 
     files = []
+    cookies = requests.post(f'https://www.ddboline.net/api/auth', json={'email': garmin_username, 'password': garmin_password}).cookies
     for date in dates:
-        js = requests.get(f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}').json()
+        js = requests.get(f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}', cookies=cookies).json()
         files.extend(js['gps_list'])
     for fname in files:
         print(fname)
-        js = requests.get(f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}').json()
+        js = requests.get(f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}', cookies=cookies).json()
         tmp = [{
             'time': parse(x['time']).astimezone(est).isoformat()[:19],
             'value': x['value']
         } for x in js['hr_data']]
         data.extend(tmp)
 
-        js = requests.get(f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}').json()
+        js = requests.get(f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}', cookies=cookies).json()
         tmp = [{'hrt': int(x['hr']), 'pace': x['pace']} for x in js['hr_pace']]
         heart_rate_pace_data.extend(tmp)
     df = pd.DataFrame(data)
     if df.shape[0] > 0:
-        df.index = df.time
+        df.index = pd.to_datetime(df.time)
         ts = df.sort_index().value
         pl.clf()
         ts.resample('5Min').mean().dropna().plot()
