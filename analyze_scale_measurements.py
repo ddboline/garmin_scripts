@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ fit world record paces to simple model """
-from __future__ import (absolute_import, division, print_function, unicode_literals)
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import os
 import datetime
 from dateutil.parser import parse
@@ -48,9 +49,11 @@ def analyze_scale_measurements():
         return df
 
     df = get_spreadsheet_by_title(
-        'Scale Measurements', key='1MG8so2pFKoOIpt0Vo9pUAtoNk-Y1SnHq9DiEFi-m5Uw')
+        'Scale Measurements',
+        key='1MG8so2pFKoOIpt0Vo9pUAtoNk-Y1SnHq9DiEFi-m5Uw')
     df1 = get_spreadsheet_by_title(
-        'Scale Measurement (Responses)', key='1_m-D8U-jHNur6TkpoDufGPn1S9fl_v-_oX_lCnS9LNk')
+        'Scale Measurement (Responses)',
+        key='1_m-D8U-jHNur6TkpoDufGPn1S9fl_v-_oX_lCnS9LNk')
 
     df = df.rename(
         columns={
@@ -78,11 +81,18 @@ def analyze_scale_measurements():
     df = df.sort_index()
 
     client = get_client()
-    body_weight = {x['date']: x['weight'] for x in client.get_bodyweight(period='30d')['weight']}
-    body_fat = {x['date']: x['fat'] for x in client.get_bodyfat(period='30d')['fat']}
+    body_weight = {
+        x['date']: x['weight']
+        for x in client.get_bodyweight(period='30d')['weight']
+    }
+    body_fat = {
+        x['date']: x['fat']
+        for x in client.get_bodyfat(period='30d')['fat']
+    }
 
     if len(body_weight) == 0 or len(body_fat) == 0:
-        min_date = (datetime.date.today() - datetime.timedelta(days=30)).isoformat()
+        min_date = (
+            datetime.date.today() - datetime.timedelta(days=30)).isoformat()
     else:
         min_date = min(chain(body_weight.keys(), body_fat.keys()))
     cond = df.datetime.dt.date >= parse(min_date).date()
@@ -120,7 +130,8 @@ def analyze_scale_measurements():
         yticklabels = ['%3.1f' % x for x in ytickarray]
 
         data = df[['days', var]].values
-        params, dparams = do_fit(data, lin_func, param_default=[75, 1, 1, 1, 1])
+        params, dparams = do_fit(
+            data, lin_func, param_default=[75, 1, 1, 1, 1])
         pp_, pm_ = params + dparams, params - dparams
 
         v0 = lin_func(today, *params)
@@ -147,11 +158,15 @@ def analyze_scale_measurements():
         cmd = 'mv scale_%s.png /home/ddboline/public_html/' % var
         print(cmd)
         os.system(cmd)
-        print('%s\tmean=%s parameters=[%s, %s, %s]' % (var, df[var].mean(), params[0], params[1],
-                                                       params[2]))
+        print('%s\tmean=%s parameters=[%s, %s, %s]' %
+              (var, df[var].mean(), params[0], params[1], params[2]))
         print('\t%s +%s -%s' % (v0, vp - v0, v0 - vm))
 
     df.to_csv('scale_measurements.csv', index=False)
+
+    for var in ('mass', 'fat', 'water', 'muscle', 'bone'):
+        cmd = 'scp /home/ddboline/public_html/scale_%s.png ubuntu@cloud.ddboline.net:~/public_html/' % var
+        os.system(cmd)
 
     return
 

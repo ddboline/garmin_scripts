@@ -29,13 +29,16 @@ import pylab as pl
 os.set_blocking(0, True)
 
 utc = timezone('UTC')
-est = timezone(strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
+est = timezone(
+    strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
+
 
 def read_config_env():
     with open('config.env', 'r') as f:
         for l in f:
             (key, val) = l.strip().split('=')[:2]
             os.environ[key] = val
+
 
 read_config_env()
 
@@ -47,10 +50,11 @@ garmin_password = os.environ['GARMIN_PASSWORD']
 
 def get_client(refresh=False):
     if refresh:
-        url = 'https://www.ddboline.net/fitbit/auth?%s' % urlencode({
-            'id': client_id,
-            'secret': client_secret
-        })
+        url = 'https://www.ddboline.net/fitbit/auth?%s' % urlencode(
+            {
+                'id': client_id,
+                'secret': client_secret
+            })
         webbrowser.open(requests.get(url).text)
         sleep(5)
 
@@ -67,7 +71,10 @@ def get_client(refresh=False):
                 refresh_token = val
 
     client = fitbit.Fitbit(
-        client_id, client_secret, access_token=access_token, refresh_token=refresh_token)
+        client_id,
+        client_secret,
+        access_token=access_token,
+        refresh_token=refresh_token)
     try:
         client.user_profile_get()
         return client
@@ -76,7 +83,8 @@ def get_client(refresh=False):
     return client
 
 
-def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().isoformat()):
+def get_heartrate_data(begin_date='2017-03-10',
+                       end_date=datetime.date.today().isoformat()):
     begin_date = parse(begin_date).date()
     end_date = parse(end_date).date()
     assert end_date >= begin_date
@@ -89,27 +97,42 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
 
     client = get_client()
     for date in dates:
-        fitbit_hr_data = client.intraday_time_series('activities/heart', base_date=date)
+        fitbit_hr_data = client.intraday_time_series(
+            'activities/heart', base_date=date)
         tmp = fitbit_hr_data['activities-heart-intraday']['dataset']
-        tmp = [{'time': parse('%sT%s' % (date, x['time'])), 'value': x['value']} for x in tmp]
+        tmp = [{
+            'time': parse('%sT%s' % (date, x['time'])),
+            'value': x['value']
+        } for x in tmp]
         print(date, len(tmp))
         data.extend(tmp)
 
     files = []
-    cookies = requests.post(f'https://www.ddboline.net/api/auth', json={'email': garmin_username, 'password': garmin_password}).cookies
+    cookies = requests.post(
+        f'https://www.ddboline.net/api/auth',
+        json={
+            'email': garmin_username,
+            'password': garmin_password
+        }).cookies
     for date in dates:
-        js = requests.get(f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}', cookies=cookies).json()
+        js = requests.get(
+            f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}',
+            cookies=cookies).json()
         files.extend(js['gps_list'])
     for fname in files:
         print(fname)
-        js = requests.get(f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}', cookies=cookies).json()
+        js = requests.get(
+            f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}',
+            cookies=cookies).json()
         tmp = [{
             'time': parse(x['time']).astimezone(est).isoformat()[:19],
             'value': x['value']
         } for x in js['hr_data']]
         data.extend(tmp)
 
-        js = requests.get(f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}', cookies=cookies).json()
+        js = requests.get(
+            f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}',
+            cookies=cookies).json()
         tmp = [{'hrt': int(x['hr']), 'pace': x['pace']} for x in js['hr_pace']]
         heart_rate_pace_data.extend(tmp)
     df = pd.DataFrame(data)
@@ -128,6 +151,11 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
         df.plot.hexbin('hrt', 'pace', gridsize=30)
         pl.savefig('hrt_vs_pace.png')
         os.system('mv hrt_vs_pace.png /home/ddboline/public_html/')
+
+    for f in ('hrt_vs_pace.png', 'heartrate_data.png'):
+        cmd = 'scp /home/ddboline/public_html/%s ubuntu@cloud.ddboline.net:~/public_html/' % f
+        os.system(cmd)
+
     return df
 
 

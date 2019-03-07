@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """ fit world record paces to simple model """
-from __future__ import (absolute_import, division, print_function, unicode_literals)
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import os
 import numpy as np
 import matplotlib
@@ -40,7 +41,8 @@ def do_fit(data, func, param_default, do_bootstrap=False):
             random_delta = np.random.normal(0., s_res, len(datay))
             random_data_y = datay + random_delta
         else:
-            random_delta = np.array([np.random.normal(0., derr, 1)[0] for derr in datayerrors])
+            random_delta = np.array(
+                [np.random.normal(0., derr, 1)[0] for derr in datayerrors])
             random_data_y = datay + random_delta
         randomfit, _ = optimize.leastsq(
             errfunc, param_default, args=(datax, random_data_y), full_output=0)
@@ -88,8 +90,10 @@ def plot_paces():
     rpm = np.array(running_paces_men)
     rpw = np.array(running_paces_women)
 
-    plt.scatter(np.log(rpm[:, 0]), rpm[:, 1], c='b', label='Men\'s World Records')
-    plt.scatter(np.log(rpw[:, 0]), rpw[:, 1], c='r', label='Women\'s World Records')
+    plt.scatter(
+        np.log(rpm[:, 0]), rpm[:, 1], c='b', label='Men\'s World Records')
+    plt.scatter(
+        np.log(rpw[:, 0]), rpw[:, 1], c='r', label='Women\'s World Records')
 
     plt.xlim(np.log(60 / METERS_PER_MILE), np.log(600e3 / METERS_PER_MILE))
     plt.ylim(2, 16)
@@ -97,13 +101,16 @@ def plot_paces():
     # Set x ticks
     xtickarray = np.log(
         np.array([
-            100, 200, 400, 800, METERS_PER_MILE, 5e3, 10e3, MARATHON_DISTANCE_M / 2.,
-            MARATHON_DISTANCE_M, 50 * METERS_PER_MILE, 100 * METERS_PER_MILE, 300 * METERS_PER_MILE
+            100, 200, 400, 800, METERS_PER_MILE, 5e3, 10e3,
+            MARATHON_DISTANCE_M / 2., MARATHON_DISTANCE_M,
+            50 * METERS_PER_MILE, 100 * METERS_PER_MILE, 300 * METERS_PER_MILE
         ]) / METERS_PER_MILE)
     ytickarray = np.array(range(2, 16))
 
-    plt.xticks(xtickarray,
-               ['100m', '', '', '800m', '1mi', '5k', '10k', '', 'Marathon', '', '100mi', '300mi'])
+    plt.xticks(xtickarray, [
+        '100m', '', '', '800m', '1mi', '5k', '10k', '', 'Marathon', '',
+        '100mi', '300mi'
+    ])
 
     # Set y ticks
     plt.yticks(ytickarray, ['%d:00/mi' % x for x in range(3, 16)])
@@ -111,16 +118,21 @@ def plot_paces():
     plt.legend(loc='upper left')
 
     for xt_ in xtickarray:
-        plt.plot([xt_, xt_], [2, 16], color='black', linewidth=0.5, linestyle=':')
+        plt.plot([xt_, xt_], [2, 16],
+                 color='black',
+                 linewidth=0.5,
+                 linestyle=':')
 
     for yt_ in ytickarray:
         plt.plot(
-            np.log([60 / METERS_PER_MILE, 600e3 / METERS_PER_MILE]), [yt_, yt_],
+            np.log([60 / METERS_PER_MILE, 600e3 / METERS_PER_MILE]),
+            [yt_, yt_],
             color='black',
             linewidth=0.5,
             linestyle=':')
 
-    plt.title('Running Race (minutes per mile) for World Records from 100m ' 'to 48hours')
+    plt.title('Running Race (minutes per mile) for World Records from 100m '
+              'to 48hours')
 
     mp0 = np.mean(rpm[np.abs(rpm[:, 0] - MARATHON_DISTANCE_MI) < 1][:, 1])
     wp0 = np.mean(rpw[np.abs(rpw[:, 0] - MARATHON_DISTANCE_MI) < 1][:, 1])
@@ -185,6 +197,9 @@ def plot_paces():
     plt.show()
     plt.savefig('world_record.png')
     os.system('mv world_record.png /home/ddboline/public_html/')
+
+    cmd = 'scp /home/ddboline/public_html/world_record.png ubuntu@cloud.ddboline.net:~/public_html/'
+    os.system(cmd)
 
 
 if __name__ == '__main__':
