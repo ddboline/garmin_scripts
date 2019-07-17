@@ -114,29 +114,30 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
         data.extend(tmp)
 
     files = []
-    cookies = requests.post(
+    session = requests.Session()
+
+    session.post(
         f'https://www.ddboline.net/api/auth',
         json={
             'email': garmin_username,
             'password': garmin_password
         }).cookies
     for date in dates:
-        js = requests.get(
-            f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}',
-            cookies=cookies).json()
+        js = session.get(
+            f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}').json()
         files.extend(js['gps_list'])
     for fname in files:
         print(fname)
-        js = requests.get(
-            f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}', cookies=cookies).json()
+        js = session.get(
+            f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}').json()
         tmp = [{
             'time': parse(x['time']).astimezone(est).isoformat()[:19],
             'value': x['value']
         } for x in js['hr_data']]
         data.extend(tmp)
 
-        js = requests.get(
-            f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}', cookies=cookies).json()
+        js = session.get(
+            f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}').json()
         tmp = [{'hrt': int(x['hr']), 'pace': x['pace']} for x in js['hr_pace']]
         heart_rate_pace_data.extend(tmp)
     df = pd.DataFrame(data)
