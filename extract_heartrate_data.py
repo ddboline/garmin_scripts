@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import cherrypy
 import os
 import sys
 
@@ -17,7 +16,6 @@ from time import strftime, sleep
 from base64 import b64encode
 import fitbit
 from fitbit.api import Fitbit
-from oauthlib.oauth2.rfc6749.errors import MismatchingStateError, MissingTokenError
 
 import matplotlib
 matplotlib.use('Agg')
