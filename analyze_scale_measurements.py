@@ -51,7 +51,6 @@ def analyze_scale_measurements():
     df.index = df.datetime
     df = df.sort_index()
 
-    session = get_session()
     client = get_client(session)
     body_weight = {
         x['date']: x['weight']
