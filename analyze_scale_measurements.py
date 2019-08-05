@@ -5,6 +5,7 @@ from __future__ import (absolute_import, division, print_function,
 import os
 import datetime
 from dateutil.parser import parse
+from dateutil.tz import tzutc
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -14,7 +15,7 @@ from itertools import chain
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 
-from extract_heartrate_data import get_client
+from extract_heartrate_data import get_client, get_session
 
 try:
     from StringIO import StringIO
@@ -31,56 +32,27 @@ os.set_blocking(0, True)
 
 
 def analyze_scale_measurements():
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        '/home/ddboline/setup_files/build/gapi_scripts/gspread.json',
-        ['https://spreadsheets.google.com/feeds'])
-    gc = gspread.authorize(credentials)
-
-    def get_spreadsheet_by_title(title, key=None):
-        if key:
-            s = gc.open_by_key(key)
-        else:
-            s = gc.open(title)
-        w = s.sheet1
-        df = pd.DataFrame(w.get_all_records())
-        for col in ('Datetime', 'Timestamp'):
-            if col in df:
-                df[col] = df[col].apply(lambda x: parse(x, ignoretz=True))
-        return df
-
-    df = get_spreadsheet_by_title(
-        'Scale Measurements',
-        key='1MG8so2pFKoOIpt0Vo9pUAtoNk-Y1SnHq9DiEFi-m5Uw')
-    df1 = get_spreadsheet_by_title(
-        'Scale Measurement (Responses)',
-        key='1_m-D8U-jHNur6TkpoDufGPn1S9fl_v-_oX_lCnS9LNk')
+    session = get_session()
+    url = f'https://www.ddboline.net/garmin/scale_measurements'
+    js = session.get(url).json()
+    df = pd.DataFrame(js)
+    df['datetime'] = df['datetime'].apply(lambda x: parse(x))
 
     df = df.rename(
         columns={
-            'Mass': 'mass',
-            'Datetime': 'datetime',
-            'Fat': 'fat',
-            'Water': 'water',
-            'Muscle': 'muscle',
-            'Bone': 'bone'
-        })
-    df1 = df1.rename(
-        columns={
-            'Weight (lbs)': 'mass',
-            'Timestamp': 'datetime',
-            'Fat %': 'fat',
-            'Muscle': 'muscle',
-            'Bone': 'bone',
-            'Water %': 'water'
+            'mass': 'mass',
+            'datetime': 'datetime',
+            'fat_pct': 'fat',
+            'water_pct': 'water',
+            'muscle_pct': 'muscle',
+            'bone_pct': 'bone'
         })
     df = df.sort_values(by='datetime')
-    df1 = df.sort_values(by='datetime')
-    df1 = df1[df1.datetime > df.datetime.max()]
-    df = pd.concat([df, df1], axis=0)
     df.index = df.datetime
     df = df.sort_index()
 
-    client = get_client()
+    session = get_session()
+    client = get_client(session)
     body_weight = {
         x['date']: x['weight']
         for x in client.get_bodyweight(period='30d')['weight']
@@ -112,7 +84,7 @@ def analyze_scale_measurements():
             print(url)
             client.make_request(url, data=data, method='POST')
     df['days'] = (df.datetime - df.datetime[0]).apply(lambda x: x.days)
-    today = (datetime.datetime.now() - df.datetime[0]).days
+    today = (datetime.datetime.now(tzutc()) - df.datetime[0]).days
     xval = np.linspace(0, df['days'].max())
 
     tmp = pd.Series(np.arange(0, df['days'].max()))
