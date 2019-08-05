@@ -62,7 +62,7 @@ def get_client(session, refresh=False, tokens_last_mod=None):
         sleep(5)
         return get_client(session, refresh=False, tokens_last_mod=tokens_last_mod)
 
-    user_id, access_token, refresh_token = '', '', ''
+    access_token, refresh_token = '', ''
 
     with open('%s/.fitbit_tokens' % os.getenv('HOME'), 'r') as fd:
         for line in fd:
@@ -70,9 +70,7 @@ def get_client(session, refresh=False, tokens_last_mod=None):
             if len(tmp) < 2:
                 continue
             key, val = tmp[:2]
-            if key == 'user_id':
-                user_id = val
-            elif key == 'access_token':
+            if key == 'access_token':
                 access_token = val
             elif key == 'refresh_token':
                 refresh_token = val
@@ -116,7 +114,6 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
     files = []
     session = get_session()
 
-    client = get_client(session)
     last_date = dates[0]
     zero_dates = []
 
