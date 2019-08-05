@@ -117,13 +117,22 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
     session = get_session()
 
     client = get_client(session)
+    last_date = dates[0]
+    zero_dates = []
+
     for date in dates:
         url = f'https://www.ddboline.net/garmin/fitbit/heartrate_db?date={date}'
         tmp = session.get(url).json()
-        tmp = [{'time': parse(x['datetime']), 'value': x['value']} for x in tmp]
+
+        if len(tmp) > 0:
+            last_date = date
+        else:
+            zero_dates.append(date)
+        tmp = [{'time': parse(x['datetime']).astimezone(est).isoformat()[:19], 'value': x['value']} for x in tmp]
         print(date, len(tmp))
         data.extend(tmp)
 
+    for date in [last_date] + zero_dates:
         url = f'https://www.ddboline.net/garmin/fitbit/sync?date={date}'
         session.get(url).raise_for_status()
         print(f'sync {date}')
