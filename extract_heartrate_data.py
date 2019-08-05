@@ -45,13 +45,10 @@ garmin_username = os.environ['GARMIN_USERNAME']
 garmin_password = os.environ['GARMIN_PASSWORD']
 
 
-def get_client(refresh=False, tokens_last_mod=None):
+def get_client(session, refresh=False, tokens_last_mod=None):
     if refresh:
-        url = 'https://www.ddboline.net/fitbit/auth?%s' % urlencode({
-            'id': client_id,
-            'secret': client_secret
-        })
-        webbrowser.open(requests.get(url).text)
+        url = 'https://www.ddboline.net/garmin/fitbit/auth'
+        webbrowser.open(session.get(url).text)
         sleep(5)
 
     token_fname = '%s/.fitbit_tokens' % os.getenv('HOME')
@@ -59,11 +56,11 @@ def get_client(refresh=False, tokens_last_mod=None):
     if os.path.exists(token_fname):
         current_last_mod = os.stat(token_fname).st_mtime
     else:
-        return get_client(refresh=True)
+        return get_client(session, refresh=True)
 
     if tokens_last_mod is not None and current_last_mod <= tokens_last_mod:
         sleep(5)
-        return get_client(refresh=False, tokens_last_mod=tokens_last_mod)
+        return get_client(session, refresh=False, tokens_last_mod=tokens_last_mod)
 
     user_id, access_token, refresh_token = '', '', ''
 
@@ -80,16 +77,29 @@ def get_client(refresh=False, tokens_last_mod=None):
             elif key == 'refresh_token':
                 refresh_token = val
 
-    client = fitbit.Fitbit(
-        client_id, client_secret, access_token=access_token, refresh_token=refresh_token)
+    client = fitbit.Fitbit(client_id,
+                           client_secret,
+                           access_token=access_token,
+                           refresh_token=refresh_token)
     try:
         client.user_profile_get()
         return client
     except fitbit.exceptions.HTTPUnauthorized:
         if refresh is True:
-            return get_client(refresh=False, tokens_last_mod=current_last_mod)
+            return get_client(session, refresh=False, tokens_last_mod=current_last_mod)
         else:
-            return get_client(refresh=True, tokens_last_mod=current_last_mod)
+            return get_client(session, refresh=True, tokens_last_mod=current_last_mod)
+
+
+def get_session():
+    session = requests.Session()
+
+    session.post(f'https://www.ddboline.net/api/auth',
+                 json={
+                     'email': garmin_username,
+                     'password': garmin_password
+                 })
+    return session
 
 
 def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().isoformat()):
@@ -103,39 +113,34 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
     data = []
     heart_rate_pace_data = []
 
-    client = get_client()
+    files = []
+    session = get_session()
+
+    client = get_client(session)
     for date in dates:
-        fitbit_hr_data = client.intraday_time_series('activities/heart', base_date=date)
-        tmp = fitbit_hr_data['activities-heart-intraday']['dataset']
-        tmp = [{'time': parse('%sT%s' % (date, x['time'])), 'value': x['value']} for x in tmp]
+        url = f'https://www.ddboline.net/garmin/fitbit/heartrate_db?date={date}'
+        tmp = session.get(url).json()
+        tmp = [{'time': parse(x['datetime']), 'value': x['value']} for x in tmp]
         print(date, len(tmp))
         data.extend(tmp)
 
-    files = []
-    session = requests.Session()
+        url = f'https://www.ddboline.net/garmin/fitbit/sync?date={date}'
+        session.get(url).raise_for_status()
+        print(f'sync {date}')
 
-    session.post(
-        f'https://www.ddboline.net/api/auth',
-        json={
-            'email': garmin_username,
-            'password': garmin_password
-        }).cookies
     for date in dates:
-        js = session.get(
-            f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}').json()
+        js = session.get(f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}').json()
         files.extend(js['gps_list'])
     for fname in files:
         print(fname)
-        js = session.get(
-            f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}').json()
+        js = session.get(f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}').json()
         tmp = [{
             'time': parse(x['time']).astimezone(est).isoformat()[:19],
             'value': x['value']
         } for x in js['hr_data']]
         data.extend(tmp)
 
-        js = session.get(
-            f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}').json()
+        js = session.get(f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}').json()
         tmp = [{'hrt': int(x['hr']), 'pace': x['pace']} for x in js['hr_pace']]
         heart_rate_pace_data.extend(tmp)
     df = pd.DataFrame(data)
