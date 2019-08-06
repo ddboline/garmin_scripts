@@ -108,7 +108,6 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
     dates = [begin_date + datetime.timedelta(days=x) for x in range(days + 1)]
     dates = list(map(lambda x: x.isoformat(), dates))
 
-    data = []
     heart_rate_pace_data = []
 
     files = []
@@ -117,22 +116,37 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
     last_date = dates[0]
     zero_dates = []
 
+    entries = []
     for date in dates:
         url = f'https://www.ddboline.net/garmin/fitbit/heartrate_db?date={date}'
         tmp = session.get(url).json()
 
         if len(tmp) > 0:
             last_date = date
+            entries.append(tmp)
+            print(date, len(tmp))
         else:
             zero_dates.append(date)
-        tmp = [{'time': parse(x['datetime']).astimezone(est).isoformat()[:19], 'value': x['value']} for x in tmp]
-        print(date, len(tmp))
-        data.extend(tmp)
 
+    entries.pop()
     for date in [last_date] + zero_dates:
         url = f'https://www.ddboline.net/garmin/fitbit/sync?date={date}'
         session.get(url).raise_for_status()
         print(f'sync {date}')
+
+        url = f'https://www.ddboline.net/garmin/fitbit/heartrate_db?date={date}'
+        tmp = session.get(url).json()
+        print(date, len(tmp))
+
+        entries.append(tmp)
+
+    data = []
+    for tmp in entries:
+        tmp = [{
+            'time': parse(x['datetime']).astimezone(est).isoformat()[:19],
+            'value': x['value']
+        } for x in tmp]
+        data.extend(tmp)
 
     for date in dates:
         js = session.get(f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}').json()
