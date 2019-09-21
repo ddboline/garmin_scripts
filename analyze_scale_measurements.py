@@ -12,8 +12,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as pl
 import pandas as pd
 from itertools import chain
-from oauth2client.service_account import ServiceAccountCredentials
-import gspread
 
 from extract_heartrate_data import get_client, get_session
 

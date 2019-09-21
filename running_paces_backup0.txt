@@ -1,3 +1,11 @@
+   31.0686       13 28   2019    1       Wildcat Ridge 50k
+   31.0686       12 57   2019    1       Mayapple 50k
+   31.0686       12 01   2019    1       Shore 2 Shore 50k
+   13.1094       18 24   2019    0       Breakneck Trail Half Marathon
+   31.0686       13 05   2019    1       Tito's Tacos and Trails 50k
+   13.1094       08 54   2018    1       Paine to Pain Half Marathon, New Rochelle NY
+   31.0686       10 40   2018    1       Tesla Hertz 50k
+   31.0686       11 04   2018    1       Smart Ass Trail Mixup 50k
    54.0000       24 36   2018    1       Manitou's Revenge
    31.0686       15 29   2018    1       North Face Endurance Challenge MA 50k
    31.0686       13 19   2018    1       Mayapple 50k
