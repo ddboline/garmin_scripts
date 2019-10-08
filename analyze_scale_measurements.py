@@ -13,7 +13,7 @@ import matplotlib.pyplot as pl
 import pandas as pd
 from itertools import chain
 
-from extract_heartrate_data import get_client, get_session
+from extract_heartrate_data import get_client, get_session, DEFAULT_HOST
 
 try:
     from StringIO import StringIO
@@ -27,11 +27,12 @@ except ImportError:
     from scripts.world_record import do_fit
 
 os.set_blocking(0, True)
+HOME = os.environ['HOME']
 
 
-def analyze_scale_measurements():
+def analyze_scale_measurements(host=DEFAULT_HOST):
     session = get_session()
-    url = f'https://www.ddboline.net/garmin/scale_measurements'
+    url = f'https://{host}/garmin/scale_measurements'
     js = session.get(url).json()
     df = pd.DataFrame(js)
     df['datetime'] = df['datetime'].apply(lambda x: parse(x))
@@ -60,8 +61,8 @@ def analyze_scale_measurements():
     }
 
     if len(body_weight) == 0 or len(body_fat) == 0:
-        min_date = (
-            datetime.date.today() - datetime.timedelta(days=30)).isoformat()
+        min_date = (datetime.date.today() -
+                    datetime.timedelta(days=30)).isoformat()
     else:
         min_date = min(chain(body_weight.keys(), body_fat.keys()))
     cond = df.datetime.dt.date >= parse(min_date).date()
@@ -99,8 +100,9 @@ def analyze_scale_measurements():
         yticklabels = ['%3.1f' % x for x in ytickarray]
 
         data = df[['days', var]].values
-        params, dparams = do_fit(
-            data, lin_func, param_default=[75, 1, 1, 1, 1])
+        params, dparams = do_fit(data,
+                                 lin_func,
+                                 param_default=[75, 1, 1, 1, 1])
         pp_, pm_ = params + dparams, params - dparams
 
         v0 = lin_func(today, *params)
@@ -123,8 +125,8 @@ def analyze_scale_measurements():
             pl.ylabel('lbs')
         else:
             pl.ylabel('%')
-        pl.savefig('scale_%s.png' % var)
-        cmd = 'mv scale_%s.png /home/ddboline/public_html/' % var
+        pl.savefig(f'scale_{var}.png')
+        cmd = f'mv scale_{var}.png {HOME}/public_html/'
         print(cmd)
         os.system(cmd)
         print('%s\tmean=%s parameters=[%s, %s, %s]' %
@@ -133,8 +135,11 @@ def analyze_scale_measurements():
 
     df.to_csv('scale_measurements.csv', index=False)
 
+    if DEFAULT_HOST != 'www.ddboline.net':
+        return
+
     for var in ('mass', 'fat', 'water', 'muscle', 'bone'):
-        cmd = 'scp /home/ddboline/public_html/scale_%s.png ubuntu@cloud.ddboline.net:~/public_html/' % var
+        cmd = f'scp {HOME}/public_html/scale_{var}.png ubuntu@cloud.ddboline.net:~/public_html/'
         os.system(cmd)
 
     return

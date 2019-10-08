@@ -16,17 +16,21 @@ import appdirs
 
 os.set_blocking(0, True)
 
-est = timezone(strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
-ScaleEntry = namedtuple('ScaleEntry', ['timestamp', 'weight', 'fat', 'water', 'muscle', 'bone'])
+est = timezone(
+    strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
+ScaleEntry = namedtuple(
+    'ScaleEntry', ['timestamp', 'weight', 'fat', 'water', 'muscle', 'bone'])
+HOME = os.environ['HOME']
 
 
 def insert_entries_into_spreadsheet(new_entries):
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        '/home/ddboline/setup_files/build/gapi_scripts/gspread.json',
+        f'{HOME}/setup_files/build/gapi_scripts/gspread.json',
         ['https://spreadsheets.google.com/feeds'])
     gc = gspread.authorize(credentials)
 
-    spreadsheet = gc.open_by_key('1MG8so2pFKoOIpt0Vo9pUAtoNk-Y1SnHq9DiEFi-m5Uw')
+    spreadsheet = gc.open_by_key(
+        '1MG8so2pFKoOIpt0Vo9pUAtoNk-Y1SnHq9DiEFi-m5Uw')
     wsheet = spreadsheet.sheet1
 
     current_entries = {}
@@ -36,7 +40,8 @@ def insert_entries_into_spreadsheet(new_entries):
             continue
         tstamp = parse(vals[0]).replace(tzinfo=est)
         weight, fat, water, muscle, bone = [float(x) for x in vals[1:]]
-        entry = ScaleEntry(tstamp.isoformat(), weight, fat, water, muscle, bone)
+        entry = ScaleEntry(tstamp.isoformat(), weight, fat, water, muscle,
+                           bone)
         current_entries[tstamp.date().isoformat()] = entry
         last_row = irow
 
@@ -47,7 +52,8 @@ def insert_entries_into_spreadsheet(new_entries):
     for day in sorted(new_days):
         new_entry = new_entries[day]
         print(new_entries[day])
-        wsheet.insert_row([getattr(new_entry, x) for x in new_entry._fields], index=current_row)
+        wsheet.insert_row([getattr(new_entry, x) for x in new_entry._fields],
+                          index=current_row)
         current_row += 1
         current_entries[day] = new_entry
     return current_entries
@@ -55,7 +61,8 @@ def insert_entries_into_spreadsheet(new_entries):
 
 @asyncio.coroutine
 def extract_scale_inputs(client, _):
-    _, conversation_list = (yield from hangups.build_user_conversation_list(client))
+    _, conversation_list = (yield from
+                            hangups.build_user_conversation_list(client))
     all_conversations = conversation_list.get_all(include_archived=True)
 
     print('{} known conversations'.format(len(all_conversations)))
@@ -74,21 +81,28 @@ def extract_scale_inputs(client, _):
                     if event.timestamp < oldest_time:
                         oldest_event = event.id_
                         oldest_time = event.timestamp
-                    if event.text[0].isnumeric() and event.text[-1].isnumeric():
-                        entries.add((event.text.strip(), event.timestamp.isoformat()))
+                    if event.text[0].isnumeric() and event.text[-1].isnumeric(
+                    ):
+                        entries.add(
+                            (event.text.strip(), event.timestamp.isoformat()))
     new_entries = {}
     for txt, tstmp in entries:
         tstmp = parse(tstmp).astimezone(est)
         try:
             if ':' in txt:
-                weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split(':')]
+                weight, fat, water, muscle, bone = [
+                    int(x) / 10. for x in txt.split(':')
+                ]
             elif '=' in txt:
-                weight, fat, water, muscle, bone = [int(x) / 10. for x in txt.split('=')]
+                weight, fat, water, muscle, bone = [
+                    int(x) / 10. for x in txt.split('=')
+                ]
                 if muscle > 300.0:
                     muscle = muscle / 10.
         except ValueError:
             continue
-        new_entry = ScaleEntry(tstmp.isoformat(), weight, fat, water, muscle, bone)
+        new_entry = ScaleEntry(tstmp.isoformat(), weight, fat, water, muscle,
+                               bone)
         new_entries[tstmp.date().isoformat()] = new_entry
     insert_entries_into_spreadsheet(new_entries)
 
@@ -124,7 +138,8 @@ def run_example(example_coroutine, *extra_args):
 
 def _get_parser(extra_args):
     """Return ArgumentParser with any extra arguments."""
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, )
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter, )
     dirs = appdirs.AppDirs('hangups', 'hangups')
     default_token_path = os.path.join(dirs.user_cache_dir, 'refresh_token.txt')
     parser.add_argument('--token-path',
@@ -148,7 +163,8 @@ def _async_main(example_coroutine, client, args):
     # Wait for hangups to either finish connecting or raise an exception.
     on_connect = asyncio.Future()
     client.on_connect.add_observer(lambda: on_connect.set_result(None))
-    done, _ = yield from asyncio.wait((on_connect, task), return_when=asyncio.FIRST_COMPLETED)
+    done, _ = yield from asyncio.wait((on_connect, task),
+                                      return_when=asyncio.FIRST_COMPLETED)
     yield from asyncio.gather(*done)
 
     # Run the example coroutine. Afterwards, disconnect hangups gracefully and

@@ -5,7 +5,8 @@ import os
 
 def read_config_env():
     homedir = os.environ.get('HOME', '/tmp')
-    with open(f'{homedir}/setup_files/build/garmin_scripts/config.env', 'r') as f:
+    with open(f'{homedir}/setup_files/build/garmin_scripts/config.env',
+              'r') as f:
         for l in f:
             (key, val) = l.strip().split('=')[:2]
             os.environ[key] = val
@@ -48,13 +49,17 @@ def sync_scale_measurements():
     measurements0 = {x['datetime']: x for x in measurements0}
     measurements1 = {x['datetime']: x for x in measurements1}
 
-    measurements = [measurements0[x] for x in (set(measurements0) - set(measurements1))]
+    measurements = [
+        measurements0[x] for x in (set(measurements0) - set(measurements1))
+    ]
     if len(measurements) > 0:
         print(measurements)
         requests.post(f'{to_endpoint}/garmin/scale_measurements',
                       cookies=cookies1,
                       json={'measurements': measurements})
-    measurements = [measurements1[x] for x in (set(measurements1) - set(measurements0))]
+    measurements = [
+        measurements1[x] for x in (set(measurements1) - set(measurements0))
+    ]
     if len(measurements) > 0:
         print(measurements)
         requests.post(f'{from_endpoint}/garmin/scale_measurements',
