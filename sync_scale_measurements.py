@@ -30,8 +30,8 @@ dry_run = False
 
 def get_json(url, cookies, retry=5):
     result = requests.get(url, cookies=cookies)
-    print(result)
     if result.status_code != 200:
+        print(result)
         return get_json(url, cookies, retry - 1)
     return result.json()
 
