@@ -2,6 +2,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import os
+import socket
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -10,6 +11,9 @@ from util import print_h_m_s, print_m_s
 
 from world_record import (do_fit, METERS_PER_MILE, MARATHON_DISTANCE_M,
                           MARATHON_DISTANCE_MI)
+
+hostname = socket.gethostname()
+HOME = os.environ['HOME']
 
 
 def read_result_file(fname):
@@ -61,12 +65,11 @@ def plot_paces(fname):
                  linestyle=':')
 
     for yt_ in ytickarray:
-        plt.plot(
-            np.log([60 / METERS_PER_MILE, 600e3 / METERS_PER_MILE]),
-            [yt_, yt_],
-            color='black',
-            linewidth=0.5,
-            linestyle=':')
+        plt.plot(np.log([60 / METERS_PER_MILE, 600e3 / METERS_PER_MILE]),
+                 [yt_, yt_],
+                 color='black',
+                 linewidth=0.5,
+                 linestyle=':')
 
     plt.legend(loc='upper left')
 
@@ -149,9 +152,12 @@ def plot_paces(fname):
           print_h_m_s(p50m * 50))
 
     plt.savefig('running_pace.png')
-    os.system('mv running_pace.png /home/ddboline/public_html/')
+    os.system(f'mv running_pace.png {HOME}/public_html/')
 
-    cmd = 'scp /home/ddboline/public_html/running_pace.png ubuntu@cloud.ddboline.net:~/public_html/'
+    if hostname != 'dilepton-tower':
+        return
+
+    cmd = f'scp {HOME}/public_html/running_pace.png ubuntu@cloud.ddboline.net:~/public_html/'
     os.system(cmd)
 
 

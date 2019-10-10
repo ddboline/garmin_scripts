@@ -3,6 +3,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import os
+import socket
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
@@ -14,6 +15,8 @@ except ImportError:
     os.sys.path.append('%s' % os.getenv('HOME'))
     from scripts.util import print_m_s
 
+hostname = socket.gethostname()
+HOME = os.environ['HOME']
 METERS_PER_MILE = 1609.344  # meters
 MARATHON_DISTANCE_M = 42195  # meters
 MARATHON_DISTANCE_MI = MARATHON_DISTANCE_M / METERS_PER_MILE  # meters
@@ -44,8 +47,10 @@ def do_fit(data, func, param_default, do_bootstrap=False):
             random_delta = np.array(
                 [np.random.normal(0., derr, 1)[0] for derr in datayerrors])
             random_data_y = datay + random_delta
-        randomfit, _ = optimize.leastsq(
-            errfunc, param_default, args=(datax, random_data_y), full_output=0)
+        randomfit, _ = optimize.leastsq(errfunc,
+                                        param_default,
+                                        args=(datax, random_data_y),
+                                        full_output=0)
         params.append(randomfit)
 
     params = np.array(params)
@@ -90,10 +95,14 @@ def plot_paces():
     rpm = np.array(running_paces_men)
     rpw = np.array(running_paces_women)
 
-    plt.scatter(
-        np.log(rpm[:, 0]), rpm[:, 1], c='b', label='Men\'s World Records')
-    plt.scatter(
-        np.log(rpw[:, 0]), rpw[:, 1], c='r', label='Women\'s World Records')
+    plt.scatter(np.log(rpm[:, 0]),
+                rpm[:, 1],
+                c='b',
+                label='Men\'s World Records')
+    plt.scatter(np.log(rpw[:, 0]),
+                rpw[:, 1],
+                c='r',
+                label='Women\'s World Records')
 
     plt.xlim(np.log(60 / METERS_PER_MILE), np.log(600e3 / METERS_PER_MILE))
     plt.ylim(2, 16)
@@ -124,12 +133,11 @@ def plot_paces():
                  linestyle=':')
 
     for yt_ in ytickarray:
-        plt.plot(
-            np.log([60 / METERS_PER_MILE, 600e3 / METERS_PER_MILE]),
-            [yt_, yt_],
-            color='black',
-            linewidth=0.5,
-            linestyle=':')
+        plt.plot(np.log([60 / METERS_PER_MILE, 600e3 / METERS_PER_MILE]),
+                 [yt_, yt_],
+                 color='black',
+                 linewidth=0.5,
+                 linestyle=':')
 
     plt.title('Running Race (minutes per mile) for World Records from 100m '
               'to 48hours')
@@ -196,9 +204,13 @@ def plot_paces():
 
     plt.show()
     plt.savefig('world_record.png')
-    os.system('mv world_record.png /home/ddboline/public_html/')
 
-    cmd = 'scp /home/ddboline/public_html/world_record.png ubuntu@cloud.ddboline.net:~/public_html/'
+    os.system(f'mv world_record.png {HOME}/public_html/')
+
+    if hostname != 'dilepton-tower':
+        return
+
+    cmd = f'scp {HOME}/public_html/world_record.png ubuntu@cloud.ddboline.net:~/public_html/'
     os.system(cmd)
 
 

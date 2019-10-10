@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import socket
 
 import traceback
 import webbrowser
@@ -27,7 +28,12 @@ import pylab as pl
 os.set_blocking(0, True)
 
 utc = timezone('UTC')
-est = timezone(strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
+est = timezone(
+    strftime("%Z").replace('CST', 'CST6CDT').replace('EDT', 'EST5EDT'))
+
+hostname = socket.gethostname()
+HOME = os.environ['HOME']
+DEFAULT_HOST = 'www.ddboline.net' if hostname == 'dilepton-tower' else 'cloud.ddboline.net'
 
 
 def read_config_env():
@@ -45,9 +51,10 @@ garmin_username = os.environ['GARMIN_USERNAME']
 garmin_password = os.environ['GARMIN_PASSWORD']
 
 
-def get_client(session, refresh=False, tokens_last_mod=None):
+def get_client(session, refresh=False, tokens_last_mod=None,
+               host=DEFAULT_HOST):
     if refresh:
-        url = 'https://www.ddboline.net/garmin/fitbit/auth'
+        url = f'https://{host}/garmin/fitbit/auth'
         webbrowser.open(session.get(url).text)
         sleep(5)
 
@@ -60,7 +67,9 @@ def get_client(session, refresh=False, tokens_last_mod=None):
 
     if tokens_last_mod is not None and current_last_mod <= tokens_last_mod:
         sleep(5)
-        return get_client(session, refresh=False, tokens_last_mod=tokens_last_mod)
+        return get_client(session,
+                          refresh=False,
+                          tokens_last_mod=tokens_last_mod)
 
     access_token, refresh_token = '', ''
 
@@ -84,15 +93,19 @@ def get_client(session, refresh=False, tokens_last_mod=None):
         return client
     except fitbit.exceptions.HTTPUnauthorized:
         if refresh is True:
-            return get_client(session, refresh=False, tokens_last_mod=current_last_mod)
+            return get_client(session,
+                              refresh=False,
+                              tokens_last_mod=current_last_mod)
         else:
-            return get_client(session, refresh=True, tokens_last_mod=current_last_mod)
+            return get_client(session,
+                              refresh=True,
+                              tokens_last_mod=current_last_mod)
 
 
-def get_session():
+def get_session(host=DEFAULT_HOST):
     session = requests.Session()
 
-    session.post(f'https://www.ddboline.net/api/auth',
+    session.post(f'https://{host}/api/auth',
                  json={
                      'email': garmin_username,
                      'password': garmin_password
@@ -100,7 +113,9 @@ def get_session():
     return session
 
 
-def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().isoformat()):
+def get_heartrate_data(begin_date='2017-03-10',
+                       end_date=datetime.date.today().isoformat(),
+                       host=DEFAULT_HOST):
     begin_date = parse(begin_date).date()
     end_date = parse(end_date).date()
     assert end_date >= begin_date
@@ -118,7 +133,7 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
 
     entries = []
     for date in dates:
-        url = f'https://www.ddboline.net/garmin/fitbit/heartrate_db?date={date}'
+        url = f'https://{host}/garmin/fitbit/heartrate_db?date={date}'
         tmp = session.get(url).json()
 
         if len(tmp) > 0:
@@ -131,11 +146,11 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
     if entries:
         entries.pop()
     for date in [last_date] + zero_dates:
-        url = f'https://www.ddboline.net/garmin/fitbit/sync?date={date}'
+        url = f'https://{host}/garmin/fitbit/sync?date={date}'
         session.get(url).raise_for_status()
         print(f'sync {date}')
 
-        url = f'https://www.ddboline.net/garmin/fitbit/heartrate_db?date={date}'
+        url = f'https://{host}/garmin/fitbit/heartrate_db?date={date}'
         tmp = session.get(url).json()
         print(date, len(tmp))
 
@@ -150,18 +165,21 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
         data.extend(tmp)
 
     for date in dates:
-        js = session.get(f'https://www.ddboline.net/garmin/list_gps_tracks?filter={date}').json()
+        js = session.get(
+            f'https://{host}/garmin/list_gps_tracks?filter={date}').json()
         files.extend(js['gps_list'])
     for fname in files:
         print(fname)
-        js = session.get(f'https://www.ddboline.net/garmin/get_hr_data?filter={fname}').json()
+        js = session.get(
+            f'https://{host}/garmin/get_hr_data?filter={fname}').json()
         tmp = [{
             'time': parse(x['time']).astimezone(est).isoformat()[:19],
             'value': x['value']
         } for x in js['hr_data']]
         data.extend(tmp)
 
-        js = session.get(f'https://www.ddboline.net/garmin/get_hr_pace?filter={fname}').json()
+        js = session.get(
+            f'https://{host}/garmin/get_hr_pace?filter={fname}').json()
         tmp = [{'hrt': int(x['hr']), 'pace': x['pace']} for x in js['hr_pace']]
         heart_rate_pace_data.extend(tmp)
     df = pd.DataFrame(data)
@@ -171,7 +189,7 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
         pl.clf()
         ts.resample('5Min').mean().dropna().plot()
         pl.savefig('heartrate_data.png')
-        os.system('mv heartrate_data.png /home/ddboline/public_html/')
+        os.system(f'mv heartrate_data.png {HOME}/public_html/')
 
     df = pd.DataFrame(heart_rate_pace_data)
     if df.shape[0] > 0:
@@ -179,10 +197,13 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
         #df.plot.scatter('hrt', 'pace')
         df.plot.hexbin('hrt', 'pace', gridsize=30)
         pl.savefig('hrt_vs_pace.png')
-        os.system('mv hrt_vs_pace.png /home/ddboline/public_html/')
+        os.system('mv hrt_vs_pace.png {HOME}/public_html/')
+
+    if DEFAULT_HOST != 'www.ddboline.net':
+        return df
 
     for f in ('hrt_vs_pace.png', 'heartrate_data.png'):
-        cmd = 'scp /home/ddboline/public_html/%s ubuntu@cloud.ddboline.net:~/public_html/' % f
+        cmd = 'scp {HOME}/public_html/%s ubuntu@cloud.ddboline.net:~/public_html/' % f
         os.system(cmd)
 
     return df

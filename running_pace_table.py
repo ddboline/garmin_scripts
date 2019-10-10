@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-from __future__ import (absolute_import, division, print_function, unicode_literals)
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import os
 from util import print_h_m_s, print_m_s
 
@@ -13,14 +14,16 @@ def print_time(pace, dist):
     print(print_m_s(pace), print_h_m_s(dist * pace))
 
 
-def print_time_a_b_c_d_e_f(dist_a, pace_a, dist_b, pace_b, dist_c, pace_c, dist_d, pace_d, dist_e,
-                           pace_e, dist_f, pace_f):
+def print_time_a_b_c_d_e_f(dist_a, pace_a, dist_b, pace_b, dist_c, pace_c,
+                           dist_d, pace_d, dist_e, pace_e, dist_f, pace_f):
     """ format table """
     print('\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' %
           (print_m_s(pace_a), print_h_m_s(dist_a * pace_a), print_m_s(pace_b),
-           print_h_m_s(dist_b * pace_b), print_m_s(pace_c), print_h_m_s(dist_c * pace_c),
-           print_m_s(pace_d), print_h_m_s(dist_d * pace_d), print_m_s(pace_e),
-           print_h_m_s(dist_e * pace_e), print_m_s(pace_f), print_h_m_s(dist_f * pace_f)))
+           print_h_m_s(dist_b * pace_b), print_m_s(pace_c),
+           print_h_m_s(dist_c * pace_c), print_m_s(pace_d),
+           print_h_m_s(dist_d * pace_d), print_m_s(pace_e),
+           print_h_m_s(dist_e * pace_e), print_m_s(pace_f),
+           print_h_m_s(dist_f * pace_f)))
 
 
 def running_pace():
@@ -61,8 +64,9 @@ def running_pace():
         #        five_k = print_h_m_s(5/km_per_mile * second)
         fifty_mi = print_h_m_s(50 * second)
         print('%s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s \t %s' %
-              (pace, four_hundred_meter, eight_hundred_meter, twelve_hundred_meter, four_mi,
-               five_mi, eight_mi, half_marathon, marathon, fifty_mi))
+              (pace, four_hundred_meter, eight_hundred_meter,
+               twelve_hundred_meter, four_mi, five_mi, eight_mi, half_marathon,
+               marathon, fifty_mi))
 
     print('\n\n')
 
@@ -75,7 +79,8 @@ def running_pace():
         pace = print_h_m_s(second)
         output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_two_miles)):
-            pace_every_two_miles[idx][1] = print_h_m_s(pace_every_two_miles[idx][0] * second)
+            pace_every_two_miles[idx][1] = print_h_m_s(
+                pace_every_two_miles[idx][0] * second)
             output_.append('%s \t' % pace_every_two_miles[idx][1])
         print(''.join(output_))
 
@@ -89,7 +94,8 @@ def running_pace():
         pace = print_h_m_s(second)
         output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_five_k)):
-            pace_every_five_k[idx][1] = print_h_m_s(pace_every_five_k[idx][0] * second)
+            pace_every_five_k[idx][1] = print_h_m_s(pace_every_five_k[idx][0] *
+                                                    second)
             output_.append('%s \t' % pace_every_five_k[idx][1])
         print(''.join(output_))
 
@@ -103,7 +109,8 @@ def running_pace():
         pace = print_h_m_s(second)
         output_ = ['%s \t' % pace]
         for idx in range(0, len(pace_every_five_k_later)):
-            pace_every_five_k_later[idx][1] = print_h_m_s(pace_every_five_k_later[idx][0] * second)
+            pace_every_five_k_later[idx][1] = print_h_m_s(
+                pace_every_five_k_later[idx][0] * second)
             output_.append('%s \t' % pace_every_five_k_later[idx][1])
         print(''.join(output_))
 
@@ -121,10 +128,12 @@ def running_pace():
     #bear_mountain_legs = (4.0, 4.7, 5.5, 5.6, 3.4, 5.8, 6.2, 3.4, 2.7, 4.4, 2.5, 2.8)
     tesla_100_legs = tuple(10.4 for _ in range(10))
     manitous_legs = (3.0, 10.3, 17.5, 21.5, 31.5, 38.5, 43.5, 48.5, 53, 54.3)
-    superior_100_legs = (9.7, 10.4, 4.9, 9.9, 8.6, 7.7, 7.5, 4.2, 9.4, 5.6, 7.1, 5.7, 5.5, 7.1)
+    superior_100_legs = (9.7, 10.4, 4.9, 9.9, 8.6, 7.7, 7.5, 4.2, 9.4, 5.6,
+                         7.1, 5.7, 5.5, 7.1)
 
     def cumulative_table(label, leg_distances, min_pace=6, max_pace=22.2):
-        cumulative_distances = tuple(sum(leg_distances[:i + 1]) for i in range(len(leg_distances)))
+        cumulative_distances = tuple(
+            sum(leg_distances[:i + 1]) for i in range(len(leg_distances)))
         print('%s Cumulative Time' % label)
         output = '%10s' % ''
         for dist in leg_distances:
