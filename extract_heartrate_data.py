@@ -128,7 +128,8 @@ def get_heartrate_data(begin_date='2017-03-10', end_date=datetime.date.today().i
         else:
             zero_dates.append(date)
 
-    entries.pop()
+    if entries:
+        entries.pop()
     for date in [last_date] + zero_dates:
         url = f'https://www.ddboline.net/garmin/fitbit/sync?date={date}'
         session.get(url).raise_for_status()

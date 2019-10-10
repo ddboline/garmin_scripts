@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import requests
 import os
+import datetime
 
 
 def read_config_env():
@@ -26,7 +27,15 @@ entry_map = {
 dry_run = False
 
 
-def sync_scale_measurements():
+def get_json(url, cookies, retry=5):
+    result = requests.get(url, cookies=cookies)
+    print(result)
+    if result.status_code != 200:
+        return get_json(url, cookies, retry - 1)
+    return result.json()
+
+
+def sync_scale_measurements(path='/garmin/scale_measurements', js_prefix='measurements'):
     from_endpoint = 'https://cloud.ddboline.net'
     to_endpoint = 'https://www.ddboline.net'
 
@@ -41,27 +50,34 @@ def sync_scale_measurements():
                                  'password': garmin_password
                              }).cookies
 
-    measurements0 = requests.get(f'{from_endpoint}/garmin/scale_measurements',
-                                 cookies=cookies0).json()
-    measurements1 = requests.get(f'{to_endpoint}/garmin/scale_measurements',
-                                 cookies=cookies1).json()
+    print(f'{from_endpoint}{path}')
+
+    measurements0 = get_json(f'{from_endpoint}{path}', cookies=cookies0)
+    print(f'{to_endpoint}{path}')
+    measurements1 = get_json(f'{to_endpoint}{path}', cookies=cookies1)
     measurements0 = {x['datetime']: x for x in measurements0}
     measurements1 = {x['datetime']: x for x in measurements1}
 
     measurements = [measurements0[x] for x in (set(measurements0) - set(measurements1))]
     if len(measurements) > 0:
-        print(measurements)
-        requests.post(f'{to_endpoint}/garmin/scale_measurements',
-                      cookies=cookies1,
-                      json={'measurements': measurements})
+        if len(measurements) < 20:
+            print(measurements)
+        else:
+            print(len(measurements))
+        requests.post(f'{to_endpoint}{path}', cookies=cookies1, json={js_prefix: measurements})
     measurements = [measurements1[x] for x in (set(measurements1) - set(measurements0))]
     if len(measurements) > 0:
-        print(measurements)
-        requests.post(f'{from_endpoint}/garmin/scale_measurements',
-                      cookies=cookies0,
-                      json={'measurements': measurements})
+        if len(measurements) < 20:
+            print(measurements)
+        else:
+            print(len(measurements))
+        requests.post(f'{from_endpoint}{path}', cookies=cookies0, json={js_prefix: measurements})
     return
 
 
 if __name__ == '__main__':
     sync_scale_measurements()
+    dates = [datetime.date.today() - datetime.timedelta(days=i) for i in range(10)]
+    for date in dates:
+        sync_scale_measurements(path=f'/garmin/fitbit/heartrate_db?date={date}',
+                                js_prefix='updates')
