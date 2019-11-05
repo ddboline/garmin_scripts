@@ -58,7 +58,7 @@ def get_client(session, refresh=False, tokens_last_mod=None,
         webbrowser.open(session.get(url).text)
         sleep(5)
 
-    token_fname = '%s/.fitbit_tokens' % os.getenv('HOME')
+    token_fname = f'{HOME}/.fitbit_tokens'
     current_last_mod = None
     if os.path.exists(token_fname):
         current_last_mod = os.stat(token_fname).st_mtime
@@ -73,7 +73,7 @@ def get_client(session, refresh=False, tokens_last_mod=None,
 
     access_token, refresh_token = '', ''
 
-    with open('%s/.fitbit_tokens' % os.getenv('HOME'), 'r') as fd:
+    with open(f'{HOME}/.fitbit_tokens', 'r') as fd:
         for line in fd:
             tmp = line.strip().split('=')
             if len(tmp) < 2:
@@ -197,13 +197,13 @@ def get_heartrate_data(begin_date='2017-03-10',
         #df.plot.scatter('hrt', 'pace')
         df.plot.hexbin('hrt', 'pace', gridsize=30)
         pl.savefig('hrt_vs_pace.png')
-        os.system('mv hrt_vs_pace.png {HOME}/public_html/')
+        os.system(f'mv hrt_vs_pace.png {HOME}/public_html/')
 
     if DEFAULT_HOST != 'www.ddboline.net':
         return df
 
     for f in ('hrt_vs_pace.png', 'heartrate_data.png'):
-        cmd = 'scp {HOME}/public_html/%s ubuntu@cloud.ddboline.net:~/public_html/' % f
+        cmd = f'scp {HOME}/public_html/{f} ubuntu@cloud.ddboline.net:~/public_html/'
         os.system(cmd)
 
     return df
