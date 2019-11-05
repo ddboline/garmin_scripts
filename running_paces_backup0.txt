@@ -1,7 +1,10 @@
+   31.0686       12 46   2019    1       Castle to River 50k
+   26.2188       08 58   2019    1       Chicago Marathon
+   26.2188       08 41   2019    1       Berlin Marathon
    31.0686       13 28   2019    1       Wildcat Ridge 50k
    31.0686       12 57   2019    1       Mayapple 50k
    31.0686       12 01   2019    1       Shore 2 Shore 50k
-   13.1094       18 24   2019    0       Breakneck Trail Half Marathon
+   13.1094       18 24   2019    1       Breakneck Trail Half Marathon
    31.0686       13 05   2019    1       Tito's Tacos and Trails 50k
    13.1094       08 54   2018    1       Paine to Pain Half Marathon, New Rochelle NY
    31.0686       10 40   2018    1       Tesla Hertz 50k

@@ -122,6 +122,7 @@
     9.3206       08 22   2014    1       Manorville Hills 15k Trail Race
    26.2188       08 29   2004    1       Twin Cities Marathon 2004 - Run Marathon    MN
    26.2188       08 29   2013    1       Minneapolis Marathon - Marathon MN
+   26.2188       08 41   2019    1       Berlin Marathon
    31.0686       08 48   2016    1       Caumsett 50k USATF Championships
    31.0686       08 49   2014    0       Caumsett 50k USATF Championships
     9.3206       08 50   2015    1       Manorville Hills 15k Trail Race
@@ -132,6 +133,7 @@
    13.1094       08 54   2014    0       Paine to Pain Half Marathon, New Rochelle NY
    13.1094       08 54   2018    1       Paine to Pain Half Marathon, New Rochelle NY
     6.2137       08 56   2014    0       Leatherman's Loop 10k Trail Run
+   26.2188       08 58   2019    1       Chicago Marathon
    26.2188       09 04   2016    0       NYCRUNS Central Park Marathon
    31.0686       09 06   2017    1       Caumsett 50k
    26.2188       09 07   2005    0       Grandma's Marathon 2005 - Marathon  MN
@@ -171,6 +173,7 @@
    50.0000       12 41   2015    1       JFK 50 miler
    31.0686       12 43   2017    0       Fat Ass 50(k)
    31.0686       12 45   2017    0       North Face Endurance Challenge DC 50k
+   31.0686       12 46   2019    1       Castle to River 50k
    31.0686       12 50   2016    0       NJTrailSeries Spring Watchung 50k
    50.0000       12 51   2014    0       Ocean to Sound 50 mile
    31.0686       12 57   2019    1       Mayapple 50k
@@ -204,6 +207,6 @@
    50.0000       16 35   2017    0       Cayuga Trail 50 mile
    20.3000       16 48   2016    0       Great Schunemunk Traverse
    54.0000       17 11   2017    0       Lost Turkey 50 mi
-   13.1094       18 24   2019    1       Breakneck Trail Half Marathon
+   13.1094       18 24   2019    0       Breakneck Trail Half Marathon
    28.0000       20 22   2017    0       Breakneck Trail "Marathon"
    54.0000       24 36   2018    0       Manitou's Revenge
