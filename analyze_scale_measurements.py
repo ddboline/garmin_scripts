@@ -13,7 +13,7 @@ import matplotlib.pyplot as pl
 import pandas as pd
 from itertools import chain
 
-from extract_heartrate_data import get_client, get_session, DEFAULT_HOST
+from extract_heartrate_data import get_session, DEFAULT_HOST
 
 try:
     from StringIO import StringIO
@@ -50,37 +50,6 @@ def analyze_scale_measurements(host=DEFAULT_HOST):
     df.index = df.datetime
     df = df.sort_index()
 
-    client = get_client(session)
-    body_weight = {
-        x['date']: x['weight']
-        for x in client.get_bodyweight(period='30d')['weight']
-    }
-    body_fat = {
-        x['date']: x['fat']
-        for x in client.get_bodyfat(period='30d')['fat']
-    }
-
-    if len(body_weight) == 0 or len(body_fat) == 0:
-        min_date = (datetime.date.today() -
-                    datetime.timedelta(days=30)).isoformat()
-    else:
-        min_date = min(chain(body_weight.keys(), body_fat.keys()))
-    cond = df.datetime.dt.date >= parse(min_date).date()
-    for idx, row in df[cond].iterrows():
-        date = row['datetime'].date().isoformat()
-        time = row['datetime'].time().strftime('%H:%M:%S')
-        mass = row['mass']
-        fat = row['fat']
-        if date not in body_weight:
-            url = 'https://api.fitbit.com/1/user/-/body/log/weight.json'
-            data = {'date': date, 'time': time, 'weight': mass}
-            print(url)
-            client.make_request(url, data=data, method='POST')
-        if date not in body_fat:
-            url = 'https://api.fitbit.com/1/user/-/body/log/fat.json'
-            data = {'date': date, 'time': time, 'fat': fat}
-            print(url)
-            client.make_request(url, data=data, method='POST')
     df['days'] = (df.datetime - df.datetime[0]).apply(lambda x: x.days)
     today = (datetime.datetime.now(tzutc()) - df.datetime[0]).days
     xval = np.linspace(0, df['days'].max())
