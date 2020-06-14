@@ -162,5 +162,4 @@ def plot_paces(fname):
 
 
 if __name__ == '__main__':
-    read_result_file('running_paces.txt')
     plot_paces('running_paces.txt')
